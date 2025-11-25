@@ -1,4 +1,5 @@
 module.exports = `
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="../jquery-migration-3.7.1.min.js"></script>
 <link rel="stylesheet" href="intlTelInput.css">

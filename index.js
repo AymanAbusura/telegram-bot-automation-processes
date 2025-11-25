@@ -127,7 +127,6 @@ bot.command('preland', (ctx) => {
             archives: [],
             processingMultiple: false
         };
-        // return ctx.reply(messages.prelandMessage);
         return ctx.reply(
             messages.prelandMessage,
             {
@@ -148,7 +147,7 @@ bot.command('preland', (ctx) => {
     }
 
     const match = paramText.match(/^\s*([^=]+)=([^=]+)\s*$/);
-    if (!match) return ctx.reply('Неверный формат. Используйте: /preland key=value');
+    if (!match) return ctx.reply('⛔️ Неверный формат. Используйте: /preland key=value');
 
     const [, key, value] = match;
     userSessions[userId] = {
@@ -160,14 +159,16 @@ bot.command('preland', (ctx) => {
     };
 
     ctx.reply(
-        `✅ Параметры сохранены: ${key}=${value}. Отправьте архив(ы). После отправки всех архивов нажмите кнопку для копирования команды или напишите "process".`,
+        `✅ Параметры сохранены: ${key}=${value}\n\n📦 Теперь отправьте ZIP архив(ы).\n\n⚠️ ВАЖНО: После отправки ВСЕХ архивов нажмите кнопку для копирования команды или напишите "process".`,
         {
             reply_markup: {
                 inline_keyboard: [
                     [
                         {
-                            text: "▶️ Process",
-                            copy_text: { text: "process" }
+                            text: "📋 Скопировать команду",
+                            copy_text: {
+                                text: "process"
+                            }
                         }
                     ]
                 ]
@@ -207,7 +208,7 @@ bot.command('prokla_land', (ctx) => {
     const orderParamsStr = parts[1] || '';
 
     const keyValueMatch = keyValuePart.match(/^([^=\s]+)=([^=\s]+)$/);
-    if (!keyValueMatch) return ctx.reply('Неверный формат. Используйте: /prokla_land key=value kt=5&metka=1A&country=RU&lang=RU&number_code=+7&funnel=PrimeAura&source=Prime-Aura.com&logs=0');
+    if (!keyValueMatch) return ctx.reply('⛔️ Неверный формат. Используйте: /prokla_land key=value kt=5&metka=1A&country=RU&lang=RU&number_code=+7&funnel=PrimeAura&source=Prime-Aura.com&logs=0');
 
     const [, key, value] = keyValueMatch;
 
@@ -234,8 +235,10 @@ bot.command('prokla_land', (ctx) => {
                 inline_keyboard: [
                     [
                         {
-                            text: "▶️ Process",
-                            copy_text: { text: "process" }
+                            text: "📋 Скопировать команду",
+                            copy_text: {
+                                text: "process"
+                            }
                         }
                     ]
                 ]
@@ -366,7 +369,6 @@ bot.on('text', async (ctx) => {
             if (!session.versions || session.versions.length === 0) 
                 return ctx.reply('Нет кода для сохранения. Сначала загрузите order.php');
 
-            // Save the latest version as a file
             const latestCode = session.versions[session.versions.length - 1];
             const tmpFilePath = path.join(__dirname, `edited_order_${userId}.php`);
             fs.writeFileSync(tmpFilePath, latestCode, 'utf8');
@@ -386,21 +388,17 @@ bot.on('text', async (ctx) => {
             return;
         }
 
-        // Parse changes
         const changes = {};
         text.split(',').forEach(pair => {
             const [key, value] = pair.split('=').map(s => s.trim());
             if (key && value !== undefined) changes[key] = value.replace(/^['"]|['"]$/g, '');
         });
 
-        // Initialize versions array if it doesn't exist
         if (!session.versions) session.versions = [];
 
-        // Apply changes to the latest version or original code
         const baseCode = session.versions.length > 0 ? session.versions[session.versions.length - 1] : session.code;
         const newVersion = applyChangesToOrderPhp(baseCode, changes);
 
-        // Store the new version
         session.versions.push(newVersion);
 
         ctx.reply(
@@ -421,7 +419,6 @@ bot.on('text', async (ctx) => {
         return;
     }
 
-    // Handling 'process' as before
     if (!session) return;
 
     const text = ctx.message.text.trim().toLowerCase();
@@ -465,105 +462,6 @@ bot.on('text', async (ctx) => {
     }
 });
 
-// bot.on('text', async (ctx) => {
-//     const userId = ctx.from.id;
-//     const session = userSessions[userId];
-
-//     if (session && session.type === 'edit_order' && !session.waitFile) {
-//         const text = ctx.message.text.trim();
-
-//         if (text.toLowerCase() === 'done') {
-//             if (!session.code) return ctx.reply('Нет кода для сохранения. Сначала загрузите order.php');
-
-//             const tmpFilePath = path.join(__dirname, `edited_order_${userId}.php`);
-//             fs.writeFileSync(tmpFilePath, session.code, 'utf8');
-
-//             ctx.replyWithDocument({ source: tmpFilePath, filename: 'order.php' })
-//                 .then(() => {
-//                     ctx.reply('Редактирование завершено.');
-//                     // fs.unlinkSync(tmpFilePath);
-//                     if (fs.existsSync(tmpFilePath)) {
-//                         fs.unlinkSync(tmpFilePath);
-//                     }
-//                     delete userSessions[userId];
-//                 })
-//                 .catch(err => {
-//                     console.error(err);
-//                     ctx.reply('Ошибка при отправке файла.');
-//                 });
-//             return;
-//         }
-
-//         const changes = {};
-//         text.split(',').forEach(pair => {
-//             const [key, value] = pair.split('=').map(s => s.trim());
-//             if (key && value !== undefined) changes[key] = value.replace(/^['"]|['"]$/g, '');
-//         });
-
-//         session.code = applyChangesToOrderPhp(session.code, changes);
-//         ctx.reply(
-//             '✅ Изменения внесены.\n\n⚠️ ВАЖНО: нажмите кнопку для копирования команды или напишите "done"',
-//             {
-//                 reply_markup: {
-//                     inline_keyboard: [
-//                         [
-//                             {
-//                                 text: "📋 Скопировать команду",
-//                                 copy_text: {
-//                                     text: "done"
-//                                 }
-//                             }
-//                         ]
-//                     ]
-//                 }
-//             }
-//         );
-//         return;
-//     }
-
-//     if (!session) return;
-
-//     const text = ctx.message.text.trim().toLowerCase();
-
-//     if (text === 'process') {
-//         if (session.archives.length === 0) {
-//             return ctx.reply('Нет архивов для обработки. Отправьте хотя бы один ZIP архив.');
-//         }
-
-//         session.processingMultiple = true;
-//         await ctx.reply(`⏳ Начинаю обработку ${session.archives.length} архива(ов)...`);
-
-//         const processedFiles = [];
-
-//         for (let i = 0; i < session.archives.length; i++) {
-//             const archive = session.archives[i];
-            
-//             try {
-//                 const resultFile = await processArchive(archive, session, userId, ctx);
-//                 processedFiles.push(resultFile);
-
-//                 await ctx.replyWithDocument({ 
-//                     source: resultFile.path, 
-//                     filename: resultFile.name 
-//                 });
-
-//             } catch (err) {
-//                 console.error(`Error processing archive ${archive.fileName}:`, err);
-//                 await ctx.reply(`❌ Ошибка при обработке ${archive.fileName}: ${err.message}`);
-//             }
-//         }
-
-//         processedFiles.forEach(file => {
-//             if (fs.existsSync(file.path)) {
-//                 fs.unlinkSync(file.path);
-//             }
-//         });
-
-//         await ctx.reply(`✅ Готово! Обработано ${processedFiles.length} из ${session.archives.length} архивов.`);
-//         delete userSessions[userId];
-//     }
-// });
-
 /* ------------------------ ARCHIVE PROCESSING FUNCTION ------------------------ */
 async function processArchive(archive, session, userId, ctx) {
     const { fileId, fileName } = archive;
@@ -596,69 +494,20 @@ async function processArchive(archive, session, userId, ctx) {
             if (fs.existsSync(p)) fs.unlinkSync(p);
         });
 
-        if (session.type === 'landing') {
-            let orderContent = fs.readFileSync(ORDER_TEMPLATE_PATH, 'utf8');
-            const p = session.params || {};
-            const logsValue = p.logs && !isNaN(parseInt(p.logs)) ? parseInt(p.logs) : 0;
-
-            orderContent = orderContent
-                .replace('{{kt}}', p.kt || '')
-                .replace('{{metka}}', p.metka || '')
-                .replace('{{country}}', p.country || '')
-                .replace('{{lang}}', p.lang || '')
-                .replace('{{number_code}}', p.number_code || '')
-                .replace('{{funnel}}', p.funnel || '')
-                .replace('{{source}}', p.source || '')
-                .replace('{{logs}}', logsValue);
-
-            fs.writeFileSync(path.join(rootPath, 'order.php'), orderContent);
-
-            const countryFromSession = (session.params && session.params.country) || 'DO';
-            const dynamicCountry = String(countryFromSession).substring(0, 2).toUpperCase();
-            fs.writeFileSync(
-                path.join(rootPath, 'form-scripts.js'),
-                generateFormScriptsContent(dynamicCountry)
-            );
-        }
-
-        if (session.type === 'prokla_land') {
-            let orderContent = fs.readFileSync(ORDER_TEMPLATE_PATH, 'utf8');
-            const p = session.params || {};
-            const logsValue = p.logs && !isNaN(parseInt(p.logs)) ? parseInt(p.logs) : 0;
-
-            orderContent = orderContent
-                .replace('{{kt}}', p.kt || '')
-                .replace('{{metka}}', p.metka || '')
-                .replace('{{country}}', p.country || '')
-                .replace('{{lang}}', p.lang || '')
-                .replace('{{number_code}}', p.number_code || '')
-                .replace('{{funnel}}', p.funnel || '')
-                .replace('{{source}}', p.source || '')
-                .replace('{{logs}}', logsValue);
-
-            fs.writeFileSync(path.join(rootPath, 'order.php'), orderContent);
-
-            const countryFromSession = (session.params && session.params.country) || 'DO';
-            const dynamicCountry = String(countryFromSession).substring(0, 2).toUpperCase();
-            fs.writeFileSync(
-                path.join(rootPath, 'form-scripts.js'),
-                generateFormScriptsContent(dynamicCountry)
-            );
+        if (session.type === 'landing' || session.type === 'prokla_land') {
+            handleOrderAndScripts(session, rootPath);
         }
 
         const allFiles = fs.readdirSync(rootPath);
         for (const file of allFiles) {
             const filePath = path.join(rootPath, file);
 
-            if (file.endsWith('.html') || file.endsWith('.htm')) {
+            if (file.endsWith('index.html') || file.endsWith('.htm') || file.endsWith('index.php')) {
                 let html = fs.readFileSync(filePath, 'utf8');
-                const $ = cheerio.load(html);
+                const $ = cheerio.load(html, { xmlMode: false });
 
                 // --- Land ---
                 if (session.type === 'landing') {
-                    // $('script').remove();
-                    // $('style').remove();
-
                     $('link[rel="stylesheet"]').each((i, el) => {
                         const href = $(el).attr('href') || '';
                         if (
@@ -686,6 +535,11 @@ async function processArchive(archive, session, userId, ctx) {
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (src === 'scripts.js') {
                             $el.remove();
                             return;
                         }
@@ -737,77 +591,130 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
-                        if (!src && html.trim() === '') {
+                        if (
+                            html.includes('history.pushState') ||
+                            html.includes('vitBack') ||
+                            html.includes('minfobiz') ||
+                            html.includes('domonet') ||
+                            html.includes('domonetka') ||
+                            html.includes('IMask') ||
+                            html.includes('x_order_form') ||
+                            html.includes("on('submit', 'form'") ||
+                            html.includes('order-in-progress__popup') ||
+                            html.includes('leadprofit') ||
+                            html.includes('initBacklink') ||
+                            html.includes('land-form')
+                        ) {
                             $el.remove();
                             return;
                         }
 
-                        if (!src && html.trim() !== '') {
+                        if (src.includes('form-scripts.js')) {
                             $el.remove();
                             return;
                         }
 
-                        if (!src && asyncAttr !== undefined) {
+                        const removeInlinePatterns = [
+                            'ipapi.co'
+                        ];
+
+                        if (!src && removeInlinePatterns.some(pattern => html.includes(pattern))) {
                             $el.remove();
+                            return;
                         }
                     });
+
+                    $('noscript').remove();
 
                     $('body .rf-form__loader.js-rf-loader').remove();
 
                     $('form').each((i, form) => {
                         const $form = $(form);
 
+                        if ($form.find('input[type="text"]').length === 1 &&
+                            $form.find('input').length <= 3 &&
+                            !$form.find('input[type="email"], input[type="tel"]').length) {
+                            return;
+                        }
+
+                        if (!$form.attr('action') || $form.attr('action').trim() === '') {
+                            $form.attr('action', 'order.php');
+                        }
+
+                        if (!$form.attr('method') || $form.attr('method').toUpperCase() !== 'POST') {
+                            $form.attr('method', 'POST');
+                        }
+
+                        if (!$form.attr('id') || $form.attr('id') !== 'form') {
+                            $form.attr('id', 'form');
+                        }
+
+                        $form.removeAttr('onsubmit');
+                        $form.find('input[type="submit"]#ds').removeAttr('id');
+                        $form.find('.flag-container').remove();
+
                         $form.find('input[type="hidden"]').remove();
 
                         const sub1 = `<input type="hidden" name="sub1" value="{subid}">`;
                         const ip   = `<input type="hidden" name="ip" value="{ip}">`;
-                        const pc   = `<input type="hidden" name="pc" value="<?= $_GET['scroll'];?>">`;
+                        const pc   = `<input type="hidden" name="pc" value="<?=$_GET['scroll'];?>">`;
+                        const loaderDiv = `<div class="rf-form__loader js-rf-loader" style="display: none;"></div>`;
 
-                        $form.prepend(`\n${sub1}\n${ip}\n${pc}`);
+                        $form.prepend(`\n\n${sub1}\n${ip}\n${pc}\n\n${loaderDiv}`);
 
                         $form.find('input:not([type="hidden"])').each((j, input) => {
                             const $input = $(input);
 
                             let name = $input.attr('name') || '';
+                            let id = $input.attr('id') || '';
 
-                            // Normalize FIRST NAME
                             const firstNameVariants = [
-                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name'
+                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name'
                             ];
 
                             if (firstNameVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'first_name');
                                 name = 'first_name';
+                                $input.attr('id', 'first_name');
                             }
 
-                            // Normalize LAST NAME
                             const lastNameVariants = [
-                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name'
+                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name'
                             ];
 
                             if (lastNameVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'last_name');
                                 name = 'last_name';
+                                $input.attr('id', 'last_name');
                             }
 
-                            // Normalize PHONE
+                            const emailVariants = [
+                                '1-email'
+                            ];
+
+                            if (emailVariants.includes(name.toLowerCase())) {
+                                $input.attr('name', 'email');
+                                name = 'email';
+                                $input.attr('id', 'email');
+                            }
+
                             const phoneVariants = [
-                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile'
+                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number'
                             ];
 
                             if (phoneVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'phone');
                                 name = 'phone';
+                                $input.attr('id', 'phone');
+
+                                $input.attr('type', 'tel');
+
+                                $input.removeAttr('title');
+                                $input.removeAttr('pattern');
+                                $input.removeAttr('value');
                             }
 
-
-                            // let name = $input.attr('name');
-
-                            // if (name === 'firstName') $input.attr('name', 'first_name');
-                            // if (name === 'lastName') $input.attr('name', 'last_name');
-                            // if (name === 'phone_visible') $input.attr('name', 'phone');
-
-                            if (!$input.attr('data-validation-status')) {
+                            if ($input.attr('type') !== 'submit' && !$input.attr('data-validation-status')) {
                                 $input.attr('data-validation-status', 'inactive');
                             }
 
@@ -836,10 +743,6 @@ async function processArchive(archive, session, userId, ctx) {
                                 $input.after('\n', errorDiv);
                             }
                         });
-
-                        $form.prepend(`
-                            <div class="rf-form__loader js-rf-loader" style="display: none;"></div>
-                        `);
                     });
 
                     $('link[rel="stylesheet"]').each((i, el) => {
@@ -882,7 +785,7 @@ async function processArchive(archive, session, userId, ctx) {
                     }
 
                     $('body').append(`\n<script src="intlTelInput.min.js"></script>`);
-                    $('body').append(`\n<script src="form-scripts.js"></script>\n`);
+                    $('body').append(`\n<script src="form-scripts.js"></script>\n\n`);
 
                     $('body [href]').each((i, el) => {
                         const $el = $(el);
@@ -936,110 +839,7 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
-                        if (
-                            src.includes('googletagmanager.com/gtag/js') ||
-                            src.includes('gtag/js') ||
-                            src.includes('googletagmanager.com/gtm.js') ||
-                            html.includes('gtag(') ||
-                            html.includes('dataLayer') ||
-                            html.includes('GoogleAnalyticsObject') ||
-                            html.includes('GTM-')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
-                            src.includes('mc.yandex.ru') ||
-                            src.includes('yandex.ru/metrika') ||
-                            html.includes('Ya.Metrika') ||
-                            html.includes('ym(') ||
-                            html.includes('yandex_metrika_callbacks') ||
-                            html.includes('metrika') ||
-                            html.includes('yandex')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (!src && html.trim() === '') {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (!src && html.trim() !== scriptContent.trim()) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (!src && asyncAttr !== undefined) {
-                            $el.remove();
-                        }
-                    });
-
-                    $('body a').each((i, el) => {
-                        $(el).attr('href', '{offer}');
-                    });
-
-                    const inlineScript = `<script>\n${scriptContent}\n</script>`;
-                    $('body').append(inlineScript);
-
-                    const migrationScript = `<script src="../jquery-migration-3.7.1.min.js"></script>`;
-                    if ($('head').length) {
-                        $('head').append(migrationScript);
-                    } else {
-                        $('html').prepend(migrationScript);
-                    }
-
-                    let finalHtml = $.html();
-
-                    const { key, value } = session.prelandParam || {};
-                    if (key && value) {
-                        const phpCode =
-                            `<?php if ($_GET["${key}"] != "${value}") { ` +
-                            `echo '<script>window.location.replace("https://www.google.com/");</script>'; exit; } ?>\n\n`;
-
-                        if (finalHtml.includes('<!DOCTYPE')) {
-                            finalHtml = finalHtml.replace('<!DOCTYPE', phpCode + '<!DOCTYPE');
-                        } else {
-                            finalHtml = phpCode + finalHtml;
-                        }
-                    }
-
-                    fs.writeFileSync(filePath, finalHtml, 'utf8');
-                }
-                
-                if (session.type === 'prokla_land') {
-                    // $('script').remove();
-                    // $('style').remove();
-
-                    $('link[rel="stylesheet"]').each((i, el) => {
-                        const href = $(el).attr('href') || '';
-                        if (
-                            href.includes('intlTelInput.min.css') ||
-                            href.includes('intlTelInput.css')
-                        ) {
-                            $(el).remove();
-                        }
-                    });
-
-                    $('script').each((i, el) => {
-                        const $el = $(el);
-                        const src = $el.attr('src') || '';
-                        const html = $el.html() || '';
-                        const asyncAttr = $el.attr('async');
-
-                        const removeFiles = [
-                            'backfix.js',
-                            'fbevents.js',
-                            'auth.js',
-                            'utils.js',
-                            'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
-                            'intlTelInput.min.js',
-                            'lib.js'
-                        ];
-
-                        if (removeFiles.some(f => src.includes(f))) {
+                        if (src === 'scripts.js') {
                             $el.remove();
                             return;
                         }
@@ -1091,76 +891,277 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
-                        if (!src && html.trim() === '') {
+                        if (
+                            html.includes('history.pushState') ||
+                            html.includes('vitBack') ||
+                            html.includes('minfobiz') ||
+                            html.includes('domonet') ||
+                            html.includes('domonetka') ||
+                            html.includes('scrollTop') ||
+                            html.includes('IMask') ||
+                            html.includes('x_order_form') ||
+                            html.includes("on('submit', 'form'") ||
+                            html.includes('order-in-progress__popup') ||
+                            html.includes('leadprofit') ||
+                            html.includes('initBacklink') ||
+                            html.includes('land-form')
+                        ) {
                             $el.remove();
                             return;
                         }
 
-                        if (!src && html.trim() !== '') {
+                        const removeInlinePatterns = [
+                            'ipapi.co'
+                        ];
+
+                        if (!src && removeInlinePatterns.some(pattern => html.includes(pattern))) {
                             $el.remove();
                             return;
-                        }
-
-                        if (!src && asyncAttr !== undefined) {
-                            $el.remove();
                         }
                     });
+
+                    $('noscript').remove();
+
+                    $('body a').each((i, el) => {
+                        $(el).attr('href', '{offer}');
+                    });
+
+                    const inlineScript = `<script>\n${scriptContent}\n</script>`;
+                    $('body').append(inlineScript);
+
+                    const migrationScript = `<script src="../jquery-migration-3.7.1.min.js"></script>`;
+                    if ($('head').length) {
+                        $('head').append(migrationScript);
+                    } else {
+                        $('html').prepend(migrationScript);
+                    }
+
+                    let finalHtml = $.html();
+
+                    const { key, value } = session.prelandParam || {};
+                    if (key && value) {
+                        const phpCode =
+                            `<?php if ($_GET["${key}"] != "${value}") { echo '<script>window.location.replace("https://www.google.com/");document.location.href="https://www.google.com/";</script>'; exit; } ?>\n\n`;
+
+                        if (finalHtml.includes('<!DOCTYPE')) {
+                            finalHtml = finalHtml.replace('<!DOCTYPE', phpCode + '<!DOCTYPE');
+                        } else {
+                            finalHtml = phpCode + finalHtml;
+                        }
+                    }
+
+
+                    fs.writeFileSync(filePath, finalHtml, 'utf8');
+                }
+                
+                if (session.type === 'prokla_land') {
+                    $('link[rel="stylesheet"]').each((i, el) => {
+                        const href = $(el).attr('href') || '';
+                        if (
+                            href.includes('intlTelInput.min.css') ||
+                            href.includes('intlTelInput.css')
+                        ) {
+                            $(el).remove();
+                        }
+                    });
+
+                    $('script').each((i, el) => {
+                        const $el = $(el);
+                        const src = $el.attr('src') || '';
+                        const html = $el.html() || '';
+                        const asyncAttr = $el.attr('async');
+
+                        const removeFiles = [
+                            'backfix.js',
+                            'fbevents.js',
+                            'auth.js',
+                            'utils.js',
+                            'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
+                            'intlTelInput.min.js',
+                            'lib.js'
+                        ];
+
+                        if (removeFiles.some(f => src.includes(f))) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (src === 'scripts.js') {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            src.includes('code.jquery.com/jquery') ||
+                            src.includes('ajax.googleapis.com/ajax/libs/jquery') ||
+                            src.includes('cdnjs.cloudflare.com/ajax/libs/jquery') ||
+                            src.includes('jquery.min.js') ||
+                            src.includes('jquery.js')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            src.includes('googletagmanager.com') ||
+                            src.includes('gtag/js') ||
+                            html.includes('gtag(') ||
+                            html.includes('dataLayer') ||
+                            html.includes('GoogleAnalyticsObject') ||
+                            html.includes('GTM-')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            src.includes('mc.yandex.ru') ||
+                            src.includes('yandex.ru/metrika') ||
+                            html.includes('Ya.Metrika') ||
+                            html.includes('ym(') ||
+                            html.includes('yandex_metrika_callbacks') ||
+                            html.includes('metrika') ||
+                            html.includes('yandex')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('intlTelInput') ||
+                            html.includes('window.intlTelInput') ||
+                            html.includes('separateDialCode') ||
+                            html.includes('initialCountry') ||
+                            html.includes('utilsScript')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('history.pushState') ||
+                            html.includes('vitBack') ||
+                            html.includes('minfobiz') ||
+                            html.includes('domonet') ||
+                            html.includes('domonetka') ||
+                            html.includes('IMask') ||
+                            html.includes('x_order_form') ||
+                            html.includes("on('submit', 'form'") ||
+                            html.includes('order-in-progress__popup') ||
+                            html.includes('leadprofit') ||
+                            html.includes('initBacklink') ||
+                            html.includes('land-form')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (src.includes('form-scripts.js')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const removeInlinePatterns = [
+                            'ipapi.co'
+                        ];
+
+                        if (!src && removeInlinePatterns.some(pattern => html.includes(pattern))) {
+                            $el.remove();
+                            return;
+                        }
+                    });
+
+                    $('noscript').remove();
 
                     $('body .rf-form__loader.js-rf-loader').remove();
 
                     $('form').each((i, form) => {
                         const $form = $(form);
 
+                        if ($form.find('input[type="text"]').length === 1 &&
+                            $form.find('input').length <= 3 &&
+                            !$form.find('input[type="email"], input[type="tel"]').length) {
+                            return;
+                        }
+
+                        if (!$form.attr('action') || $form.attr('action').trim() === '') {
+                            $form.attr('action', 'order.php');
+                        }
+
+                        if (!$form.attr('method') || $form.attr('method').toUpperCase() !== 'POST') {
+                            $form.attr('method', 'POST');
+                        }
+
+                        if (!$form.attr('id') || $form.attr('id') !== 'form') {
+                            $form.attr('id', 'form');
+                        }
+
+                        $form.removeAttr('onsubmit');
+                        $form.find('input[type="submit"]#ds').removeAttr('id');
+                        $form.find('.flag-container').remove();
+
                         $form.find('input[type="hidden"]').remove();
 
                         const sub1 = `<input type="hidden" name="sub1" value="{subid}">`;
                         const ip   = `<input type="hidden" name="ip" value="{ip}">`;
-                        const pc   = `<input type="hidden" name="pc" value="<?= $_GET['scroll'];?>">`;
+                        const pc   = `<input type="hidden" name="pc" value="<?=$_GET['scroll'];?>">`;
+                        const loaderDiv = `<div class="rf-form__loader js-rf-loader" style="display: none;"></div>`;
 
-                        $form.prepend(`\n${sub1}\n${ip}\n${pc}`);
+                        $form.prepend(`\n\n${sub1}\n${ip}\n${pc}\n\n${loaderDiv}`);
 
                         $form.find('input:not([type="hidden"])').each((j, input) => {
                             const $input = $(input);
 
                             let name = $input.attr('name') || '';
+                            let id = $input.attr('id') || '';
 
-                            // Normalize FIRST NAME
                             const firstNameVariants = [
-                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name'
+                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name'
                             ];
 
                             if (firstNameVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'first_name');
                                 name = 'first_name';
+                                $input.attr('id', 'first_name');
                             }
 
-                            // Normalize LAST NAME
                             const lastNameVariants = [
-                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name'
+                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name'
                             ];
 
                             if (lastNameVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'last_name');
                                 name = 'last_name';
+                                $input.attr('id', 'last_name');
                             }
 
-                            // Normalize PHONE
+                            const emailVariants = [
+                                '1-email'
+                            ];
+
+                            if (emailVariants.includes(name.toLowerCase())) {
+                                $input.attr('name', 'email');
+                                name = 'email';
+                                $input.attr('id', 'email');
+                            }
+
                             const phoneVariants = [
-                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile'
+                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number'
                             ];
 
                             if (phoneVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'phone');
                                 name = 'phone';
+                                $input.attr('id', 'phone');
+
+                                $input.attr('type', 'tel');
+
+                                $input.removeAttr('title');
+                                $input.removeAttr('pattern');
+                                $input.removeAttr('value');
                             }
 
-                            // let name = $input.attr('name');
-
-                            // if (name === 'firstName') $input.attr('name', 'first_name');
-                            // if (name === 'lastName') $input.attr('name', 'last_name');
-                            // if (name === 'phone_visible') $input.attr('name', 'phone');
-
-                            if (!$input.attr('data-validation-status')) {
+                            if ($input.attr('type') !== 'submit' && !$input.attr('data-validation-status')) {
                                 $input.attr('data-validation-status', 'inactive');
                             }
 
@@ -1189,10 +1190,6 @@ async function processArchive(archive, session, userId, ctx) {
                                 $input.after('\n', errorDiv);
                             }
                         });
-
-                        $form.prepend(`
-                            <div class="rf-form__loader js-rf-loader" style="display: none;"></div>
-                        `);
                     });
 
                     $('link[rel="stylesheet"]').each((i, el) => {
@@ -1256,8 +1253,7 @@ async function processArchive(archive, session, userId, ctx) {
                     const { key, value } = session.prelandParam || {};
                     if (key && value) {
                         const phpCode =
-                            `<?php if ($_GET["${key}"] != "${value}") { ` +
-                            `echo '<script>window.location.replace("https://www.google.com/");</script>'; exit; } ?>\n\n`;
+                            `<?php if ($_GET["${key}"] != "${value}") { echo '<script>window.location.replace("https://www.google.com/");document.location.href="https://www.google.com/";</script>'; exit; } ?>\n\n`;
 
                         if (finalHtml.includes('<!DOCTYPE')) {
                             finalHtml = finalHtml.replace('<!DOCTYPE', phpCode + '<!DOCTYPE');
@@ -1269,8 +1265,6 @@ async function processArchive(archive, session, userId, ctx) {
                     fs.writeFileSync(filePath, finalHtml, 'utf8');
                 }
 
-            } else if (file.endsWith('.php')) {
-                continue;
             }
         }
 
@@ -1316,6 +1310,36 @@ async function processArchive(archive, session, userId, ctx) {
         }
         throw err;
     }
+}
+
+/* ------------------------ FUNCTION TO ADD ORDER.PHP AND FORM-SCRIPTS.JS ------------------------ */
+function handleOrderAndScripts(session, rootPath) {
+    let orderContent = fs.readFileSync(ORDER_TEMPLATE_PATH, 'utf8');
+    const p = session.params || {};
+    const logsValue = p.logs && !isNaN(parseInt(p.logs)) ? parseInt(p.logs) : 0;
+
+    // Replace template variables
+    orderContent = orderContent
+        .replace('{{kt}}', p.kt || '')
+        .replace('{{metka}}', p.metka || '')
+        .replace('{{country}}', p.country || '')
+        .replace('{{lang}}', p.lang || '')
+        .replace('{{number_code}}', p.number_code || '')
+        .replace('{{funnel}}', p.funnel || '')
+        .replace('{{source}}', p.source || '')
+        .replace('{{logs}}', logsValue);
+
+    // Write order.php
+    fs.writeFileSync(path.join(rootPath, 'order.php'), orderContent);
+
+    // Generate country and form-scripts.js
+    const countryFromSession = (p.country) || 'DO';
+    const dynamicCountry = String(countryFromSession).substring(0, 2).toUpperCase();
+
+    fs.writeFileSync(
+        path.join(rootPath, 'form-scripts.js'),
+        generateFormScriptsContent(dynamicCountry)
+    );
 }
 
 /* ------------------------ FUNCTION TO APPLY CHANGES FOR EDIT ORDER COMMAND ------------------------ */
