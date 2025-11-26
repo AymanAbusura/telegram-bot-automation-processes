@@ -21,6 +21,7 @@ bot.telegram.setMyCommands([
     { command: 'preland', description: 'Прилендинги' },
     { command: 'prokla_land', description: 'Проклолендинги' },
     { command: 'edit_order', description: 'Изменить фйал ордер' },
+    { command: 'domonetka', description: 'Домонетка' },
     { command: 'bot_info', description: 'Информация о боте' }
 ]);
 
@@ -35,6 +36,7 @@ bot.start((ctx) => {
                     [{ text: "/preland" }],
                     [{ text: "/prokla_land" }],
                     [{ text: "/edit_order" }],
+                    [{ text: "/domonetka" }],
                     [{ text: "/bot_info" }]
                 ],
                 resize_keyboard: true,
@@ -258,6 +260,86 @@ bot.command('edit_order', (ctx) => {
         code: null
     };
     ctx.reply('Отправьте ваш файл order.php для редактирования.');
+});
+
+/* ------------------------ /domonetka ------------------------ */
+const escapeMD = (str) =>
+str
+    .replace(/_/g, "\\_")
+    .replace(/\*/g, "\\*")
+    .replace(/\[/g, "\\[")
+    .replace(/\]/g, "\\]")
+    .replace(/\(/g, "\\(")
+    .replace(/\)/g, "\\)")
+    .replace(/~/g, "\\~")
+    .replace(/`/g, "\\`")
+    .replace(/>/g, "\\>")
+    .replace(/#/g, "\\#")
+    .replace(/\+/g, "\\+")
+    .replace(/-/g, "\\-")
+    .replace(/=/g, "\\=")
+    .replace(/\|/g, "\\|")
+    .replace(/\{/g, "\\{")
+    .replace(/\}/g, "\\}")
+    .replace(/\./g, "\\.")
+    .replace(/!/g, "\\!");
+
+const luckyFeedHead = `<script src="//static.bestgonews.com/m1sh81qh8/ivl867tq2h8q/h18mp0quv3y0kzh57o.js"></script>`;
+const luckyFeedBody = `<script>window.initBacklink("https://webechoesoftoday.com/product?stream_uuid=113a3774-a4c9-44d2-bcab-08719d22814b&subid2=METKA")</script>`;
+
+const newsProfitFull =
+`<script src="https://mixer-events.com/back.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    window.vitBack("https://mixer-events.com/new?utm_campaign=53978&utm_source=[SID]&sid7=METKA&utm_medium=4840", true);
+});
+</script>`;
+
+bot.command("domonetka", (ctx) => {
+    const keyboard = {
+        reply_markup: {
+            inline_keyboard: [
+                [
+                    { text: "📋 LuckyFeed", callback_data: "domonetka_luckyfeed" },
+                    { text: "📋 newsProfit", callback_data: "domonetka_newsprofit" }
+                ]
+            ]
+        }
+    };
+
+    return ctx.reply(
+        `📌 Выберите домонетку, чтобы получить код:\n\n⚠️ *ВАЖНО:* Метку указываем так — \\[цифра\\+первая буква имени\\], например: *11A*`,
+        { parse_mode: "MarkdownV2", ...keyboard }
+    );
+});
+
+bot.on("callback_query", async (ctx) => {
+    const data = ctx.callbackQuery.data;
+    await ctx.answerCbQuery();
+
+    if (data === "domonetka_luckyfeed") {
+        const escapedHead = escapeMD(luckyFeedHead);
+        const escapedBody = escapeMD(luckyFeedBody);
+
+        return ctx.reply(
+            `📌 Код для LuckyFeed:\n\n` +
+            `🟦 Вставьте *перед* \`</head>\`:\n` +
+            `\`\`\`\n${escapedHead}\n\`\`\`\n\n` +
+            `🟩 Вставьте *перед* \`</body>\`:\n` +
+            `\`\`\`\n${escapedBody}\n\`\`\``,
+            { parse_mode: "MarkdownV2" }
+        );
+    }
+
+    if (data === "domonetka_newsprofit") {
+        const escapedNews = escapeMD(newsProfitFull);
+
+        return ctx.reply(
+            `📌 Код для newsProfit(OneProfit):\n\n` +
+            `\`\`\`\n${escapedNews}\n\`\`\``,
+            { parse_mode: "MarkdownV2" }
+        );
+    }
 });
 
 /* ------------------------ /bot_info ------------------------ */
