@@ -447,7 +447,11 @@ bot.on('text', async (ctx) => {
 
             } catch (err) {
                 console.error(`Error processing archive ${archive.fileName}:`, err);
-                await ctx.reply(`❌ Ошибка при обработке ${archive.fileName}: ${err.message}`);
+                if (err?.response?.description?.includes('file is too big')) {
+                    await ctx.reply(`⚠️ Архив должен быть меньше 20 МБ`);
+                } else {
+                    await ctx.reply(`❌ Ошибка при обработке ${archive.fileName}: ${err.message}`);
+                }
             }
         }
 
@@ -457,7 +461,12 @@ bot.on('text', async (ctx) => {
             }
         });
 
-        await ctx.reply(`✅ Готово! Обработано ${processedFiles.length} из ${session.archives.length} архивов.`);
+        if (processedFiles.length > 0) {
+            await ctx.reply(`✅ Готово! Обработано ${processedFiles.length} из ${session.archives.length} архивов.`);
+        } else {
+            await ctx.reply(`❌ Обработка не выполнена.`);
+        }
+
         delete userSessions[userId];
     }
 });
@@ -517,12 +526,14 @@ async function processArchive(archive, session, userId, ctx) {
                             $(el).remove();
                         }
                     });
+                    $('link[data-type="F1TFunnelSdkCss"]').remove();
 
                     $('script').each((i, el) => {
                         const $el = $(el);
                         const src = $el.attr('src') || '';
                         const html = $el.html() || '';
                         const asyncAttr = $el.attr('async');
+                        if (html.includes('.main-chat')) return;
 
                         const removeFiles = [
                             'backfix.js',
@@ -663,6 +674,8 @@ async function processArchive(archive, session, userId, ctx) {
                         if (!$form.attr('id') || $form.attr('id') !== 'form') {
                             $form.attr('id', 'form');
                         }
+
+                        $form.attr('style', 'position: relative; z-index: 1;');
 
                         $form.removeAttr('onsubmit');
                         $form.find('input[type="submit"]#ds').removeAttr('id');
@@ -1149,6 +1162,8 @@ async function processArchive(archive, session, userId, ctx) {
                         if (!$form.attr('id') || $form.attr('id') !== 'form') {
                             $form.attr('id', 'form');
                         }
+
+                        $form.attr('style', 'position: relative; z-index: 1;');
 
                         $form.removeAttr('onsubmit');
                         $form.find('input[type="submit"]#ds').removeAttr('id');
