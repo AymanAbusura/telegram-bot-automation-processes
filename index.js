@@ -596,7 +596,13 @@ async function processArchive(archive, session, userId, ctx) {
 
             if (file.endsWith('index.html') || file.endsWith('.htm') || file.endsWith('index.php')) {
                 let html = fs.readFileSync(filePath, 'utf8');
-                const $ = cheerio.load(html, { xmlMode: false });
+
+                if (['landing', 'prelanding', 'prokla_land'].includes(session.type)) {
+                    html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<!DOCTYPE html>)/i, '');
+                }
+
+                // const $ = cheerio.load(html, { xmlMode: false });
+                const $ = cheerio.load(html, { decodeEntities: false });
 
                 // --- Land ---
                 if (session.type === 'landing') {
@@ -610,6 +616,12 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                     });
                     $('link[data-type="F1TFunnelSdkCss"]').remove();
+                    $('style').each((i, el) => {
+                        const styleContent = $(el).html() || '';
+                        if (styleContent.includes('.rf-form__loader')) {
+                            $(el).remove();
+                        }
+                    });
 
                     $('script').each((i, el) => {
                         const $el = $(el);
@@ -934,6 +946,12 @@ async function processArchive(archive, session, userId, ctx) {
                             $(el).remove();
                         }
                     });
+                    $('style').each((i, el) => {
+                        const styleContent = $(el).html() || '';
+                        if (styleContent.includes('.rf-form__loader')) {
+                            $(el).remove();
+                        }
+                    });
 
                     $('script').each((i, el) => {
                         const $el = $(el);
@@ -1107,6 +1125,13 @@ async function processArchive(archive, session, userId, ctx) {
                             href.includes('intlTelInput.min.css') ||
                             href.includes('intlTelInput.css')
                         ) {
+                            $(el).remove();
+                        }
+                    });
+                    
+                    $('style').each((i, el) => {
+                        const styleContent = $(el).html() || '';
+                        if (styleContent.includes('.rf-form__loader')) {
                             $(el).remove();
                         }
                     });
