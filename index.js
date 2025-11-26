@@ -1401,7 +1401,6 @@ function handleOrderAndScripts(session, rootPath) {
     const p = session.params || {};
     const logsValue = p.logs && !isNaN(parseInt(p.logs)) ? parseInt(p.logs) : 0;
 
-    // Replace template variables
     orderContent = orderContent
         .replace('{{kt}}', p.kt || '')
         .replace('{{metka}}', p.metka || '')
@@ -1412,10 +1411,8 @@ function handleOrderAndScripts(session, rootPath) {
         .replace('{{source}}', p.source || '')
         .replace('{{logs}}', logsValue);
 
-    // Write order.php
     fs.writeFileSync(path.join(rootPath, 'order.php'), orderContent);
 
-    // Generate country and form-scripts.js
     const countryFromSession = (p.country) || 'DO';
     const dynamicCountry = String(countryFromSession).substring(0, 2).toUpperCase();
 
