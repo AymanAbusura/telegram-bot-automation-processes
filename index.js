@@ -21,7 +21,7 @@ bot.telegram.setMyCommands([
     { command: 'preland', description: 'Прилендинги' },
     { command: 'prokla_land', description: 'Проклолендинги' },
     { command: 'edit_order', description: 'Изменить фйал ордер' },
-    { command: 'domonetka', description: 'Домонетка' },
+    { command: 'domonetka', description: 'Домонетки' },
     { command: 'bot_info', description: 'Информация о боте' }
 ]);
 
