@@ -48,7 +48,7 @@ module.exports = `
     input.valid-input { 
         border: 3px solid #28a745 !important; 
     }
-    #form button[type="submit"]:disabled, #form input[type="submit"]:disabled {
+    form button[type="submit"]:disabled, form input[type="submit"]:disabled {
         opacity: 0.6;
         cursor: not-allowed!important;
     }

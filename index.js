@@ -531,7 +531,18 @@ async function processArchive(archive, session, userId, ctx) {
                             'utils.js',
                             'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
                             'intlTelInput.min.js',
-                            'lib.js'
+                            'lib.js',
+                            'plgintlTel',
+                            'email-decode.min',
+                            'uwt.js',
+                            'track.js',
+                            'translations.js',
+                            '/aio-static/sdk/main.js',
+                            '/aio-static/sdk/',
+                            '/_cdn/production/landing-cdn/',
+                            'time-scripts/main.js',
+                            'bundle.umd.min.js',
+                            './index/track.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -615,7 +626,11 @@ async function processArchive(archive, session, userId, ctx) {
                         }
 
                         const removeInlinePatterns = [
-                            'ipapi.co'
+                            'ipapi.co',
+                            '_d',
+                            '_chk',
+                            '_t',
+                            'vid'
                         ];
 
                         if (!src && removeInlinePatterns.some(pattern => html.includes(pattern))) {
@@ -793,6 +808,7 @@ async function processArchive(archive, session, userId, ctx) {
                         if (
                             href === '{offer}' ||
                             href === '#' ||
+                            href === '/' ||
                             href.startsWith('http') ||
                             href.startsWith('/') ||
                             href.startsWith('#')
@@ -831,7 +847,14 @@ async function processArchive(archive, session, userId, ctx) {
                             'utils.js',
                             'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
                             'intlTelInput.min.js',
-                            'lib.js'
+                            'lib.js',
+                            'plgintlTel',
+                            'email-decode.min',
+                            'uwt.js',
+                            'track.js',
+                            'translations.js',
+                            '/aio-static/sdk/main.js',
+                            './index/track.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -861,7 +884,11 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('gtag(') ||
                             html.includes('dataLayer') ||
                             html.includes('GoogleAnalyticsObject') ||
-                            html.includes('GTM-')
+                            html.includes('GTM-') ||
+                            html.includes('window.aio.visit.fields.gl_gtag_id') ||
+                            html.includes('gtag(') ||
+                            html.includes('gtag("config"') ||
+                            html.includes('aioDataLayer')
                         ) {
                             $el.remove();
                             return;
@@ -904,14 +931,28 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('order-in-progress__popup') ||
                             html.includes('leadprofit') ||
                             html.includes('initBacklink') ||
-                            html.includes('land-form')
+                            html.includes('land-form') ||
+                            html.includes('window.aioBus') ||
+                            html.includes('transliterate(') ||
+                            html.includes('l_settings_fullname') ||
+                            html.includes('celebrity_1') ||
+                            html.includes('aio.landing') ||
+                            html.includes('linkCounter') ||
+                            html.includes('link_number') ||
+                            html.includes('link_enumerate error') ||
+                            html.includes('screen_resize') ||
+                            html.includes('addEventListener("resize"')
                         ) {
                             $el.remove();
                             return;
                         }
 
                         const removeInlinePatterns = [
-                            'ipapi.co'
+                            'ipapi.co',
+                            '_d',
+                            '_chk',
+                            '_t',
+                            'vid'
                         ];
 
                         if (!src && removeInlinePatterns.some(pattern => html.includes(pattern))) {
@@ -926,10 +967,12 @@ async function processArchive(archive, session, userId, ctx) {
                         $(el).attr('href', '{offer}');
                     });
 
-                    const inlineScript = `<script>\n${scriptContent}\n</script>`;
+                    $('head, body').contents().filter((i, node) => node.type === 'comment').remove();
+
+                    const inlineScript = `<script>\n${scriptContent}\n</script>\n\n`;
                     $('body').append(inlineScript);
 
-                    const migrationScript = `<script src="../jquery-migration-3.7.1.min.js"></script>`;
+                    const migrationScript = `<script src="../jquery-migration-3.7.1.min.js"></script>\n`;
                     if ($('head').length) {
                         $('head').append(migrationScript);
                     } else {
@@ -978,7 +1021,14 @@ async function processArchive(archive, session, userId, ctx) {
                             'utils.js',
                             'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
                             'intlTelInput.min.js',
-                            'lib.js'
+                            'lib.js',
+                            'plgintlTel',
+                            'email-decode.min',
+                            'uwt.js',
+                            'track.js',
+                            'translations.js',
+                            '/aio-static/sdk/main.js',
+                            './index/track.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1062,7 +1112,11 @@ async function processArchive(archive, session, userId, ctx) {
                         }
 
                         const removeInlinePatterns = [
-                            'ipapi.co'
+                            'ipapi.co',
+                            '_d',
+                            '_chk',
+                            '_t',
+                            'vid'
                         ];
 
                         if (!src && removeInlinePatterns.some(pattern => html.includes(pattern))) {
