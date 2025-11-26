@@ -19,7 +19,7 @@ const messages = require('./messages.json');
 bot.telegram.setMyCommands([
     { command: 'land', description: 'Ленденги' },
     { command: 'preland', description: 'Прилендинги' },
-    { command: 'prokla_land', description: 'Прокла-ленд' },
+    { command: 'prokla_land', description: 'Проклолендинги' },
     { command: 'edit_order', description: 'Изменить фйал ордер' },
     { command: 'bot_info', description: 'Информация о боте' }
 ]);
@@ -69,7 +69,7 @@ bot.command('land', (ctx) => {
                             {
                                 text: "📋 Скопировать команду",
                                 copy_text: {
-                                    text: "/land kt=5&metka=1A&country=RU&lang=RU&number_code=+7&funnel=PrimeAura&source=Prime-Aura.com&logs=0"
+                                    text: "/land\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0"
                                 }
                             }
                         ]
@@ -80,9 +80,10 @@ bot.command('land', (ctx) => {
     }
 
     const params = {};
-    paramStr.split('&').forEach(pair => {
-        const [k, v] = pair.split('=');
-        if (k && v) params[k] = decodeURIComponent(v);
+
+    paramStr.split(/\r?\n/).forEach(line => {
+        const [k, v] = line.split('=');
+        if (k && v) params[k.trim()] = decodeURIComponent(v.trim());
     });
 
     userSessions[userId] = { 
@@ -193,7 +194,7 @@ bot.command('prokla_land', (ctx) => {
                             {
                                 text: "📋 Скопировать команду",
                                 copy_text: {
-                                    text: "/prokla_land key=value kt=5&metka=1A&country=RU&lang=RU&number_code=+7&funnel=PrimeAura&source=Prime-Aura.com&logs=0"
+                                    text: "/prokla_land\nkey=value\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0"
                                 }
                             }
                         ]
@@ -203,22 +204,22 @@ bot.command('prokla_land', (ctx) => {
         );
     }
 
-    const parts = paramStr.split(/\s+/, 2);
-    const keyValuePart = parts[0];
-    const orderParamsStr = parts[1] || '';
+    const lines = paramStr.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
 
-    const keyValueMatch = keyValuePart.match(/^([^=\s]+)=([^=\s]+)$/);
-    if (!keyValueMatch) return ctx.reply('⛔️ Неверный формат. Используйте: /prokla_land key=value kt=5&metka=1A&country=RU&lang=RU&number_code=+7&funnel=PrimeAura&source=Prime-Aura.com&logs=0');
+    if (lines.length === 0) {
+        return ctx.reply('⛔️ Неверный формат. Отправьте параметры в виде: key=value и остальные параметры по строкам.');
+    }
+
+    const keyValueMatch = lines[0].match(/^([^=\s]+)=([^=\s]+)$/);
+    if (!keyValueMatch) return ctx.reply('⛔️ Неверный формат первой строки. Используйте: /prokla_land\nkey=value\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0');
 
     const [, key, value] = keyValueMatch;
 
     const params = {};
-    if (orderParamsStr) {
-        orderParamsStr.split('&').forEach(pair => {
-            const [k, v] = pair.split('=');
-            if (k && v) params[k] = decodeURIComponent(v);
-        });
-    }
+    lines.slice(1).forEach(line => {
+        const [k, v] = line.split('=');
+        if (k && v) params[k.trim()] = decodeURIComponent(v.trim());
+    });
 
     userSessions[userId] = { 
         type: 'prokla_land', 
@@ -541,6 +542,7 @@ async function processArchive(archive, session, userId, ctx) {
                             'auth.js',
                             'utils.js',
                             'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
+                            'vli6872tq8hqh810mp/uqv3y0lxc.js',
                             'intlTelInput.min.js',
                             'lib.js',
                             'plgintlTel',
@@ -663,6 +665,10 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        if ($form.find('input[type="text"]').length === 1 || $form.find('textarea').length === 1) {
+                            return;
+                        }
+
                         if (!$form.attr('action') || $form.attr('action').trim() === '') {
                             $form.attr('action', 'order.php');
                         }
@@ -697,7 +703,7 @@ async function processArchive(archive, session, userId, ctx) {
                             let id = $input.attr('id') || '';
 
                             const firstNameVariants = [
-                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name'
+                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name'
                             ];
 
                             if (firstNameVariants.includes(name.toLowerCase())) {
@@ -707,7 +713,7 @@ async function processArchive(archive, session, userId, ctx) {
                             }
 
                             const lastNameVariants = [
-                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name'
+                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name', 'form-last_name'
                             ];
 
                             if (lastNameVariants.includes(name.toLowerCase())) {
@@ -717,7 +723,7 @@ async function processArchive(archive, session, userId, ctx) {
                             }
 
                             const emailVariants = [
-                                '1-email'
+                                '1-email', 'form-email'
                             ];
 
                             if (emailVariants.includes(name.toLowerCase())) {
@@ -859,6 +865,7 @@ async function processArchive(archive, session, userId, ctx) {
                             'auth.js',
                             'utils.js',
                             'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
+                            'vli6872tq8hqh810mp/uqv3y0lxc.js',
                             'intlTelInput.min.js',
                             'lib.js',
                             'plgintlTel',
@@ -995,7 +1002,8 @@ async function processArchive(archive, session, userId, ctx) {
                     let finalHtml = $.html();
 
                     const { key, value } = session.prelandParam || {};
-                    if (key && value) {
+                    // if (key && value) {
+                    if (key && value && !(key === '0' && value === '0')) {
                         const phpCode =
                             `<?php if ($_GET["${key}"] != "${value}") { echo '<script>window.location.replace("https://www.google.com/");document.location.href="https://www.google.com/";</script>'; exit; } ?>\n\n`;
 
@@ -1033,6 +1041,7 @@ async function processArchive(archive, session, userId, ctx) {
                             'auth.js',
                             'utils.js',
                             'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
+                            'vli6872tq8hqh810mp/uqv3y0lxc.js',
                             'intlTelInput.min.js',
                             'lib.js',
                             'plgintlTel',
@@ -1151,6 +1160,10 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        if ($form.find('input[type="text"]').length === 1 || $form.find('textarea').length === 1) {
+                            return;
+                        }
+
                         if (!$form.attr('action') || $form.attr('action').trim() === '') {
                             $form.attr('action', 'order.php');
                         }
@@ -1185,7 +1198,7 @@ async function processArchive(archive, session, userId, ctx) {
                             let id = $input.attr('id') || '';
 
                             const firstNameVariants = [
-                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name'
+                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name'
                             ];
 
                             if (firstNameVariants.includes(name.toLowerCase())) {
@@ -1195,7 +1208,7 @@ async function processArchive(archive, session, userId, ctx) {
                             }
 
                             const lastNameVariants = [
-                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name'
+                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name', 'form-last_name'
                             ];
 
                             if (lastNameVariants.includes(name.toLowerCase())) {
@@ -1205,7 +1218,7 @@ async function processArchive(archive, session, userId, ctx) {
                             }
 
                             const emailVariants = [
-                                '1-email'
+                                '1-email', 'form-email'
                             ];
 
                             if (emailVariants.includes(name.toLowerCase())) {
@@ -1301,7 +1314,7 @@ async function processArchive(archive, session, userId, ctx) {
                     }
 
                     $('body').append(`\n<script src="intlTelInput.min.js"></script>`);
-                    $('body').append(`\n<script src="form-scripts.js"></script>\n`);
+                    $('body').append(`\n<script src="form-scripts.js"></script>\n\n`);
 
                     $('body [href]').each((i, el) => {
                         const $el = $(el);
@@ -1320,7 +1333,8 @@ async function processArchive(archive, session, userId, ctx) {
                     let finalHtml = $.html();
 
                     const { key, value } = session.prelandParam || {};
-                    if (key && value) {
+                    // if (key && value) {
+                    if (key && value && !(key === '0' && value === '0')) {
                         const phpCode =
                             `<?php if ($_GET["${key}"] != "${value}") { echo '<script>window.location.replace("https://www.google.com/");document.location.href="https://www.google.com/";</script>'; exit; } ?>\n\n`;
 
