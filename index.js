@@ -622,6 +622,7 @@ async function processArchive(archive, session, userId, ctx) {
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<!DOCTYPE html>)/i, '');
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html>)/i, '');
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html\b[^>]*>)/i, '');
+                    html = html.replace(/<!--\s*<\?php[\s\S]*?\?>\s*-->/gi, '');
                 }
 
                 // const $ = cheerio.load(html, { xmlMode: false });
@@ -682,9 +683,11 @@ async function processArchive(archive, session, userId, ctx) {
                             'fbevents.js',
                             'auth.js',
                             'utils.js',
+                            'jquery-3.7.1.min.js',
                             'intl-tel-input/17.0.8/js/utils.min.js',
                             'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
                             'vli6872tq8hqh810mp/uqv3y0lxc.js',
+                            'intlTelInput.js',
                             'intlTelInput.min.js',
                             'jquery-migration-3.7.1.min.js',
                             'lib.js',
@@ -777,6 +780,11 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        if (src.includes('minfobiz.online')) {
+                            $el.remove();
+                            return;
+                        }
+
                         if (src.includes('form-scripts.js')) {
                             $el.remove();
                             return;
@@ -804,6 +812,21 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.remove();
                             return;
                         }
+
+                        if (html.includes('querySelectorAll(".form")') && html.includes('iti__selected-dial-code')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (html.includes('window.aioBus') && html.includes('aio.landing')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (!src && html.includes('googletag.cmd.push')) {
+                            $el.remove();
+                            return;
+                        }
                     });
 
                     $('noscript').remove();
@@ -816,9 +839,10 @@ async function processArchive(archive, session, userId, ctx) {
                         $form.find('input[type="submit"][disabled]').removeAttr('disabled');
                         $form.find('button[disabled]').removeAttr('disabled');
                         $form.find('div.form-preloader.hidden').remove();
+                        $form.find('span#error').remove();
 
                         var isSearchForm =
-                            $form.find('input[type="text"]').length === 1 &&
+                            ($form.find('input[type="text"], input[type="search"]').length === 1) &&
                             $form.find('input').length <= 3 &&
                             !$form.find('input[type="email"], input[type="tel"]').length;
 
@@ -865,10 +889,14 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        if ($form.find('input[type="search"]').length > 0) {
+                            return;
+                        }
+
                         if (
                             $form.find('input[type="text"]').length === 1 ||
                             $form.find('textarea').length === 1 ||
-                            $form.find('input[type="checkbox"]').length > 0
+                            $form.find('input[type="checkbox"]').length > 1
                         ) {
                             var action = $form.attr('action');
                             if (
@@ -943,6 +971,8 @@ async function processArchive(archive, session, userId, ctx) {
                                 $input.attr('name', 'email');
                                 name = 'email';
                                 $input.attr('id', 'email');
+                                $input.removeAttr('pattern');
+                                $input.prop('pattern', '');
                             }
 
                             const phoneVariants = [
@@ -1102,9 +1132,11 @@ async function processArchive(archive, session, userId, ctx) {
                             'fbevents.js',
                             'auth.js',
                             'utils.js',
+                            'jquery-3.7.1.min.js',
                             'intl-tel-input/17.0.8/js/utils.min.js',
                             'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
                             'vli6872tq8hqh810mp/uqv3y0lxc.js',
+                            'intlTelInput.js',
                             'intlTelInput.min.js',
                             'jquery-migration-3.7.1.min.js',
                             'lib.js',
@@ -1197,6 +1229,11 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        if (src.includes('minfobiz.online')) {
+                            $el.remove();
+                            return;
+                        }
+
                         if (src.includes('form-scripts.js')) {
                             $el.remove();
                             return;
@@ -1221,6 +1258,21 @@ async function processArchive(archive, session, userId, ctx) {
                         ];
 
                         if (!src && removeInlinePatterns.some(pattern => html.includes(pattern))) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (html.includes('querySelectorAll(".form")') && html.includes('iti__selected-dial-code')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (html.includes('window.aioBus') && html.includes('aio.landing')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (!src && html.includes('googletag.cmd.push')) {
                             $el.remove();
                             return;
                         }
@@ -1322,9 +1374,11 @@ async function processArchive(archive, session, userId, ctx) {
                             'fbevents.js',
                             'auth.js',
                             'utils.js',
+                            'jquery-3.7.1.min.js',
                             'intl-tel-input/17.0.8/js/utils.min.js',
                             'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
                             'vli6872tq8hqh810mp/uqv3y0lxc.js',
+                            'intlTelInput.js',
                             'intlTelInput.min.js',
                             'jquery-migration-3.7.1.min.js',
                             'lib.js',
@@ -1417,6 +1471,11 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        if (src.includes('minfobiz.online')) {
+                            $el.remove();
+                            return;
+                        }
+
                         if (src.includes('form-scripts.js')) {
                             $el.remove();
                             return;
@@ -1444,6 +1503,21 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.remove();
                             return;
                         }
+
+                        if (html.includes('querySelectorAll(".form")') && html.includes('iti__selected-dial-code')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (html.includes('window.aioBus') && html.includes('aio.landing')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (!src && html.includes('googletag.cmd.push')) {
+                            $el.remove();
+                            return;
+                        }
                     });
 
                     $('noscript').remove();
@@ -1456,9 +1530,10 @@ async function processArchive(archive, session, userId, ctx) {
                         $form.find('input[type="submit"][disabled]').removeAttr('disabled');
                         $form.find('button[disabled]').removeAttr('disabled');
                         $form.find('div.form-preloader.hidden').remove();
+                        $form.find('span#error').remove();
 
                         var isSearchForm =
-                            $form.find('input[type="text"]').length === 1 &&
+                            ($form.find('input[type="text"], input[type="search"]').length === 1) &&
                             $form.find('input').length <= 3 &&
                             !$form.find('input[type="email"], input[type="tel"]').length;
 
@@ -1506,7 +1581,7 @@ async function processArchive(archive, session, userId, ctx) {
                         if (
                             $form.find('input[type="text"]').length === 1 ||
                             $form.find('textarea').length === 1 ||
-                            $form.find('input[type="checkbox"]').length > 0
+                            $form.find('input[type="checkbox"]').length > 1
                         ) {
                             var action = $form.attr('action');
                             if (
@@ -1517,6 +1592,10 @@ async function processArchive(archive, session, userId, ctx) {
                             ) {
                                 $form.attr('action', "");
                             }
+                            return;
+                        }
+
+                        if ($form.find('input[type="search"]').length > 0) {
                             return;
                         }
 
@@ -1581,6 +1660,8 @@ async function processArchive(archive, session, userId, ctx) {
                                 $input.attr('name', 'email');
                                 name = 'email';
                                 $input.attr('id', 'email');
+                                $input.removeAttr('pattern');
+                                $input.prop('pattern', '');
                             }
 
                             const phoneVariants = [
