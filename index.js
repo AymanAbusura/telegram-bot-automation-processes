@@ -81,21 +81,30 @@ bot.command('land', (ctx) => {
         );
     }
 
-    const params = {};
+    const lines = paramStr.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
 
-    paramStr.split(/\r?\n/).forEach(line => {
+    if (lines.length === 0) {
+        return ctx.reply(
+            '⛔️ Неверный формат.\nИспользуйте:\n/land\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0'
+        );
+    }
+
+    const params = {};
+    lines.forEach(line => {
         const [k, v] = line.split('=');
-        if (k && v) params[k.trim()] = decodeURIComponent(v.trim());
+        if (k && v) {
+            params[k.trim()] = decodeURIComponent(v.trim());
+        }
     });
 
     userSessions[userId] = { 
         type: 'landing', 
         waitParams: false, 
-        params, 
+        params: Object.keys(params).length ? params : null,
         archives: [],
         processingMultiple: false 
     };
-    
+
     ctx.reply(
         '✅ Параметры сохранены!\n\n📦 Теперь отправьте ZIP архив(ы).\n\n⚠️ ВАЖНО: После отправки ВСЕХ архивов нажмите кнопку для копирования команды или напишите "process".',
         {
@@ -114,7 +123,6 @@ bot.command('land', (ctx) => {
         }
     );
 });
-
 /* ------------------------ /preland ------------------------ */
 bot.command('preland', (ctx) => {
     const userId = ctx.from.id;
@@ -150,7 +158,7 @@ bot.command('preland', (ctx) => {
     }
 
     const match = paramText.match(/^\s*([^=]+)=([^=]+)\s*$/);
-    if (!match) return ctx.reply('⛔️ Неверный формат. Используйте: /preland key=value');
+    if (!match) return ctx.reply('⛔️ Неверный формат.\nИспользуйте:\n/preland key=value');
 
     const [, key, value] = match;
     userSessions[userId] = {
@@ -209,11 +217,11 @@ bot.command('prokla_land', (ctx) => {
     const lines = paramStr.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
 
     if (lines.length === 0) {
-        return ctx.reply('⛔️ Неверный формат. Отправьте параметры в виде: key=value и остальные параметры по строкам.');
+        return ctx.reply('⛔️ Неверный формат.\nИспользуйте:\n/prokla_land\nkey=value\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0');
     }
 
     const keyValueMatch = lines[0].match(/^([^=\s]+)=([^=\s]+)$/);
-    if (!keyValueMatch) return ctx.reply('⛔️ Неверный формат первой строки. Используйте: /prokla_land\nkey=value\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0');
+    if (!keyValueMatch) return ctx.reply('⛔️ Неверный формат первой строки.\nИспользуйте:\n/prokla_land\nkey=value\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0');
 
     const [, key, value] = keyValueMatch;
 
@@ -263,27 +271,6 @@ bot.command('edit_order', (ctx) => {
 });
 
 /* ------------------------ /domonetka ------------------------ */
-const escapeMD = (str) =>
-str
-    .replace(/_/g, "\\_")
-    .replace(/\*/g, "\\*")
-    .replace(/\[/g, "\\[")
-    .replace(/\]/g, "\\]")
-    .replace(/\(/g, "\\(")
-    .replace(/\)/g, "\\)")
-    .replace(/~/g, "\\~")
-    .replace(/`/g, "\\`")
-    .replace(/>/g, "\\>")
-    .replace(/#/g, "\\#")
-    .replace(/\+/g, "\\+")
-    .replace(/-/g, "\\-")
-    .replace(/=/g, "\\=")
-    .replace(/\|/g, "\\|")
-    .replace(/\{/g, "\\{")
-    .replace(/\}/g, "\\}")
-    .replace(/\./g, "\\.")
-    .replace(/!/g, "\\!");
-
 const luckyFeedHead = `<script src="//static.bestgonews.com/m1sh81qh8/ivl867tq2h8q/h18mp0quv3y0kzh57o.js"></script>`;
 const luckyFeedBody = `<script>window.initBacklink("https://webechoesoftoday.com/product?stream_uuid=113a3774-a4c9-44d2-bcab-08719d22814b&subid2=METKA")</script>`;
 
@@ -308,8 +295,8 @@ bot.command("domonetka", (ctx) => {
     };
 
     return ctx.reply(
-        `📌 Выберите домонетку, чтобы получить код:\n\n⚠️ *ВАЖНО:* Метку указываем так — \\[цифра\\+первая буква имени\\], например: *11A*`,
-        { parse_mode: "MarkdownV2", ...keyboard }
+        `📌 Выберите домонетку, чтобы получить код:\n\n⚠️ Метку указываем так — [цифра+первая буква имени], например: 11A`,
+        keyboard
     );
 });
 
@@ -318,26 +305,18 @@ bot.on("callback_query", async (ctx) => {
     await ctx.answerCbQuery();
 
     if (data === "domonetka_luckyfeed") {
-        const escapedHead = escapeMD(luckyFeedHead);
-        const escapedBody = escapeMD(luckyFeedBody);
-
         return ctx.reply(
             `📌 Код для LuckyFeed:\n\n` +
-            `🟦 Вставьте *перед* \`</head>\`:\n` +
-            `\`\`\`\n${escapedHead}\n\`\`\`\n\n` +
-            `🟩 Вставьте *перед* \`</body>\`:\n` +
-            `\`\`\`\n${escapedBody}\n\`\`\``,
-            { parse_mode: "MarkdownV2" }
+            `🟦 Вставьте перед </head>:\n\`\`\`\n${luckyFeedHead}\n\`\`\`\n\n` +
+            `🟩 Вставьте перед </body>:\n\`\`\`\n${luckyFeedBody}\n\`\`\``,
+            { parse_mode: "Markdown" }
         );
     }
 
     if (data === "domonetka_newsprofit") {
-        const escapedNews = escapeMD(newsProfitFull);
-
         return ctx.reply(
-            `📌 Код для newsProfit(OneProfit):\n\n` +
-            `\`\`\`\n${escapedNews}\n\`\`\``,
-            { parse_mode: "MarkdownV2" }
+            `📌 Код для newsProfit(OneProfit):\n\`\`\`\n${newsProfitFull}\n\`\`\``,
+            { parse_mode: "Markdown" }
         );
     }
 });
@@ -388,7 +367,7 @@ bot.on('document', async (ctx) => {
     if (session.type === 'landing' && session.waitParams) {
         if (!caption || !caption.includes('=')) {
             return ctx.reply(
-                "Параметры не обнаружены в caption. Прикрепите ZIP и укажите строку параметров в описании (caption), например:\n\nkt=45&metka=189A&country=DO&lang=ES&number_code=+1&funnel=PrimeAura&source=Prime-Aura.com&logs=0"
+                "Параметры не обнаружены в caption. Прикрепите ZIP и укажите строку параметров в описании (caption), например:\n\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0"
             );
         }
 
@@ -575,11 +554,53 @@ async function processArchive(archive, session, userId, ctx) {
 
         zip.extractAllTo(tempDir, true);
 
+        // 1 FOLDER
+        // const entries = zip.getEntries();
+        // if (!entries || entries.length === 0) throw new Error('ZIP пустой или некорректный');
+        
+        // const rootFolder = entries[0].entryName.split('/')[0];
+        // const rootPath = path.join(tempDir, rootFolder);
+
+        // 2 FOLDERS
+        // const entries = zip.getEntries();
+        // if (!entries || entries.length === 0) throw new Error('ZIP пустой или некорректный');
+
+        // // Determine root path safely
+        // const rootFolders = [...new Set(entries.map(e => e.entryName.split('/')[0]))];
+        // let rootPath;
+        // let rootFolder; // define it here
+
+        // if (rootFolders.length === 1 && entries[0].isDirectory) {
+        //     // ZIP has a single root folder
+        //     rootFolder = rootFolders[0];
+        //     rootPath = path.join(tempDir, rootFolder);
+        // } else {
+        //     // ZIP contains multiple files/folders at root
+        //     rootFolder = ''; // fallback, or use something from the ZIP for naming
+        //     rootPath = tempDir;
+        // }
+
+         // 1&2 FOLDERS
         const entries = zip.getEntries();
         if (!entries || entries.length === 0) throw new Error('ZIP пустой или некорректный');
-        
-        const rootFolder = entries[0].entryName.split('/')[0];
-        const rootPath = path.join(tempDir, rootFolder);
+
+        const rootFolders = [...new Set(entries.map(e => e.entryName.split('/')[0]))];
+        let rootPath;
+        let rootFolder;
+
+        if (rootFolders.length === 1) {
+            rootFolder = rootFolders[0];
+            rootPath = path.join(tempDir, rootFolder);
+
+            if (!fs.existsSync(rootPath) || !fs.statSync(rootPath).isDirectory()) {
+                rootPath = tempDir;
+                rootFolder = '';
+            }
+        } else {
+            rootPath = tempDir;
+            rootFolder = '';
+        }
+
 
         ['order.php', 'form-scripts.js'].forEach(f => {
             const p = path.join(rootPath, f);
@@ -599,13 +620,22 @@ async function processArchive(archive, session, userId, ctx) {
 
                 if (['landing', 'prelanding', 'prokla_land'].includes(session.type)) {
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<!DOCTYPE html>)/i, '');
+                    html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html>)/i, '');
+                    html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html\b[^>]*>)/i, '');
                 }
 
                 // const $ = cheerio.load(html, { xmlMode: false });
                 const $ = cheerio.load(html, { decodeEntities: false });
 
-                // --- Land ---
+                /* ------------------------ LAND ------------------------ */
                 if (session.type === 'landing') {
+                    $('meta[name="msapplication"]').each((i, el) => {
+                        const content = $(el).attr('content') || '';
+                        if (/^0x[0-9A-Za-z]*$/.test(content)) {
+                            $(el).remove();
+                        }
+                    });
+
                     $('link[rel="stylesheet"]').each((i, el) => {
                         const href = $(el).attr('href') || '';
                         if (
@@ -630,15 +660,455 @@ async function processArchive(archive, session, userId, ctx) {
                         const asyncAttr = $el.attr('async');
                         if (html.includes('.main-chat')) return;
 
+                        const isScrollAndLinkFixScript = (
+                            html.includes('link.href = link.href.replace(\'https:///\',') &&
+                            html.includes('maxScroll') &&
+                            html.includes('window.addEventListener("scroll"')
+                        );
+
+                        if (isScrollAndLinkFixScript) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const isFbPixelInline = html.includes('fbq(');
+                        if (isFbPixelInline) {
+                            $el.remove();
+                            return;
+                        }
+
                         const removeFiles = [
                             'backfix.js',
                             'fbevents.js',
                             'auth.js',
                             'utils.js',
+                            'intl-tel-input/17.0.8/js/utils.min.js',
                             'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
                             'vli6872tq8hqh810mp/uqv3y0lxc.js',
                             'intlTelInput.min.js',
+                            'jquery-migration-3.7.1.min.js',
                             'lib.js',
+                            'plgintlTel',
+                            'validation.js',
+                            'email-decode.min',
+                            'uwt.js',
+                            'track.js',
+                            'translations.js',
+                            '/aio-static/sdk/main.js',
+                            '/aio-static/sdk/',
+                            '/_cdn/production/landing-cdn/',
+                            'time-scripts/main.js',
+                            'bundle.umd.min.js',
+                            './index/track.js'
+                        ];
+
+                        if (removeFiles.some(f => src.includes(f))) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (src === 'scripts.js') {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            src.includes('code.jquery.com/jquery') ||
+                            src.includes('ajax.googleapis.com/ajax/libs/jquery') ||
+                            src.includes('cdnjs.cloudflare.com/ajax/libs/jquery') ||
+                            src.includes('jquery.min.js') ||
+                            src.includes('jquery.js')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            src.includes('googletagmanager.com') ||
+                            src.includes('gtag/js') ||
+                            html.includes('gtag(') ||
+                            html.includes('dataLayer') ||
+                            html.includes('GoogleAnalyticsObject') ||
+                            html.includes('GTM-')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            src.includes('mc.yandex.ru') ||
+                            src.includes('yandex.ru/metrika') ||
+                            html.includes('Ya.Metrika') ||
+                            html.includes('ym(') ||
+                            html.includes('yandex_metrika_callbacks') ||
+                            html.includes('metrika') ||
+                            html.includes('yandex')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('intlTelInput') ||
+                            html.includes('window.intlTelInput') ||
+                            html.includes('separateDialCode') ||
+                            html.includes('initialCountry') ||
+                            html.includes('utilsScript')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('history.pushState') ||
+                            html.includes('vitBack') ||
+                            html.includes('minfobiz') ||
+                            html.includes('domonet') ||
+                            html.includes('domonetka') ||
+                            html.includes('IMask') ||
+                            html.includes('x_order_form') ||
+                            html.includes("on('submit', 'form'") ||
+                            html.includes('order-in-progress__popup') ||
+                            html.includes('leadprofit') ||
+                            html.includes('initBacklink') ||
+                            html.includes('land-form')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (src.includes('form-scripts.js')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (/\.on\(\s*["']submit["']\s*,\s*['"]form['"]/.test(html)) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (/(\$|jQuery)\(\s*["']a["']\s*\)\.click\s*\(/.test(html)) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const removeInlinePatterns = [
+                            'ipapi.co',
+                            '_d',
+                            '_chk',
+                            '_t',
+                            'vid'
+                        ];
+
+                        if (!src && removeInlinePatterns.some(pattern => html.includes(pattern))) {
+                            $el.remove();
+                            return;
+                        }
+                    });
+
+                    $('noscript').remove();
+
+                    $('body .rf-form__loader.js-rf-loader').remove();
+
+                    $('form').each((i, form) => {
+                        const $form = $(form);
+
+                        $form.find('input[type="submit"][disabled]').removeAttr('disabled');
+                        $form.find('button[disabled]').removeAttr('disabled');
+                        $form.find('div.form-preloader.hidden').remove();
+
+                        var isSearchForm =
+                            $form.find('input[type="text"]').length === 1 &&
+                            $form.find('input').length <= 3 &&
+                            !$form.find('input[type="email"], input[type="tel"]').length;
+
+                        var isLoginForm =
+                            $form.find('input[type="email"]').length === 1 &&
+                            $form.find('input[type="password"]').length === 1;
+
+                        var isNewsletterForm =
+                            $form.find('input[type="email"]').length === 1 &&
+                            $form.find('input[type="submit"], button[type="submit"]').length === 1 &&
+                            $form.find('input').length === 2;
+
+                        if (isSearchForm || isLoginForm || isNewsletterForm) {
+                            $form.find('input[type="hidden"]').remove();
+
+                            if ($form.attr('action') === "order.php") {
+                                $form.attr('action', "");
+                            }
+                            var action = $form.attr('action');
+                            if (
+                                action === "order.php" ||
+                                action === "#" ||
+                                (action && action.startsWith("https")) ||
+                                (action && action.startsWith("/"))
+                            ) {
+                                $form.attr('action', "");
+                            }
+                            return;
+                        }
+                        if (
+                            $form.find('input[type="text"]').length === 1 &&
+                            $form.find('input').length <= 3 &&
+                            !$form.find('input[type="email"], input[type="tel"]').length
+                        ) {
+                            var action = $form.attr('action');
+                            if (
+                                action === "order.php" ||
+                                action === "#" ||
+                                (action && action.startsWith("https")) ||
+                                (action && action.startsWith("/"))
+                            ) {
+                                $form.attr('action', "");
+                            }
+                            return;
+                        }
+
+                        if (
+                            $form.find('input[type="text"]').length === 1 ||
+                            $form.find('textarea').length === 1 ||
+                            $form.find('input[type="checkbox"]').length > 0
+                        ) {
+                            var action = $form.attr('action');
+                            if (
+                                action === "order.php" ||
+                                action === "#" ||
+                                (action && action.startsWith("https")) ||
+                                (action && action.startsWith("/"))
+                            ) {
+                                $form.attr('action', "");
+                            }
+                            return;
+                        }
+
+                        if (!$form.attr('action') || $form.attr('action').trim() === '') {
+                            $form.attr('action', 'order.php');
+                        }
+
+                        if (!$form.attr('method') || $form.attr('method').toUpperCase() !== 'POST') {
+                            $form.attr('method', 'POST');
+                        }
+
+                        if (!$form.attr('id') || $form.attr('id') !== 'form') {
+                            $form.attr('id', 'form');
+                        }
+
+                        $form.attr('style', 'position: relative; z-index: 1;');
+
+                        $form.removeAttr('onsubmit');
+                        $form.find('input[type="submit"]#ds').removeAttr('id');
+                        $form.find('.flag-container').remove();
+
+                        $form.find('input[type="hidden"]').remove();
+
+                        const sub1 = `<input type="hidden" name="sub1" value="{subid}">`;
+                        const ip   = `<input type="hidden" name="ip" value="{ip}">`;
+                        const pc   = `<input type="hidden" name="pc" value="<?=$_GET['scroll'];?>">`;
+                        const loaderDiv = `<div class="rf-form__loader js-rf-loader" style="display: none;"></div>`;
+
+                        $form.prepend(`\n\n${sub1}\n${ip}\n${pc}\n\n${loaderDiv}`);
+
+                        $form.find('input:not([type="hidden"])').each((j, input) => {
+                            const $input = $(input);
+
+                            let name = $input.attr('name') || '';
+                            let id = $input.attr('id') || '';
+
+                            const firstNameVariants = [
+                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name'
+                            ];
+
+                            if (firstNameVariants.includes(name.toLowerCase())) {
+                                $input.attr('name', 'first_name');
+                                name = 'first_name';
+                                $input.attr('id', 'first_name');
+                            }
+
+                            const lastNameVariants = [
+                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name', 'form-last_name'
+                            ];
+
+                            if (lastNameVariants.includes(name.toLowerCase())) {
+                                $input.attr('name', 'last_name');
+                                name = 'last_name';
+                                $input.attr('id', 'last_name');
+                            }
+
+                            const emailVariants = [
+                                '1-email', 'form-email'
+                            ];
+
+                            if (emailVariants.includes(name.toLowerCase())) {
+                                $input.attr('name', 'email');
+                                name = 'email';
+                                $input.attr('id', 'email');
+                            }
+
+                            const phoneVariants = [
+                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number'
+                            ];
+
+                            if (phoneVariants.includes(name.toLowerCase())) {
+                                $input.attr('name', 'phone');
+                                name = 'phone';
+                                $input.attr('id', 'phone');
+
+                                $input.attr('type', 'tel');
+
+                                $input.removeAttr('title');
+                                $input.removeAttr('pattern');
+                                $input.removeAttr('value');
+                            }
+
+                            if ($input.attr('type') !== 'submit' && !$input.attr('data-validation-status')) {
+                                $input.attr('data-validation-status', 'inactive');
+                            }
+
+                            $input.nextAll('.input_error').remove();
+
+                            let errorText = '';
+                            switch ($input.attr('name')) {
+                                case 'first_name':
+                                    errorText = 'Your first name is too short (at least 2 characters)';
+                                    break;
+                                case 'last_name':
+                                    errorText = 'Your last name is too short (at least 2 characters)';
+                                    break;
+                                case 'email':
+                                    errorText = 'Please enter your real email address (example@email.com)';
+                                    break;
+                                case 'phone':
+                                    errorText = 'Please enter a valid phone number';
+                                    break;
+                            }
+
+                            if (errorText) {
+                                const errorDiv = $(
+                                    `<div class="input_error" data-for-error="${$input.attr('name')}" data-error-status="inactive">${errorText}</div>`
+                                );
+                                $input.after('\n', errorDiv);
+                            }
+                        });
+                    });
+
+                    $('link[rel="stylesheet"]').each((i, el) => {
+                        const $el = $(el);
+                        const href = $el.attr('href');
+                        if (href && href.includes('intlTelInput.css')) {
+                            if (!href.startsWith('http')) {
+                                const fileToDelete = path.resolve(rootPath, href);
+                                if (fs.existsSync(fileToDelete)) {
+                                    fs.unlinkSync(fileToDelete);
+                                }
+                            }
+                            $el.remove();
+                        }
+                    });
+
+                    const directoryPath = rootPath;
+                    fs.readdirSync(directoryPath).forEach(file => {
+                        if (/^lead_.*\.txt$/.test(file)) {
+                            const fileToDelete = path.join(directoryPath, file);
+                            fs.unlinkSync(fileToDelete);
+                        }
+                    });
+
+                    const ASSETS_DIR = path.join(__dirname, 'assets');
+                    if (fs.existsSync(ASSETS_DIR)) {
+                        const assetFiles = fs.readdirSync(ASSETS_DIR);
+                        assetFiles.forEach(file => {
+                            const src = path.join(ASSETS_DIR, file);
+                            const dest = path.join(rootPath, file);
+                            if (fs.existsSync(src)) fs.copyFileSync(src, dest);
+                        });
+                    }
+
+                    const landingHead = require('./landing-head');
+                    if ($('head').length) {
+                        $('head').prepend(landingHead);
+                    } else {
+                        html = landingHead + html;
+                    }
+
+                    $('body').append(`\n<script src="intlTelInput.min.js"></script>`);
+                    $('body').append(`\n<script src="form-scripts.js"></script>\n\n`);
+
+                    $('body').find('[target]').each(function () {
+                        $(this).attr('target', '');
+                    });
+
+                    $('body [href]').each((i, el) => {
+                        const $el = $(el);
+                        const href = $el.attr('href') || '';
+                        if (
+                            href === '{offer}' ||
+                            href === '#' ||
+                            href === '/' ||
+                            href.startsWith('http') ||
+                            href.startsWith('/') ||
+                            href.startsWith('#')
+                        ) {
+                            $el.attr('href', '');
+                        }
+                    });
+
+                    fs.writeFileSync(filePath, $.html());
+                }
+
+                /* ------------------------ PRELANDING ------------------------ */
+                if (session.type === 'prelanding') {
+                    const prelandScriptPath = path.join(__dirname, 'preland-script.js');
+                    const scriptContent = fs.readFileSync(prelandScriptPath, 'utf8');
+
+                    $('link[rel="stylesheet"]').each((i, el) => {
+                        const href = $(el).attr('href') || '';
+                        if (
+                            href.includes('intlTelInput.min.css') ||
+                            href.includes('intlTelInput.css')
+                        ) {
+                            $(el).remove();
+                        }
+                    });
+                    $('style').each((i, el) => {
+                        const styleContent = $(el).html() || '';
+                        if (styleContent.includes('.rf-form__loader')) {
+                            $(el).remove();
+                        }
+                    });
+
+                    $('meta[name="msapplication"]').each((i, el) => {
+                        const content = $(el).attr('content') || '';
+                        if (/^0x[0-9A-Za-z]*$/.test(content)) {
+                            $(el).remove();
+                        }
+                    });
+
+                    $('script').each((i, el) => {
+                        const $el = $(el);
+                        const src = $el.attr('src') || '';
+                        const html = $el.html() || '';
+                        const asyncAttr = $el.attr('async');
+                        if (html.includes('.main-chat')) return;
+
+                        const isFbPixelInline = html.includes('fbq(');
+                        if (isFbPixelInline) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const removeFiles = [
+                            'backfix.js',
+                            'fbevents.js',
+                            'auth.js',
+                            'utils.js',
+                            'intl-tel-input/17.0.8/js/utils.min.js',
+                            'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
+                            'vli6872tq8hqh810mp/uqv3y0lxc.js',
+                            'intlTelInput.min.js',
+                            'jquery-migration-3.7.1.min.js',
+                            'lib.js',
+                            'validation.js',
                             'plgintlTel',
                             'email-decode.min',
                             'uwt.js',
@@ -732,337 +1202,12 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
-                        const removeInlinePatterns = [
-                            'ipapi.co',
-                            '_d',
-                            '_chk',
-                            '_t',
-                            'vid'
-                        ];
-
-                        if (!src && removeInlinePatterns.some(pattern => html.includes(pattern))) {
-                            $el.remove();
-                            return;
-                        }
-                    });
-
-                    $('noscript').remove();
-
-                    $('body .rf-form__loader.js-rf-loader').remove();
-
-                    $('form').each((i, form) => {
-                        const $form = $(form);
-
-                        if ($form.find('input[type="text"]').length === 1 &&
-                            $form.find('input').length <= 3 &&
-                            !$form.find('input[type="email"], input[type="tel"]').length) {
-                            return;
-                        }
-
-                        if ($form.find('input[type="text"]').length === 1 || $form.find('textarea').length === 1) {
-                            return;
-                        }
-
-                        if (!$form.attr('action') || $form.attr('action').trim() === '') {
-                            $form.attr('action', 'order.php');
-                        }
-
-                        if (!$form.attr('method') || $form.attr('method').toUpperCase() !== 'POST') {
-                            $form.attr('method', 'POST');
-                        }
-
-                        if (!$form.attr('id') || $form.attr('id') !== 'form') {
-                            $form.attr('id', 'form');
-                        }
-
-                        $form.attr('style', 'position: relative; z-index: 1;');
-
-                        $form.removeAttr('onsubmit');
-                        $form.find('input[type="submit"]#ds').removeAttr('id');
-                        $form.find('.flag-container').remove();
-
-                        $form.find('input[type="hidden"]').remove();
-
-                        const sub1 = `<input type="hidden" name="sub1" value="{subid}">`;
-                        const ip   = `<input type="hidden" name="ip" value="{ip}">`;
-                        const pc   = `<input type="hidden" name="pc" value="<?=$_GET['scroll'];?>">`;
-                        const loaderDiv = `<div class="rf-form__loader js-rf-loader" style="display: none;"></div>`;
-
-                        $form.prepend(`\n\n${sub1}\n${ip}\n${pc}\n\n${loaderDiv}`);
-
-                        $form.find('input:not([type="hidden"])').each((j, input) => {
-                            const $input = $(input);
-
-                            let name = $input.attr('name') || '';
-                            let id = $input.attr('id') || '';
-
-                            const firstNameVariants = [
-                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name'
-                            ];
-
-                            if (firstNameVariants.includes(name.toLowerCase())) {
-                                $input.attr('name', 'first_name');
-                                name = 'first_name';
-                                $input.attr('id', 'first_name');
-                            }
-
-                            const lastNameVariants = [
-                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name', 'form-last_name'
-                            ];
-
-                            if (lastNameVariants.includes(name.toLowerCase())) {
-                                $input.attr('name', 'last_name');
-                                name = 'last_name';
-                                $input.attr('id', 'last_name');
-                            }
-
-                            const emailVariants = [
-                                '1-email', 'form-email'
-                            ];
-
-                            if (emailVariants.includes(name.toLowerCase())) {
-                                $input.attr('name', 'email');
-                                name = 'email';
-                                $input.attr('id', 'email');
-                            }
-
-                            const phoneVariants = [
-                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number'
-                            ];
-
-                            if (phoneVariants.includes(name.toLowerCase())) {
-                                $input.attr('name', 'phone');
-                                name = 'phone';
-                                $input.attr('id', 'phone');
-
-                                $input.attr('type', 'tel');
-
-                                $input.removeAttr('title');
-                                $input.removeAttr('pattern');
-                                $input.removeAttr('value');
-                            }
-
-                            if ($input.attr('type') !== 'submit' && !$input.attr('data-validation-status')) {
-                                $input.attr('data-validation-status', 'inactive');
-                            }
-
-                            $input.nextAll('.input_error').remove();
-
-                            let errorText = '';
-                            switch ($input.attr('name')) {
-                                case 'first_name':
-                                    errorText = 'Your first name is too short (at least 2 characters)';
-                                    break;
-                                case 'last_name':
-                                    errorText = 'Your last name is too short (at least 2 characters)';
-                                    break;
-                                case 'email':
-                                    errorText = 'Please enter your real email address (example@email.com)';
-                                    break;
-                                case 'phone':
-                                    errorText = 'Please enter a valid phone number';
-                                    break;
-                            }
-
-                            if (errorText) {
-                                const errorDiv = $(
-                                    `<div class="input_error" data-for-error="${$input.attr('name')}" data-error-status="inactive">${errorText}</div>`
-                                );
-                                $input.after('\n', errorDiv);
-                            }
-                        });
-                    });
-
-                    $('link[rel="stylesheet"]').each((i, el) => {
-                        const $el = $(el);
-                        const href = $el.attr('href');
-                        if (href && href.includes('intlTelInput.css')) {
-                            if (!href.startsWith('http')) {
-                                const fileToDelete = path.resolve(rootPath, href);
-                                if (fs.existsSync(fileToDelete)) {
-                                    fs.unlinkSync(fileToDelete);
-                                }
-                            }
-                            $el.remove();
-                        }
-                    });
-
-                    const directoryPath = rootPath;
-                    fs.readdirSync(directoryPath).forEach(file => {
-                        if (/^lead_.*\.txt$/.test(file)) {
-                            const fileToDelete = path.join(directoryPath, file);
-                            fs.unlinkSync(fileToDelete);
-                        }
-                    });
-
-                    const ASSETS_DIR = path.join(__dirname, 'assets');
-                    if (fs.existsSync(ASSETS_DIR)) {
-                        const assetFiles = fs.readdirSync(ASSETS_DIR);
-                        assetFiles.forEach(file => {
-                            const src = path.join(ASSETS_DIR, file);
-                            const dest = path.join(rootPath, file);
-                            if (fs.existsSync(src)) fs.copyFileSync(src, dest);
-                        });
-                    }
-
-                    const landingHead = require('./landing-head');
-                    if ($('head').length) {
-                        $('head').prepend(landingHead);
-                    } else {
-                        html = landingHead + html;
-                    }
-
-                    $('body').append(`\n<script src="intlTelInput.min.js"></script>`);
-                    $('body').append(`\n<script src="form-scripts.js"></script>\n\n`);
-
-                    $('body [href]').each((i, el) => {
-                        const $el = $(el);
-                        const href = $el.attr('href') || '';
-                        if (
-                            href === '{offer}' ||
-                            href === '#' ||
-                            href === '/' ||
-                            href.startsWith('http') ||
-                            href.startsWith('/') ||
-                            href.startsWith('#')
-                        ) {
-                            $el.attr('href', '');
-                        }
-                    });
-
-                    fs.writeFileSync(filePath, $.html());
-                }
-
-                if (session.type === 'prelanding') {
-                    const prelandScriptPath = path.join(__dirname, 'preland-script.js');
-                    const scriptContent = fs.readFileSync(prelandScriptPath, 'utf8');
-
-                    $('link[rel="stylesheet"]').each((i, el) => {
-                        const href = $(el).attr('href') || '';
-                        if (
-                            href.includes('intlTelInput.min.css') ||
-                            href.includes('intlTelInput.css')
-                        ) {
-                            $(el).remove();
-                        }
-                    });
-                    $('style').each((i, el) => {
-                        const styleContent = $(el).html() || '';
-                        if (styleContent.includes('.rf-form__loader')) {
-                            $(el).remove();
-                        }
-                    });
-
-                    $('script').each((i, el) => {
-                        const $el = $(el);
-                        const src = $el.attr('src') || '';
-                        const html = $el.html() || '';
-                        const asyncAttr = $el.attr('async');
-
-                        const removeFiles = [
-                            'backfix.js',
-                            'fbevents.js',
-                            'auth.js',
-                            'utils.js',
-                            'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
-                            'vli6872tq8hqh810mp/uqv3y0lxc.js',
-                            'intlTelInput.min.js',
-                            'lib.js',
-                            'plgintlTel',
-                            'email-decode.min',
-                            'uwt.js',
-                            'track.js',
-                            'translations.js',
-                            '/aio-static/sdk/main.js',
-                            './index/track.js'
-                        ];
-
-                        if (removeFiles.some(f => src.includes(f))) {
+                        if (/\.on\(\s*["']submit["']\s*,\s*['"]form['"]/.test(html)) {
                             $el.remove();
                             return;
                         }
 
-                        if (src === 'scripts.js') {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
-                            src.includes('code.jquery.com/jquery') ||
-                            src.includes('ajax.googleapis.com/ajax/libs/jquery') ||
-                            src.includes('cdnjs.cloudflare.com/ajax/libs/jquery') ||
-                            src.includes('jquery.min.js') ||
-                            src.includes('jquery.js')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
-                            src.includes('googletagmanager.com') ||
-                            src.includes('gtag/js') ||
-                            html.includes('gtag(') ||
-                            html.includes('dataLayer') ||
-                            html.includes('GoogleAnalyticsObject') ||
-                            html.includes('GTM-') ||
-                            html.includes('window.aio.visit.fields.gl_gtag_id') ||
-                            html.includes('gtag(') ||
-                            html.includes('gtag("config"') ||
-                            html.includes('aioDataLayer')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
-                            src.includes('mc.yandex.ru') ||
-                            src.includes('yandex.ru/metrika') ||
-                            html.includes('Ya.Metrika') ||
-                            html.includes('ym(') ||
-                            html.includes('yandex_metrika_callbacks') ||
-                            html.includes('metrika') ||
-                            html.includes('yandex')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
-                            html.includes('intlTelInput') ||
-                            html.includes('window.intlTelInput') ||
-                            html.includes('separateDialCode') ||
-                            html.includes('initialCountry') ||
-                            html.includes('utilsScript')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
-                            html.includes('history.pushState') ||
-                            html.includes('vitBack') ||
-                            html.includes('minfobiz') ||
-                            html.includes('domonet') ||
-                            html.includes('domonetka') ||
-                            html.includes('scrollTop') ||
-                            html.includes('IMask') ||
-                            html.includes('x_order_form') ||
-                            html.includes("on('submit', 'form'") ||
-                            html.includes('order-in-progress__popup') ||
-                            html.includes('leadprofit') ||
-                            html.includes('initBacklink') ||
-                            html.includes('land-form') ||
-                            html.includes('window.aioBus') ||
-                            html.includes('transliterate(') ||
-                            html.includes('l_settings_fullname') ||
-                            html.includes('celebrity_1') ||
-                            html.includes('aio.landing') ||
-                            html.includes('linkCounter') ||
-                            html.includes('link_number') ||
-                            html.includes('link_enumerate error') ||
-                            html.includes('screen_resize') ||
-                            html.includes('addEventListener("resize"')
-                        ) {
+                        if (/(\$|jQuery)\(\s*["']a["']\s*\)\.click\s*\(/.test(html)) {
                             $el.remove();
                             return;
                         }
@@ -1082,6 +1227,10 @@ async function processArchive(archive, session, userId, ctx) {
                     });
 
                     $('noscript').remove();
+
+                    $('body').find('[target]').each(function () {
+                        $(this).attr('target', '');
+                    });
 
                     $('body a').each((i, el) => {
                         $(el).attr('href', '{offer}');
@@ -1118,6 +1267,7 @@ async function processArchive(archive, session, userId, ctx) {
                     fs.writeFileSync(filePath, finalHtml, 'utf8');
                 }
                 
+                /* ------------------------ PROKLA-LANDING ------------------------ */
                 if (session.type === 'prokla_land') {
                     $('link[rel="stylesheet"]').each((i, el) => {
                         const href = $(el).attr('href') || '';
@@ -1136,27 +1286,59 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                     });
 
+                    $('meta[name="msapplication"]').each((i, el) => {
+                        const content = $(el).attr('content') || '';
+                        if (/^0x[0-9A-Za-z]*$/.test(content)) {
+                            $(el).remove();
+                        }
+                    });
+
                     $('script').each((i, el) => {
                         const $el = $(el);
                         const src = $el.attr('src') || '';
                         const html = $el.html() || '';
                         const asyncAttr = $el.attr('async');
+                        if (html.includes('.main-chat')) return;
+
+                        const isScrollAndLinkFixScript = (
+                            html.includes('link.href = link.href.replace(\'https:///\',') &&
+                            html.includes('maxScroll') &&
+                            html.includes('window.addEventListener("scroll"')
+                        );
+
+                        if (isScrollAndLinkFixScript) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const isFbPixelInline = html.includes('fbq(');
+                        if (isFbPixelInline) {
+                            $el.remove();
+                            return;
+                        }
 
                         const removeFiles = [
                             'backfix.js',
                             'fbevents.js',
                             'auth.js',
                             'utils.js',
+                            'intl-tel-input/17.0.8/js/utils.min.js',
                             'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
                             'vli6872tq8hqh810mp/uqv3y0lxc.js',
                             'intlTelInput.min.js',
+                            'jquery-migration-3.7.1.min.js',
                             'lib.js',
+                            'validation.js',
                             'plgintlTel',
                             'email-decode.min',
                             'uwt.js',
                             'track.js',
                             'translations.js',
                             '/aio-static/sdk/main.js',
+                            '/aio-static/sdk/',
+                            '/_cdn/production/landing-cdn/',
+                            'time-scripts/main.js',
+                            'bundle.umd.min.js',
                             './index/track.js'
                         ];
 
@@ -1240,6 +1422,16 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        if (/\.on\(\s*["']submit["']\s*,\s*['"]form['"]/.test(html)) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (/(\$|jQuery)\(\s*["']a["']\s*\)\.click\s*\(/.test(html)) {
+                            $el.remove();
+                            return;
+                        }
+
                         const removeInlinePatterns = [
                             'ipapi.co',
                             '_d',
@@ -1261,13 +1453,70 @@ async function processArchive(archive, session, userId, ctx) {
                     $('form').each((i, form) => {
                         const $form = $(form);
 
-                        if ($form.find('input[type="text"]').length === 1 &&
+                        $form.find('input[type="submit"][disabled]').removeAttr('disabled');
+                        $form.find('button[disabled]').removeAttr('disabled');
+                        $form.find('div.form-preloader.hidden').remove();
+
+                        var isSearchForm =
+                            $form.find('input[type="text"]').length === 1 &&
                             $form.find('input').length <= 3 &&
-                            !$form.find('input[type="email"], input[type="tel"]').length) {
+                            !$form.find('input[type="email"], input[type="tel"]').length;
+
+                        var isLoginForm =
+                            $form.find('input[type="email"]').length === 1 &&
+                            $form.find('input[type="password"]').length === 1;
+
+                        var isNewsletterForm =
+                            $form.find('input[type="email"]').length === 1 &&
+                            $form.find('input[type="submit"], button[type="submit"]').length === 1 &&
+                            $form.find('input').length === 2;
+
+                        if (isSearchForm || isLoginForm || isNewsletterForm) {
+                            if ($form.attr('action') === "order.php") {
+                                $form.attr('action', "");
+                            }
+                            var action = $form.attr('action');
+                            if (
+                                action === "order.php" ||
+                                action === "#" ||
+                                (action && action.startsWith("https")) ||
+                                (action && action.startsWith("/"))
+                            ) {
+                                $form.attr('action', "");
+                            }
+                            return;
+                        }
+                        if (
+                            $form.find('input[type="text"]').length === 1 &&
+                            $form.find('input').length <= 3 &&
+                            !$form.find('input[type="email"], input[type="tel"]').length
+                        ) {
+                            var action = $form.attr('action');
+                            if (
+                                action === "order.php" ||
+                                action === "#" ||
+                                (action && action.startsWith("https")) ||
+                                (action && action.startsWith("/"))
+                            ) {
+                                $form.attr('action', "");
+                            }
                             return;
                         }
 
-                        if ($form.find('input[type="text"]').length === 1 || $form.find('textarea').length === 1) {
+                        if (
+                            $form.find('input[type="text"]').length === 1 ||
+                            $form.find('textarea').length === 1 ||
+                            $form.find('input[type="checkbox"]').length > 0
+                        ) {
+                            var action = $form.attr('action');
+                            if (
+                                action === "order.php" ||
+                                action === "#" ||
+                                (action && action.startsWith("https")) ||
+                                (action && action.startsWith("/"))
+                            ) {
+                                $form.attr('action', "");
+                            }
                             return;
                         }
 
@@ -1423,6 +1672,10 @@ async function processArchive(archive, session, userId, ctx) {
                     $('body').append(`\n<script src="intlTelInput.min.js"></script>`);
                     $('body').append(`\n<script src="form-scripts.js"></script>\n\n`);
 
+                    $('body').find('[target]').each(function () {
+                        $(this).attr('target', '');
+                    });
+
                     $('body [href]').each((i, el) => {
                         const $el = $(el);
                         const href = $el.attr('href') || '';
@@ -1467,18 +1720,34 @@ async function processArchive(archive, session, userId, ctx) {
         const newZip = new AdmZip();
         newZip.addLocalFolder(rootPath);
 
+        // FOR 1 FOLDER
+        // const ext = path.extname(fileName);
+        // let newFileName;
+        // if (session.type === 'landing') {
+        //     newFileName = `Land_${rootFolder}${ext}`;
+        // } else if (session.type === 'prelanding') {
+        //     newFileName = `Preland_${rootFolder}${ext}`;
+        // } else if (session.type === 'prokla_land') {
+        //     newFileName = `Proklaland_${rootFolder}${ext}`;
+        // } else {
+        //     newFileName = `Result_${rootFolder}${ext}`;
+        // }
+        
+        // FOR MULTIPLE FOLDERS
         const ext = path.extname(fileName);
+        const folderNameForZip = rootFolder || path.basename(fileName, ext);
+
         let newFileName;
         if (session.type === 'landing') {
-            newFileName = `Land_${rootFolder}${ext}`;
+            newFileName = `Land_${folderNameForZip}${ext}`;
         } else if (session.type === 'prelanding') {
-            newFileName = `Preland_${rootFolder}${ext}`;
+            newFileName = `Preland_${folderNameForZip}${ext}`;
         } else if (session.type === 'prokla_land') {
-            newFileName = `Proklaland_${rootFolder}${ext}`;
+            newFileName = `Proklaland_${folderNameForZip}${ext}`;
         } else {
-            newFileName = `Result_${rootFolder}${ext}`;
+            newFileName = `Result_${folderNameForZip}${ext}`;
         }
-        
+
         const newFilePath = path.join(__dirname, newFileName);
         newZip.writeZip(newFilePath);
 
