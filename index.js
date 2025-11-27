@@ -1,9 +1,12 @@
 require('dotenv').config();
+const express = require('express');
 const { Telegraf } = require('telegraf');
 const fs = require('fs');
 const path = require('path');
 const AdmZip = require('adm-zip');
 const cheerio = require('cheerio');
+
+const app = express();
 
 const fetch = (...args) =>
     import('node-fetch').then(({ default: fetch }) => fetch(...args));
@@ -827,6 +830,12 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.remove();
                             return;
                         }
+
+                        const removeClickHandlerScript = /"\s*a,\s*button\s*"\)\.click\s*\(\s*function\s*\(e\)\s*\{\s*e\.preventDefault\(\)/.test(html);
+                        if (removeClickHandlerScript) {
+                            $el.remove();
+                            return;
+                        }
                     });
 
                     $('noscript').remove();
@@ -840,6 +849,7 @@ async function processArchive(archive, session, userId, ctx) {
                         $form.find('button[disabled]').removeAttr('disabled');
                         $form.find('div.form-preloader.hidden').remove();
                         $form.find('span#error').remove();
+                        $form.find('.rf-form__loader1.js-rf-loader1').remove();
 
                         var isSearchForm =
                             ($form.find('input[type="text"], input[type="search"]').length === 1) &&
@@ -1276,6 +1286,12 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.remove();
                             return;
                         }
+
+                        const removeClickHandlerScript = /"\s*a,\s*button\s*"\)\.click\s*\(\s*function\s*\(e\)\s*\{\s*e\.preventDefault\(\)/.test(html);
+                        if (removeClickHandlerScript) {
+                            $el.remove();
+                            return;
+                        }
                     });
 
                     $('noscript').remove();
@@ -1518,6 +1534,12 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.remove();
                             return;
                         }
+
+                        const removeClickHandlerScript = /"\s*a,\s*button\s*"\)\.click\s*\(\s*function\s*\(e\)\s*\{\s*e\.preventDefault\(\)/.test(html);
+                        if (removeClickHandlerScript) {
+                            $el.remove();
+                            return;
+                        }
                     });
 
                     $('noscript').remove();
@@ -1531,6 +1553,7 @@ async function processArchive(archive, session, userId, ctx) {
                         $form.find('button[disabled]').removeAttr('disabled');
                         $form.find('div.form-preloader.hidden').remove();
                         $form.find('span#error').remove();
+                        $form.find('.rf-form__loader1.js-rf-loader1').remove();
 
                         var isSearchForm =
                             ($form.find('input[type="text"], input[type="search"]').length === 1) &&
@@ -1939,4 +1962,9 @@ function applyChangesToOrderPhp(code, changes) {
 }
 
 bot.launch();
-console.log('Bot is running...');
+
+const PORT = process.env.PORT || 10000;
+app.get('/', (req, res) => res.send('Bot is running'));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// console.log('Bot is running...');
