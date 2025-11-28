@@ -557,33 +557,6 @@ async function processArchive(archive, session, userId, ctx) {
 
         zip.extractAllTo(tempDir, true);
 
-        // 1 FOLDER
-        // const entries = zip.getEntries();
-        // if (!entries || entries.length === 0) throw new Error('ZIP пустой или некорректный');
-        
-        // const rootFolder = entries[0].entryName.split('/')[0];
-        // const rootPath = path.join(tempDir, rootFolder);
-
-        // 2 FOLDERS
-        // const entries = zip.getEntries();
-        // if (!entries || entries.length === 0) throw new Error('ZIP пустой или некорректный');
-
-        // // Determine root path safely
-        // const rootFolders = [...new Set(entries.map(e => e.entryName.split('/')[0]))];
-        // let rootPath;
-        // let rootFolder; // define it here
-
-        // if (rootFolders.length === 1 && entries[0].isDirectory) {
-        //     // ZIP has a single root folder
-        //     rootFolder = rootFolders[0];
-        //     rootPath = path.join(tempDir, rootFolder);
-        // } else {
-        //     // ZIP contains multiple files/folders at root
-        //     rootFolder = ''; // fallback, or use something from the ZIP for naming
-        //     rootPath = tempDir;
-        // }
-
-         // 1&2 FOLDERS
         const entries = zip.getEntries();
         if (!entries || entries.length === 0) throw new Error('ZIP пустой или некорректный');
 
@@ -626,11 +599,35 @@ async function processArchive(archive, session, userId, ctx) {
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html>)/i, '');
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html\b[^>]*>)/i, '');
                     html = html.replace(/<!--\s*<\?php[\s\S]*?\?>\s*-->/gi, '');
+                    
+                    const p = session.params || {};
+                    const funnelNames = [
+                        'Nearest Edge', 'Paragonix Edge', 'Pantera Edge', 'Ethereon Edge',
+                        'Nearest Finance', 'Atom Capital', 'Nearest Earn', 'Eclipse Earn',
+                        'Paragonix Earn', 'Equinox Earn', 'Iron Earn', 'Arcane Trade',
+                        'EdgeVaultra', 'SBI Earn', 'ParagonixPrimeX', 'NetherexPro',
+                        'Pantera Earn', 'San Miguel Corporation', 'Finesse Serendipidade',
+                        'ShaddersAgent', 'FortuixAgent', 'SecuroomAi', 'MonitrexPRO',
+                        'AffinexisAgent', 'NethertoxAGENT', 'FinovexPro', 'PrimeAura',
+                        'SpectraX', 'SpectraX Bot', 'BlockJet', 'NovusX', 'Blizzetrix',
+                        'Coinsterix', 'PrimeAurora', 'Fluxorium Corporation'
+                    ];
+
+                    if (p.funnel && funnelNames.includes(p.funnel)) {
+                        const sortedNames = funnelNames.sort((a, b) => b.length - a.length);
+                        const pattern = new RegExp(
+                            sortedNames
+                                .map(name => '\\b' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b')
+                                .join('|'),
+                            'gi'
+                        );
+
+                        html = html.replace(pattern, p.funnel);
+                    }
                 }
 
-                // const $ = cheerio.load(html, { xmlMode: false });
                 const $ = cheerio.load(html, { decodeEntities: false });
-
+                
                 /* ------------------------ LAND ------------------------ */
                 if (session.type === 'landing') {
                     $('meta[name="msapplication"]').each((i, el) => {
@@ -654,6 +651,13 @@ async function processArchive(archive, session, userId, ctx) {
                         const styleContent = $(el).html() || '';
                         if (styleContent.includes('.rf-form__loader')) {
                             $(el).remove();
+                        }
+                    });
+
+                    $('style').each(function() {
+                        const styleContent = $(this).html();
+                        if (styleContent.includes('input.failed-input') || styleContent.includes('.input_error')) {
+                            $(this).remove();
                         }
                     });
 
@@ -686,7 +690,12 @@ async function processArchive(archive, session, userId, ctx) {
                             'fbevents.js',
                             'auth.js',
                             'utils.js',
+                            'utils.min.js',
                             'jquery-3.7.1.min.js',
+                            'bean-script.js',
+                            'messages_es.min.js',
+                            'messages_fr.min.js',
+                            'functions.js',
                             'intl-tel-input/17.0.8/js/utils.min.js',
                             'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
                             'vli6872tq8hqh810mp/uqv3y0lxc.js',
@@ -705,7 +714,8 @@ async function processArchive(archive, session, userId, ctx) {
                             '/_cdn/production/landing-cdn/',
                             'time-scripts/main.js',
                             'bundle.umd.min.js',
-                            './index/track.js'
+                            './index/track.js',
+                            'loader.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -723,7 +733,8 @@ async function processArchive(archive, session, userId, ctx) {
                             src.includes('ajax.googleapis.com/ajax/libs/jquery') ||
                             src.includes('cdnjs.cloudflare.com/ajax/libs/jquery') ||
                             src.includes('jquery.min.js') ||
-                            src.includes('jquery.js')
+                            src.includes('jquery.js') ||
+                            src.includes('jquery-1.11.1.min.js')
                         ) {
                             $el.remove();
                             return;
@@ -777,7 +788,16 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('order-in-progress__popup') ||
                             html.includes('leadprofit') ||
                             html.includes('initBacklink') ||
-                            html.includes('land-form')
+                            html.includes('land-form') ||
+                            html.includes('_signup_form') ||
+                            html.includes('querySelectorAll("a")') ||
+                            html.includes('scrollIntoView') ||
+                            html.includes('submit-btn') ||
+                            html.includes('.Hear-from-You-Form') ||
+                            html.includes('patternSubid') ||
+                            html.includes('cleanedPad') ||
+                            html.includes('.subid') ||
+                            html.includes('.pad')
                         ) {
                             $el.remove();
                             return;
@@ -836,6 +856,22 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.remove();
                             return;
                         }
+
+                        if (!src && html.trim() === '' && ($el.attr('async') || $el.attr('charset'))) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if ($el.attr('data-cf-beacon')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const removeScreenResizeScript = /let\s+screenResize\s*=\s*'';\s*if\s*\(screenResize !== 'yes'\)/.test(html);
+                        if (removeScreenResizeScript) {
+                            $el.remove();
+                            return;
+                        }
                     });
 
                     $('noscript').remove();
@@ -850,6 +886,40 @@ async function processArchive(archive, session, userId, ctx) {
                         $form.find('div.form-preloader.hidden').remove();
                         $form.find('span#error').remove();
                         $form.find('.rf-form__loader1.js-rf-loader1').remove();
+                        $form.removeAttr('novalidate');
+                        $form.find('.valid-msg').remove();
+                        $form.find('.error-msg').remove();
+                        $form.find('.error-text').remove();
+                        $form.find('div.input_error[data-for-error="phone"]').remove();
+
+                        const requiredFields = ['first_name', 'last_name', 'email', 'phone'];
+                        const hasAllFields = requiredFields.every(name => $form.find(`input[name="${name}"]`).length > 0);
+
+                        if (hasAllFields) {
+                            $form.find('button').each(function () {
+                                const $btn = $(this);
+                                if (!$btn.attr('type')) {
+                                    $btn.attr('type', 'submit');
+                                }
+                            });
+                        }
+
+                        $form.find('.iti').each(function () {
+                            const $iti = $(this);
+
+                            const $phoneInput = $iti.find('input[type="tel"]');
+
+                            const $error = $iti.find('.input_error');
+
+                            if ($phoneInput.length) {
+                                $iti.after($phoneInput);
+                            }
+                            if ($error.length) {
+                                $iti.after($error);
+                            }
+
+                            $iti.remove();
+                        });
 
                         var isSearchForm =
                             ($form.find('input[type="text"], input[type="search"]').length === 1) &&
@@ -899,6 +969,10 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        if ($form.hasClass('no-modify') || $form.closest('.newsletter-wrapper').length) {
+                            return;
+                        }
+
                         if ($form.find('input[type="search"]').length > 0) {
                             return;
                         }
@@ -954,27 +1028,29 @@ async function processArchive(archive, session, userId, ctx) {
                             let id = $input.attr('id') || '';
 
                             const firstNameVariants = [
-                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name'
+                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name', 'name'
                             ];
 
                             if (firstNameVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'first_name');
                                 name = 'first_name';
                                 $input.attr('id', 'first_name');
+                                $input.removeAttr('pattern');
                             }
 
                             const lastNameVariants = [
-                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name', 'form-last_name'
+                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name', 'form-last_name', 'last'
                             ];
 
                             if (lastNameVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'last_name');
                                 name = 'last_name';
                                 $input.attr('id', 'last_name');
+                                $input.removeAttr('pattern');
                             }
 
                             const emailVariants = [
-                                '1-email', 'form-email'
+                                '1-email', 'form-email', 'email'
                             ];
 
                             if (emailVariants.includes(name.toLowerCase())) {
@@ -982,11 +1058,10 @@ async function processArchive(archive, session, userId, ctx) {
                                 name = 'email';
                                 $input.attr('id', 'email');
                                 $input.removeAttr('pattern');
-                                $input.prop('pattern', '');
                             }
 
                             const phoneVariants = [
-                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number'
+                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1'
                             ];
 
                             if (phoneVariants.includes(name.toLowerCase())) {
@@ -1078,6 +1153,10 @@ async function processArchive(archive, session, userId, ctx) {
                         $(this).attr('target', '');
                     });
 
+                    $('body').find('[onclick]').each(function () {
+                        $(this).attr('onclick', '');
+                    });
+
                     $('body [href]').each((i, el) => {
                         const $el = $(el);
                         const href = $el.attr('href') || '';
@@ -1092,6 +1171,14 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.attr('href', '');
                         }
                     });
+
+                    $('body meta, body title, body link[rel="stylesheet"], body style[type="text/css"]').each(function() {
+                        $('head').append('\n', this);
+                    });
+
+                    if ($('body link[rel="shortcut icon"]').length === 0) {
+                        $('head').append('\n');
+                    }
 
                     fs.writeFileSync(filePath, $.html());
                 }
@@ -1110,243 +1197,6 @@ async function processArchive(archive, session, userId, ctx) {
                             $(el).remove();
                         }
                     });
-                    $('style').each((i, el) => {
-                        const styleContent = $(el).html() || '';
-                        if (styleContent.includes('.rf-form__loader')) {
-                            $(el).remove();
-                        }
-                    });
-
-                    $('meta[name="msapplication"]').each((i, el) => {
-                        const content = $(el).attr('content') || '';
-                        if (/^0x[0-9A-Za-z]*$/.test(content)) {
-                            $(el).remove();
-                        }
-                    });
-
-                    $('script').each((i, el) => {
-                        const $el = $(el);
-                        const src = $el.attr('src') || '';
-                        const html = $el.html() || '';
-                        const asyncAttr = $el.attr('async');
-                        if (html.includes('.main-chat')) return;
-
-                        const isFbPixelInline = html.includes('fbq(');
-                        if (isFbPixelInline) {
-                            $el.remove();
-                            return;
-                        }
-
-                        const removeFiles = [
-                            'backfix.js',
-                            'fbevents.js',
-                            'auth.js',
-                            'utils.js',
-                            'jquery-3.7.1.min.js',
-                            'intl-tel-input/17.0.8/js/utils.min.js',
-                            'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
-                            'vli6872tq8hqh810mp/uqv3y0lxc.js',
-                            'intlTelInput.js',
-                            'intlTelInput.min.js',
-                            'jquery-migration-3.7.1.min.js',
-                            'lib.js',
-                            'validation.js',
-                            'plgintlTel',
-                            'email-decode.min',
-                            'uwt.js',
-                            'track.js',
-                            'translations.js',
-                            '/aio-static/sdk/main.js',
-                            '/aio-static/sdk/',
-                            '/_cdn/production/landing-cdn/',
-                            'time-scripts/main.js',
-                            'bundle.umd.min.js',
-                            './index/track.js'
-                        ];
-
-                        if (removeFiles.some(f => src.includes(f))) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (src === 'scripts.js') {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
-                            src.includes('code.jquery.com/jquery') ||
-                            src.includes('ajax.googleapis.com/ajax/libs/jquery') ||
-                            src.includes('cdnjs.cloudflare.com/ajax/libs/jquery') ||
-                            src.includes('jquery.min.js') ||
-                            src.includes('jquery.js')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
-                            src.includes('googletagmanager.com') ||
-                            src.includes('gtag/js') ||
-                            html.includes('gtag(') ||
-                            html.includes('dataLayer') ||
-                            html.includes('GoogleAnalyticsObject') ||
-                            html.includes('GTM-')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
-                            src.includes('mc.yandex.ru') ||
-                            src.includes('yandex.ru/metrika') ||
-                            html.includes('Ya.Metrika') ||
-                            html.includes('ym(') ||
-                            html.includes('yandex_metrika_callbacks') ||
-                            html.includes('metrika') ||
-                            html.includes('yandex')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
-                            html.includes('intlTelInput') ||
-                            html.includes('window.intlTelInput') ||
-                            html.includes('separateDialCode') ||
-                            html.includes('initialCountry') ||
-                            html.includes('utilsScript')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
-                            html.includes('history.pushState') ||
-                            html.includes('vitBack') ||
-                            html.includes('minfobiz') ||
-                            html.includes('domonet') ||
-                            html.includes('domonetka') ||
-                            html.includes('IMask') ||
-                            html.includes('x_order_form') ||
-                            html.includes("on('submit', 'form'") ||
-                            html.includes('order-in-progress__popup') ||
-                            html.includes('leadprofit') ||
-                            html.includes('initBacklink') ||
-                            html.includes('land-form')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (src.includes('minfobiz.online')) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (src.includes('form-scripts.js')) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (/\.on\(\s*["']submit["']\s*,\s*['"]form['"]/.test(html)) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (/(\$|jQuery)\(\s*["']a["']\s*\)\.click\s*\(/.test(html)) {
-                            $el.remove();
-                            return;
-                        }
-
-                        const removeInlinePatterns = [
-                            'ipapi.co',
-                            '_d',
-                            '_chk',
-                            '_t',
-                            'vid'
-                        ];
-
-                        if (!src && removeInlinePatterns.some(pattern => html.includes(pattern))) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (html.includes('querySelectorAll(".form")') && html.includes('iti__selected-dial-code')) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (html.includes('window.aioBus') && html.includes('aio.landing')) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (!src && html.includes('googletag.cmd.push')) {
-                            $el.remove();
-                            return;
-                        }
-
-                        const removeClickHandlerScript = /"\s*a,\s*button\s*"\)\.click\s*\(\s*function\s*\(e\)\s*\{\s*e\.preventDefault\(\)/.test(html);
-                        if (removeClickHandlerScript) {
-                            $el.remove();
-                            return;
-                        }
-                    });
-
-                    $('noscript').remove();
-
-                    $('body').find('[target]').each(function () {
-                        $(this).attr('target', '');
-                    });
-
-                    $('body a').each((i, el) => {
-                        $(el).attr('href', '{offer}');
-                    });
-
-                    $('head, body').contents().filter((i, node) => node.type === 'comment').remove();
-
-                    const inlineScript = `<script>\n${scriptContent}\n</script>\n\n`;
-                    $('body').append(inlineScript);
-
-                    const migrationScript = `<script src="../jquery-migration-3.7.1.min.js"></script>\n`;
-                    if ($('head').length) {
-                        $('head').append(migrationScript);
-                    } else {
-                        $('html').prepend(migrationScript);
-                    }
-
-                    let finalHtml = $.html();
-
-                    const { key, value } = session.prelandParam || {};
-                    // if (key && value) {
-                    if (key && value && !(key === '0' && value === '0')) {
-                        const phpCode =
-                            `<?php if ($_GET["${key}"] != "${value}") { echo '<script>window.location.replace("https://www.google.com/");document.location.href="https://www.google.com/";</script>'; exit; } ?>\n\n`;
-
-                        if (finalHtml.includes('<!DOCTYPE')) {
-                            finalHtml = finalHtml.replace('<!DOCTYPE', phpCode + '<!DOCTYPE');
-                        } else {
-                            finalHtml = phpCode + finalHtml;
-                        }
-                    }
-
-
-                    fs.writeFileSync(filePath, finalHtml, 'utf8');
-                }
-                
-                /* ------------------------ PROKLA-LANDING ------------------------ */
-                if (session.type === 'prokla_land') {
-                    $('link[rel="stylesheet"]').each((i, el) => {
-                        const href = $(el).attr('href') || '';
-                        if (
-                            href.includes('intlTelInput.min.css') ||
-                            href.includes('intlTelInput.css')
-                        ) {
-                            $(el).remove();
-                        }
-                    });
-                    
                     $('style').each((i, el) => {
                         const styleContent = $(el).html() || '';
                         if (styleContent.includes('.rf-form__loader')) {
@@ -1390,7 +1240,12 @@ async function processArchive(archive, session, userId, ctx) {
                             'fbevents.js',
                             'auth.js',
                             'utils.js',
+                            'utils.min.js',
                             'jquery-3.7.1.min.js',
+                            'bean-script.js',
+                            'messages_es.min.js',
+                            'messages_fr.min.js',
+                            'functions.js',
                             'intl-tel-input/17.0.8/js/utils.min.js',
                             'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
                             'vli6872tq8hqh810mp/uqv3y0lxc.js',
@@ -1398,8 +1253,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'intlTelInput.min.js',
                             'jquery-migration-3.7.1.min.js',
                             'lib.js',
-                            'validation.js',
                             'plgintlTel',
+                            'validation.js',
                             'email-decode.min',
                             'uwt.js',
                             'track.js',
@@ -1409,7 +1264,8 @@ async function processArchive(archive, session, userId, ctx) {
                             '/_cdn/production/landing-cdn/',
                             'time-scripts/main.js',
                             'bundle.umd.min.js',
-                            './index/track.js'
+                            './index/track.js',
+                            'loader.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1427,7 +1283,8 @@ async function processArchive(archive, session, userId, ctx) {
                             src.includes('ajax.googleapis.com/ajax/libs/jquery') ||
                             src.includes('cdnjs.cloudflare.com/ajax/libs/jquery') ||
                             src.includes('jquery.min.js') ||
-                            src.includes('jquery.js')
+                            src.includes('jquery.js') ||
+                            src.includes('jquery-1.11.1.min.js')
                         ) {
                             $el.remove();
                             return;
@@ -1481,7 +1338,16 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('order-in-progress__popup') ||
                             html.includes('leadprofit') ||
                             html.includes('initBacklink') ||
-                            html.includes('land-form')
+                            html.includes('land-form') ||
+                            html.includes('_signup_form') ||
+                            html.includes('querySelectorAll("a")') ||
+                            html.includes('scrollIntoView') ||
+                            html.includes('submit-btn') ||
+                            html.includes('.Hear-from-You-Form') ||
+                            html.includes('patternSubid') ||
+                            html.includes('cleanedPad') ||
+                            html.includes('.subid') ||
+                            html.includes('.pad')
                         ) {
                             $el.remove();
                             return;
@@ -1540,6 +1406,312 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.remove();
                             return;
                         }
+
+                        if (!src && html.trim() === '' && ($el.attr('async') || $el.attr('charset'))) {
+                            $el.remove();
+                            return;
+                        }
+                        
+                        if ($el.attr('data-cf-beacon')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const removeScreenResizeScript = /let\s+screenResize\s*=\s*'';\s*if\s*\(screenResize !== 'yes'\)/.test(html);
+                        if (removeScreenResizeScript) {
+                            $el.remove();
+                            return;
+                        }
+                    });
+
+                    $('noscript').remove();
+
+                    $('body').find('[target]').each(function () {
+                        $(this).attr('target', '');
+                    });
+
+                    $('body').find('[onclick]').each(function () {
+                        $(this).attr('onclick', '');
+                    });
+
+                    $('body a').each((i, el) => {
+                        $(el).attr('href', '{offer}');
+                    });
+
+                    $('head, body').contents().filter((i, node) => node.type === 'comment').remove();
+
+                    const inlineScript = `<script>\n${scriptContent}\n</script>\n\n`;
+                    $('body').append(inlineScript);
+
+                    const migrationScript = `<script src="../jquery-migration-3.7.1.min.js"></script>\n`;
+                    if ($('head').length) {
+                        $('head').append(migrationScript);
+                    } else {
+                        $('html').prepend(migrationScript);
+                    }
+
+                    let finalHtml = $.html();
+
+                    const { key, value } = session.prelandParam || {};
+                    if (key && value && !(key === '0' && value === '0')) {
+                        const phpCode =
+                            `<?php if ($_GET["${key}"] != "${value}") { echo '<script>window.location.replace("https://www.google.com/");document.location.href="https://www.google.com/";</script>'; exit; } ?>\n\n`;
+
+                        if (finalHtml.includes('<!DOCTYPE')) {
+                            finalHtml = finalHtml.replace('<!DOCTYPE', phpCode + '<!DOCTYPE');
+                        } else {
+                            finalHtml = phpCode + finalHtml;
+                        }
+                    }
+
+
+                    fs.writeFileSync(filePath, finalHtml, 'utf8');
+                }
+                
+                /* ------------------------ PROKLA-LANDING ------------------------ */
+                if (session.type === 'prokla_land') {
+                    $('link[rel="stylesheet"]').each((i, el) => {
+                        const href = $(el).attr('href') || '';
+                        if (
+                            href.includes('intlTelInput.min.css') ||
+                            href.includes('intlTelInput.css')
+                        ) {
+                            $(el).remove();
+                        }
+                    });
+                    
+                    $('style').each((i, el) => {
+                        const styleContent = $(el).html() || '';
+                        if (styleContent.includes('.rf-form__loader')) {
+                            $(el).remove();
+                        }
+                    });
+
+                    $('style').each(function() {
+                        const styleContent = $(this).html();
+                        if (styleContent.includes('input.failed-input') || styleContent.includes('.input_error')) {
+                            $(this).remove();
+                        }
+                    });
+
+                    $('meta[name="msapplication"]').each((i, el) => {
+                        const content = $(el).attr('content') || '';
+                        if (/^0x[0-9A-Za-z]*$/.test(content)) {
+                            $(el).remove();
+                        }
+                    });
+
+                    $('script').each((i, el) => {
+                        const $el = $(el);
+                        const src = $el.attr('src') || '';
+                        const html = $el.html() || '';
+                        const asyncAttr = $el.attr('async');
+                        if (html.includes('.main-chat')) return;
+
+                        const isScrollAndLinkFixScript = (
+                            html.includes('link.href = link.href.replace(\'https:///\',') &&
+                            html.includes('maxScroll') &&
+                            html.includes('window.addEventListener("scroll"')
+                        );
+
+                        if (isScrollAndLinkFixScript) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const isFbPixelInline = html.includes('fbq(');
+                        if (isFbPixelInline) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const removeFiles = [
+                            'backfix.js',
+                            'fbevents.js',
+                            'auth.js',
+                            'utils.js',
+                            'utils.min.js',
+                            'jquery-3.7.1.min.js',
+                            'bean-script.js',
+                            'messages_es.min.js',
+                            'messages_fr.min.js',
+                            'functions.js',
+                            'intl-tel-input/17.0.8/js/utils.min.js',
+                            'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
+                            'vli6872tq8hqh810mp/uqv3y0lxc.js',
+                            'intlTelInput.js',
+                            'intlTelInput.min.js',
+                            'jquery-migration-3.7.1.min.js',
+                            'lib.js',
+                            'plgintlTel',
+                            'validation.js',
+                            'email-decode.min',
+                            'uwt.js',
+                            'track.js',
+                            'translations.js',
+                            '/aio-static/sdk/main.js',
+                            '/aio-static/sdk/',
+                            '/_cdn/production/landing-cdn/',
+                            'time-scripts/main.js',
+                            'bundle.umd.min.js',
+                            './index/track.js',
+                            'loader.js'
+                        ];
+
+                        if (removeFiles.some(f => src.includes(f))) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (src === 'scripts.js') {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            src.includes('code.jquery.com/jquery') ||
+                            src.includes('ajax.googleapis.com/ajax/libs/jquery') ||
+                            src.includes('cdnjs.cloudflare.com/ajax/libs/jquery') ||
+                            src.includes('jquery.min.js') ||
+                            src.includes('jquery.js') ||
+                            src.includes('jquery-1.11.1.min.js')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            src.includes('googletagmanager.com') ||
+                            src.includes('gtag/js') ||
+                            html.includes('gtag(') ||
+                            html.includes('dataLayer') ||
+                            html.includes('GoogleAnalyticsObject') ||
+                            html.includes('GTM-')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            src.includes('mc.yandex.ru') ||
+                            src.includes('yandex.ru/metrika') ||
+                            html.includes('Ya.Metrika') ||
+                            html.includes('ym(') ||
+                            html.includes('yandex_metrika_callbacks') ||
+                            html.includes('metrika') ||
+                            html.includes('yandex')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('intlTelInput') ||
+                            html.includes('window.intlTelInput') ||
+                            html.includes('separateDialCode') ||
+                            html.includes('initialCountry') ||
+                            html.includes('utilsScript')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('history.pushState') ||
+                            html.includes('vitBack') ||
+                            html.includes('minfobiz') ||
+                            html.includes('domonet') ||
+                            html.includes('domonetka') ||
+                            html.includes('IMask') ||
+                            html.includes('x_order_form') ||
+                            html.includes("on('submit', 'form'") ||
+                            html.includes('order-in-progress__popup') ||
+                            html.includes('leadprofit') ||
+                            html.includes('initBacklink') ||
+                            html.includes('land-form') ||
+                            html.includes('_signup_form') ||
+                            html.includes('querySelectorAll("a")') ||
+                            html.includes('scrollIntoView') ||
+                            html.includes('submit-btn') ||
+                            html.includes('.Hear-from-You-Form') ||
+                            html.includes('patternSubid') ||
+                            html.includes('cleanedPad') ||
+                            html.includes('.subid') ||
+                            html.includes('.pad')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (src.includes('minfobiz.online')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (src.includes('form-scripts.js')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (/\.on\(\s*["']submit["']\s*,\s*['"]form['"]/.test(html)) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (/(\$|jQuery)\(\s*["']a["']\s*\)\.click\s*\(/.test(html)) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const removeInlinePatterns = [
+                            'ipapi.co',
+                            '_d',
+                            '_chk',
+                            '_t',
+                            'vid'
+                        ];
+
+                        if (!src && removeInlinePatterns.some(pattern => html.includes(pattern))) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (html.includes('querySelectorAll(".form")') && html.includes('iti__selected-dial-code')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (html.includes('window.aioBus') && html.includes('aio.landing')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (!src && html.includes('googletag.cmd.push')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const removeClickHandlerScript = /"\s*a,\s*button\s*"\)\.click\s*\(\s*function\s*\(e\)\s*\{\s*e\.preventDefault\(\)/.test(html);
+                        if (removeClickHandlerScript) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (!src && html.trim() === '' && ($el.attr('async') || $el.attr('charset'))) {
+                            $el.remove();
+                            return;
+                        }
+                        
+                        if ($el.attr('data-cf-beacon')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const removeScreenResizeScript = /let\s+screenResize\s*=\s*'';\s*if\s*\(screenResize !== 'yes'\)/.test(html);
+                        if (removeScreenResizeScript) {
+                            $el.remove();
+                            return;
+                        }
                     });
 
                     $('noscript').remove();
@@ -1554,6 +1726,40 @@ async function processArchive(archive, session, userId, ctx) {
                         $form.find('div.form-preloader.hidden').remove();
                         $form.find('span#error').remove();
                         $form.find('.rf-form__loader1.js-rf-loader1').remove();
+                        $form.removeAttr('novalidate');
+                        $form.find('.valid-msg').remove();
+                        $form.find('.error-msg').remove();
+                        $form.find('.error-text').remove();
+                        $form.find('div.input_error[data-for-error="phone"]').remove();
+
+                        const requiredFields = ['first_name', 'last_name', 'email', 'phone'];
+                        const hasAllFields = requiredFields.every(name => $form.find(`input[name="${name}"]`).length > 0);
+
+                        if (hasAllFields) {
+                            $form.find('button').each(function () {
+                                const $btn = $(this);
+                                if (!$btn.attr('type')) {
+                                    $btn.attr('type', 'submit');
+                                }
+                            });
+                        }
+
+                        $form.find('.iti').each(function () {
+                            const $iti = $(this);
+
+                            const $phoneInput = $iti.find('input[type="tel"]');
+
+                            const $error = $iti.find('.input_error');
+
+                            if ($phoneInput.length) {
+                                $iti.after($phoneInput);
+                            }
+                            if ($error.length) {
+                                $iti.after($error);
+                            }
+
+                            $iti.remove();
+                        });
 
                         var isSearchForm =
                             ($form.find('input[type="text"], input[type="search"]').length === 1) &&
@@ -1618,6 +1824,10 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        if ($form.hasClass('no-modify') || $form.closest('.newsletter-wrapper').length) {
+                            return;
+                        }
+
                         if ($form.find('input[type="search"]').length > 0) {
                             return;
                         }
@@ -1656,23 +1866,25 @@ async function processArchive(archive, session, userId, ctx) {
                             let id = $input.attr('id') || '';
 
                             const firstNameVariants = [
-                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name'
+                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name', 'name'
                             ];
 
                             if (firstNameVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'first_name');
                                 name = 'first_name';
                                 $input.attr('id', 'first_name');
+                                $input.removeAttr('pattern');
                             }
 
                             const lastNameVariants = [
-                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name', 'form-last_name'
+                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name', 'form-last_name', 'last'
                             ];
 
                             if (lastNameVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'last_name');
                                 name = 'last_name';
                                 $input.attr('id', 'last_name');
+                                $input.removeAttr('pattern');
                             }
 
                             const emailVariants = [
@@ -1684,11 +1896,10 @@ async function processArchive(archive, session, userId, ctx) {
                                 name = 'email';
                                 $input.attr('id', 'email');
                                 $input.removeAttr('pattern');
-                                $input.prop('pattern', '');
                             }
 
                             const phoneVariants = [
-                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number'
+                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1'
                             ];
 
                             if (phoneVariants.includes(name.toLowerCase())) {
@@ -1773,11 +1984,23 @@ async function processArchive(archive, session, userId, ctx) {
                         html = landingHead + html;
                     }
 
+                    $('body meta, body title, body link[rel="stylesheet"], body style[type="text/css"]').each(function() {
+                        $('head').append('\n', this);
+                    });
+
+                    if ($('head link[rel="shortcut icon"]').length === 0) {
+                        $('head').append('<link rel="shortcut icon" href="favicon.ico">');
+                    }
+
                     $('body').append(`\n<script src="intlTelInput.min.js"></script>`);
                     $('body').append(`\n<script src="form-scripts.js"></script>\n\n`);
 
                     $('body').find('[target]').each(function () {
                         $(this).attr('target', '');
+                    });
+
+                    $('body').find('[onclick]').each(function () {
+                        $(this).attr('onclick', '');
                     });
 
                     $('body [href]').each((i, el) => {
@@ -1797,7 +2020,6 @@ async function processArchive(archive, session, userId, ctx) {
                     let finalHtml = $.html();
 
                     const { key, value } = session.prelandParam || {};
-                    // if (key && value) {
                     if (key && value && !(key === '0' && value === '0')) {
                         const phpCode =
                             `<?php if ($_GET["${key}"] != "${value}") { echo '<script>window.location.replace("https://www.google.com/");document.location.href="https://www.google.com/";</script>'; exit; } ?>\n\n`;
@@ -1824,20 +2046,6 @@ async function processArchive(archive, session, userId, ctx) {
         const newZip = new AdmZip();
         newZip.addLocalFolder(rootPath);
 
-        // FOR 1 FOLDER
-        // const ext = path.extname(fileName);
-        // let newFileName;
-        // if (session.type === 'landing') {
-        //     newFileName = `Land_${rootFolder}${ext}`;
-        // } else if (session.type === 'prelanding') {
-        //     newFileName = `Preland_${rootFolder}${ext}`;
-        // } else if (session.type === 'prokla_land') {
-        //     newFileName = `Proklaland_${rootFolder}${ext}`;
-        // } else {
-        //     newFileName = `Result_${rootFolder}${ext}`;
-        // }
-        
-        // FOR MULTIPLE FOLDERS
         const ext = path.extname(fileName);
         const folderNameForZip = rootFolder || path.basename(fileName, ext);
 
@@ -1966,5 +2174,3 @@ bot.launch();
 const PORT = process.env.PORT || 10000;
 app.get('/', (req, res) => res.send('Bot is running'));
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-// console.log('Bot is running...');
