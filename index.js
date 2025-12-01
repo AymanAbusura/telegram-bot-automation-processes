@@ -18,6 +18,7 @@ const ORDER_TEMPLATE_PATH = './order_template.php';
 const { generateFormScriptsContent } = require('./form-scripts');
 const messages = require('./messages.json');
 
+
 /* ---------------------- TELEGRAM COMMAND MENU ---------------------- */
 bot.telegram.setMyCommands([
     { command: 'land', description: 'Ленденги' },
@@ -25,6 +26,7 @@ bot.telegram.setMyCommands([
     { command: 'prokla_land', description: 'Проклолендинги' },
     { command: 'edit_order', description: 'Изменить фйал ордер' },
     { command: 'domonetka', description: 'Домонетки' },
+    { command: 'phone_code', description: 'Коды телефонов стран' },
     { command: 'bot_info', description: 'Информация о боте' }
 ]);
 
@@ -40,6 +42,7 @@ bot.start((ctx) => {
                     [{ text: "/prokla_land" }],
                     [{ text: "/edit_order" }],
                     [{ text: "/domonetka" }],
+                    [{ text: "/phone_code" }],
                     [{ text: "/bot_info" }]
                 ],
                 resize_keyboard: true,
@@ -321,6 +324,61 @@ bot.on("callback_query", async (ctx) => {
             `📌 Код для newsProfit(OneProfit):\n\`\`\`\n${newsProfitFull}\n\`\`\``,
             { parse_mode: "Markdown" }
         );
+    }
+});
+
+/* ------------------------ /phone_code ------------------------ */
+let countryMap = {};
+try {
+    let data = fs.readFileSync(path.join(__dirname, 'countryPhoneCodes.json'), 'utf8');
+    if (!data.trim().startsWith('[')) {
+        data = '[' + data + ']';
+    }
+
+    const countries = JSON.parse(data);
+
+    countryMap = {};
+    countries.forEach(c => {
+        if (c.iso && c.code) {
+            countryMap[c.iso.toUpperCase()] = `+${c.code}`;
+        }
+    });
+
+} catch (err) {
+    console.error('Failed to load countryPhoneCodes.json:', err);
+}
+
+bot.command('phone_code', (ctx) => {
+    const message = ctx.message.text;
+    const parts = message.split(' ');
+
+    if (parts.length < 2) {
+        return ctx.reply(
+            'Укажите код страны. Пример: /phone_code RU',
+            {
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "📋 Скопировать команду",
+                                copy_text: {
+                                    text: "/phone_code RU"
+                                }
+                            }
+                        ]
+                    ]
+                }
+            }
+        );
+    }
+
+    const countryCode = parts[1].toUpperCase();
+    const phoneCode = countryMap[countryCode];
+
+    if (phoneCode) {
+        ctx.reply(`✅ Код страны ${countryCode}: ${phoneCode}`);
+    } else {
+        ctx.reply(`❌ Страна с кодом "${countryCode}" не найдена.`);
     }
 });
 
