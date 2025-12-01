@@ -804,7 +804,9 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('gtag(') ||
                             html.includes('dataLayer') ||
                             html.includes('GoogleAnalyticsObject') ||
-                            html.includes('GTM-')
+                            html.includes('GTM-') ||
+                            html.includes('googletagmanager.com/gtag/js') ||
+                            html.includes('googletagmanager.com')
                         ) {
                             $el.remove();
                             return;
@@ -855,7 +857,9 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('patternSubid') ||
                             html.includes('cleanedPad') ||
                             html.includes('.subid') ||
-                            html.includes('.pad')
+                            html.includes('.pad') ||
+                            html.includes('uwt.js') ||
+                            html.includes('window.aioBus')
                         ) {
                             $el.remove();
                             return;
@@ -1354,7 +1358,9 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('gtag(') ||
                             html.includes('dataLayer') ||
                             html.includes('GoogleAnalyticsObject') ||
-                            html.includes('GTM-')
+                            html.includes('GTM-') ||
+                            html.includes('googletagmanager.com/gtag/js') ||
+                            html.includes('googletagmanager.com')
                         ) {
                             $el.remove();
                             return;
@@ -1405,7 +1411,9 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('patternSubid') ||
                             html.includes('cleanedPad') ||
                             html.includes('.subid') ||
-                            html.includes('.pad')
+                            html.includes('.pad') ||
+                            html.includes('uwt.js') ||
+                            html.includes('window.aioBus')
                         ) {
                             $el.remove();
                             return;
@@ -1648,7 +1656,9 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('gtag(') ||
                             html.includes('dataLayer') ||
                             html.includes('GoogleAnalyticsObject') ||
-                            html.includes('GTM-')
+                            html.includes('GTM-') ||
+                            html.includes('googletagmanager.com/gtag/js') ||
+                            html.includes('googletagmanager.com')
                         ) {
                             $el.remove();
                             return;
@@ -1699,7 +1709,9 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('patternSubid') ||
                             html.includes('cleanedPad') ||
                             html.includes('.subid') ||
-                            html.includes('.pad')
+                            html.includes('.pad') ||
+                            html.includes('uwt.js') ||
+                            html.includes('window.aioBus')
                         ) {
                             $el.remove();
                             return;
