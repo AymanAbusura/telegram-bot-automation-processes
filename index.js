@@ -370,7 +370,7 @@ bot.on('document', async (ctx) => {
     if (session.type === 'landing' && session.waitParams) {
         if (!caption || !caption.includes('=')) {
             return ctx.reply(
-                "Параметры не обнаружены в caption. Прикрепите ZIP и укажите строку параметров в описании (caption), например:\n\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0"
+                "Параметры не обнаружены. Прикрепите ZIP и укажите параметры, например:\n\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0"
             );
         }
 
@@ -382,32 +382,32 @@ bot.on('document', async (ctx) => {
 
         session.params = params;
         session.waitParams = false;
-        ctx.reply('Параметры получены из caption. Добавляю архив...');
+        ctx.reply('Параметры получены. Добавляю архив...');
     }
 
     if (session.type === 'prelanding' && session.waitPreParams) {
         if (!caption || !caption.includes('=')) {
             return ctx.reply(
-                "Prelanding параметр не обнаружен в caption. Прикрепите ZIP и укажите в описании (caption): key=value"
+                "Prelanding параметр не обнаружен. Прикрепите ZIP и укажите: key=value"
             );
         }
 
         const m = caption.match(/^\s*([^=]+)=([^&\s]+)\s*$/);
         if (!m) {
-            return ctx.reply('Неверный формат prelanding в caption. Используйте key=value');
+            return ctx.reply('Неверный формат prelanding. Используйте key=value');
         }
 
         session.prelandParam = { key: m[1], value: m[2] };
         session.waitPreParams = false;
-        ctx.reply('Prelanding параметр получен из caption. Добавляю архив...');
+        ctx.reply('Prelanding параметр получен. Добавляю архив...');
     }
 
     if (session.type === 'landing' && !session.params) {
-        return ctx.reply('Не могу обработать архив — параметры ещё не заданы. Используйте /land с параметрами или пришлите ZIP с caption содержащим параметры.');
+        return ctx.reply('Не могу обработать архив — параметры ещё не заданы. Используйте /land с параметрами.');
     }
 
     if (session.type === 'prelanding' && !session.prelandParam) {
-        return ctx.reply('Не могу обработать архив — prelanding параметр ещё не задан. Используйте /preland с параметром или пришлите ZIP с caption содержащим key=value.');
+        return ctx.reply('Не могу обработать архив — prelanding параметр ещё не задан. Используйте /preland с параметром.');
     }
 
     try {
@@ -432,7 +432,7 @@ bot.on('text', async (ctx) => {
 
         if (text.toLowerCase() === 'done') {
             if (!session.versions || session.versions.length === 0) 
-                return ctx.reply('Нет кода для сохранения. Сначала загрузите order.php');
+                return ctx.reply('❌ Нет кода для сохранения. Сначала загрузите order.php');
 
             const latestCode = session.versions[session.versions.length - 1];
             const tmpFilePath = path.join(__dirname, `edited_order_${userId}.php`);
@@ -440,7 +440,7 @@ bot.on('text', async (ctx) => {
 
             ctx.replyWithDocument({ source: tmpFilePath, filename: 'order.php' })
                 .then(() => {
-                    ctx.reply('Редактирование завершено.');
+                    ctx.reply('✅ Редактирование завершено.');
                     if (fs.existsSync(tmpFilePath)) {
                         fs.unlinkSync(tmpFilePath);
                     }
@@ -448,7 +448,7 @@ bot.on('text', async (ctx) => {
                 })
                 .catch(err => {
                     console.error(err);
-                    ctx.reply('Ошибка при отправке файла.');
+                    ctx.reply('❌ Ошибка при отправке файла.');
                 });
             return;
         }
@@ -1422,6 +1422,10 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.remove();
                             return;
                         }
+                    });
+
+                    $('form').each((i, el) => {
+                        $(el).attr('action', '');
                     });
 
                     $('noscript').remove();
