@@ -726,6 +726,10 @@ async function processArchive(archive, session, userId, ctx) {
                         const asyncAttr = $el.attr('async');
                         if (html.includes('.main-chat')) return;
 
+                        if (html.includes('updateTimer') && html.includes('countdown(')) {
+                            return;
+                        }
+
                         const isScrollAndLinkFixScript = (
                             html.includes('link.href = link.href.replace(\'https:///\',') &&
                             html.includes('maxScroll') &&
@@ -939,6 +943,7 @@ async function processArchive(archive, session, userId, ctx) {
                     $('noscript').remove();
 
                     $('body .rf-form__loader.js-rf-loader').remove();
+                    $('body .rf-form__loader1.js-rf-loader1').remove();
 
                     $('form').each((i, form) => {
                         const $form = $(form);
@@ -947,7 +952,6 @@ async function processArchive(archive, session, userId, ctx) {
                         $form.find('button[disabled]').removeAttr('disabled');
                         $form.find('div.form-preloader.hidden').remove();
                         $form.find('span#error').remove();
-                        $form.find('.rf-form__loader1.js-rf-loader1').remove();
                         $form.removeAttr('novalidate');
                         $form.find('.valid-msg').remove();
                         $form.find('.error-msg').remove();
@@ -968,16 +972,12 @@ async function processArchive(archive, session, userId, ctx) {
 
                         $form.find('.iti').each(function () {
                             const $iti = $(this);
-
-                            const $phoneInput = $iti.find('input[type="tel"]');
-
-                            const $error = $iti.find('.input_error');
+                            const $phoneInput = $iti.find('input[type="tel"], input[type="phone"]').first();
 
                             if ($phoneInput.length) {
-                                $iti.after($phoneInput);
-                            }
-                            if ($error.length) {
-                                $iti.after($error);
+                                const $group = $iti.closest('.form-group');
+                                const $label = $group.find('label').first();
+                                $label.before($phoneInput);
                             }
 
                             $iti.remove();
@@ -993,11 +993,17 @@ async function processArchive(archive, session, userId, ctx) {
                             $form.find('input[type="password"]').length === 1;
 
                         var isNewsletterForm =
+                            $form.is('[data-type="subscription"]') ||
                             $form.find('input[type="email"]').length === 1 &&
                             $form.find('input[type="submit"], button[type="submit"]').length === 1 &&
                             $form.find('input').length === 2;
+                        
+                        var isNewsletterForm2 =
+                            $form.is('[data-type="subscription"]') ||
+                            $form.attr('id')?.startsWith('sib-form') ||
+                            $form.find('.sib-form-block, .sib-input').length > 0;
 
-                        if (isSearchForm || isLoginForm || isNewsletterForm) {
+                        if (isSearchForm || isLoginForm || isNewsletterForm || isNewsletterForm2) {
                             $form.find('input[type="hidden"]').remove();
 
                             if ($form.attr('action') === "order.php") {
@@ -1096,8 +1102,13 @@ async function processArchive(archive, session, userId, ctx) {
                             if (firstNameVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'first_name');
                                 name = 'first_name';
+                                
                                 $input.attr('id', 'first_name');
+                                
                                 $input.removeAttr('pattern');
+                                $input.removeAttr('value');
+                                $input.removeAttr('data-input');
+                                $input.removeAttr('data-valid');
                             }
 
                             const lastNameVariants = [
@@ -1107,8 +1118,13 @@ async function processArchive(archive, session, userId, ctx) {
                             if (lastNameVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'last_name');
                                 name = 'last_name';
+                                
                                 $input.attr('id', 'last_name');
+
                                 $input.removeAttr('pattern');
+                                $input.removeAttr('value');
+                                $input.removeAttr('data-input');
+                                $input.removeAttr('data-valid');
                             }
 
                             const emailVariants = [
@@ -1118,8 +1134,13 @@ async function processArchive(archive, session, userId, ctx) {
                             if (emailVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'email');
                                 name = 'email';
+
                                 $input.attr('id', 'email');
+
                                 $input.removeAttr('pattern');
+                                $input.removeAttr('value');
+                                $input.removeAttr('data-input');
+                                $input.removeAttr('data-valid');
                             }
 
                             const phoneVariants = [
@@ -1136,6 +1157,8 @@ async function processArchive(archive, session, userId, ctx) {
                                 $input.removeAttr('title');
                                 $input.removeAttr('pattern');
                                 $input.removeAttr('value');
+                                $input.removeAttr('data-input');
+                                $input.removeAttr('data-valid');
                             }
 
                             if ($input.attr('type') !== 'submit' && !$input.attr('data-validation-status')) {
@@ -1279,6 +1302,10 @@ async function processArchive(archive, session, userId, ctx) {
                         const html = $el.html() || '';
                         const asyncAttr = $el.attr('async');
                         if (html.includes('.main-chat')) return;
+
+                        if (html.includes('updateTimer') && html.includes('countdown(')) {
+                            return;
+                        }
 
                         const isScrollAndLinkFixScript = (
                             html.includes('link.href = link.href.replace(\'https:///\',') &&
@@ -1578,6 +1605,10 @@ async function processArchive(archive, session, userId, ctx) {
                         const asyncAttr = $el.attr('async');
                         if (html.includes('.main-chat')) return;
 
+                        if (html.includes('updateTimer') && html.includes('countdown(')) {
+                            return;
+                        }
+
                         const isScrollAndLinkFixScript = (
                             html.includes('link.href = link.href.replace(\'https:///\',') &&
                             html.includes('maxScroll') &&
@@ -1791,6 +1822,7 @@ async function processArchive(archive, session, userId, ctx) {
                     $('noscript').remove();
 
                     $('body .rf-form__loader.js-rf-loader').remove();
+                    $('body .rf-form__loader1.js-rf-loader1').remove();
 
                     $('form').each((i, form) => {
                         const $form = $(form);
@@ -1799,7 +1831,6 @@ async function processArchive(archive, session, userId, ctx) {
                         $form.find('button[disabled]').removeAttr('disabled');
                         $form.find('div.form-preloader.hidden').remove();
                         $form.find('span#error').remove();
-                        $form.find('.rf-form__loader1.js-rf-loader1').remove();
                         $form.removeAttr('novalidate');
                         $form.find('.valid-msg').remove();
                         $form.find('.error-msg').remove();
@@ -1820,16 +1851,12 @@ async function processArchive(archive, session, userId, ctx) {
 
                         $form.find('.iti').each(function () {
                             const $iti = $(this);
-
-                            const $phoneInput = $iti.find('input[type="tel"]');
-
-                            const $error = $iti.find('.input_error');
+                            const $phoneInput = $iti.find('input[type="tel"], input[type="phone"]').first();
 
                             if ($phoneInput.length) {
-                                $iti.after($phoneInput);
-                            }
-                            if ($error.length) {
-                                $iti.after($error);
+                                const $group = $iti.closest('.form-group');
+                                const $label = $group.find('label').first();
+                                $label.before($phoneInput);
                             }
 
                             $iti.remove();
@@ -1845,11 +1872,19 @@ async function processArchive(archive, session, userId, ctx) {
                             $form.find('input[type="password"]').length === 1;
 
                         var isNewsletterForm =
+                            $form.is('[data-type="subscription"]') ||
                             $form.find('input[type="email"]').length === 1 &&
                             $form.find('input[type="submit"], button[type="submit"]').length === 1 &&
                             $form.find('input').length === 2;
+                        
+                        var isNewsletterForm2 =
+                            $form.is('[data-type="subscription"]') ||
+                            $form.attr('id')?.startsWith('sib-form') ||
+                            $form.find('.sib-form-block, .sib-input').length > 0;
 
-                        if (isSearchForm || isLoginForm || isNewsletterForm) {
+                        if (isSearchForm || isLoginForm || isNewsletterForm || isNewsletterForm2) {
+                            $form.find('input[type="hidden"]').remove();
+
                             if ($form.attr('action') === "order.php") {
                                 $form.attr('action', "");
                             }
@@ -1881,6 +1916,14 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        if ($form.hasClass('no-modify') || $form.closest('.newsletter-wrapper').length) {
+                            return;
+                        }
+
+                        if ($form.find('input[type="search"]').length > 0) {
+                            return;
+                        }
+
                         if (
                             $form.find('input[type="text"]').length === 1 ||
                             $form.find('textarea').length === 1 ||
@@ -1895,14 +1938,6 @@ async function processArchive(archive, session, userId, ctx) {
                             ) {
                                 $form.attr('action', "");
                             }
-                            return;
-                        }
-
-                        if ($form.hasClass('no-modify') || $form.closest('.newsletter-wrapper').length) {
-                            return;
-                        }
-
-                        if ($form.find('input[type="search"]').length > 0) {
                             return;
                         }
 
@@ -1946,8 +1981,13 @@ async function processArchive(archive, session, userId, ctx) {
                             if (firstNameVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'first_name');
                                 name = 'first_name';
+                                
                                 $input.attr('id', 'first_name');
+                                
                                 $input.removeAttr('pattern');
+                                $input.removeAttr('value');
+                                $input.removeAttr('data-input');
+                                $input.removeAttr('data-valid');
                             }
 
                             const lastNameVariants = [
@@ -1957,19 +1997,29 @@ async function processArchive(archive, session, userId, ctx) {
                             if (lastNameVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'last_name');
                                 name = 'last_name';
+                                
                                 $input.attr('id', 'last_name');
+
                                 $input.removeAttr('pattern');
+                                $input.removeAttr('value');
+                                $input.removeAttr('data-input');
+                                $input.removeAttr('data-valid');
                             }
 
                             const emailVariants = [
-                                '1-email', 'form-email'
+                                '1-email', 'form-email', 'email'
                             ];
 
                             if (emailVariants.includes(name.toLowerCase())) {
                                 $input.attr('name', 'email');
                                 name = 'email';
+
                                 $input.attr('id', 'email');
+
                                 $input.removeAttr('pattern');
+                                $input.removeAttr('value');
+                                $input.removeAttr('data-input');
+                                $input.removeAttr('data-valid');
                             }
 
                             const phoneVariants = [
@@ -1986,6 +2036,8 @@ async function processArchive(archive, session, userId, ctx) {
                                 $input.removeAttr('title');
                                 $input.removeAttr('pattern');
                                 $input.removeAttr('value');
+                                $input.removeAttr('data-input');
+                                $input.removeAttr('data-valid');
                             }
 
                             if ($input.attr('type') !== 'submit' && !$input.attr('data-validation-status')) {
