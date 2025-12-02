@@ -777,7 +777,10 @@ async function processArchive(archive, session, userId, ctx) {
                             'time-scripts/main.js',
                             'bundle.umd.min.js',
                             './index/track.js',
-                            'loader.js'
+                            'loader.js',
+                            'i18n.min.js',
+                            'form.js',
+                            'validator.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1063,6 +1066,11 @@ async function processArchive(archive, session, userId, ctx) {
                         }
 
                         if (!$form.attr('action') || $form.attr('action').trim() === '') {
+                            $form.attr('action', 'order.php');
+                        }
+
+                        const action1 = $form.attr('action') ? $form.attr('action').trim() : '';
+                        if (!action1 || action1 !== 'order.php') {
                             $form.attr('action', 'order.php');
                         }
 
@@ -1354,7 +1362,10 @@ async function processArchive(archive, session, userId, ctx) {
                             'time-scripts/main.js',
                             'bundle.umd.min.js',
                             './index/track.js',
-                            'loader.js'
+                            'loader.js',
+                            'i18n.min.js',
+                            'form.js',
+                            'validator.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1656,7 +1667,10 @@ async function processArchive(archive, session, userId, ctx) {
                             'time-scripts/main.js',
                             'bundle.umd.min.js',
                             './index/track.js',
-                            'loader.js'
+                            'loader.js',
+                            'i18n.min.js',
+                            'form.js',
+                            'validator.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1942,6 +1956,11 @@ async function processArchive(archive, session, userId, ctx) {
                         }
 
                         if (!$form.attr('action') || $form.attr('action').trim() === '') {
+                            $form.attr('action', 'order.php');
+                        }
+
+                        const action1 = $form.attr('action') ? $form.attr('action').trim() : '';
+                        if (!action1 || action1 !== 'order.php') {
                             $form.attr('action', 'order.php');
                         }
 
