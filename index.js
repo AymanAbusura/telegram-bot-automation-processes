@@ -979,9 +979,8 @@ async function processArchive(archive, session, userId, ctx) {
                             const $iti = $(this);
 
                             const $visibleInputs = $iti.find('input:not([type="hidden"])');
-
                             $visibleInputs.each(function () {
-                                $(this).detach().insertBefore($iti);
+                                $(this).insertBefore($iti);
                             });
 
                             $iti.remove();
@@ -1875,9 +1874,8 @@ async function processArchive(archive, session, userId, ctx) {
                             const $iti = $(this);
 
                             const $visibleInputs = $iti.find('input:not([type="hidden"])');
-
                             $visibleInputs.each(function () {
-                                $(this).detach().insertBefore($iti);
+                                $(this).insertBefore($iti);
                             });
 
                             $iti.remove();
