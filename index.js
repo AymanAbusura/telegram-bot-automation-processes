@@ -780,7 +780,9 @@ async function processArchive(archive, session, userId, ctx) {
                             'loader.js',
                             'i18n.min.js',
                             'form.js',
-                            'validator.js'
+                            'validator.js',
+                            'axios.min.js',
+                            'app.js',
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -975,13 +977,12 @@ async function processArchive(archive, session, userId, ctx) {
 
                         $form.find('.iti').each(function () {
                             const $iti = $(this);
-                            const $phoneInput = $iti.find('input[type="tel"], input[type="phone"]').first();
 
-                            if ($phoneInput.length) {
-                                const $group = $iti.closest('.form-group');
-                                const $label = $group.find('label').first();
-                                $label.before($phoneInput);
-                            }
+                            const $visibleInputs = $iti.find('input:not([type="hidden"])');
+
+                            $visibleInputs.each(function () {
+                                $(this).detach().insertBefore($iti);
+                            });
 
                             $iti.remove();
                         });
@@ -1115,6 +1116,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 
                                 $input.removeAttr('pattern');
                                 $input.removeAttr('value');
+                                $input.removeAttr('title');
                                 $input.removeAttr('data-input');
                                 $input.removeAttr('data-valid');
                             }
@@ -1131,6 +1133,7 @@ async function processArchive(archive, session, userId, ctx) {
 
                                 $input.removeAttr('pattern');
                                 $input.removeAttr('value');
+                                $input.removeAttr('title');
                                 $input.removeAttr('data-input');
                                 $input.removeAttr('data-valid');
                             }
@@ -1147,6 +1150,7 @@ async function processArchive(archive, session, userId, ctx) {
 
                                 $input.removeAttr('pattern');
                                 $input.removeAttr('value');
+                                $input.removeAttr('title');
                                 $input.removeAttr('data-input');
                                 $input.removeAttr('data-valid');
                             }
@@ -1269,8 +1273,8 @@ async function processArchive(archive, session, userId, ctx) {
                         $('head').append('\n', this);
                     });
 
-                    if ($('body link[rel="shortcut icon"]').length === 0) {
-                        $('head').append('\n');
+                    if ($('head link[rel*="icon"]').length === 0) {
+                        $('head').append('<link rel="icon" href="favicon.ico">');
                     }
 
                     fs.writeFileSync(filePath, $.html());
@@ -1365,7 +1369,9 @@ async function processArchive(archive, session, userId, ctx) {
                             'loader.js',
                             'i18n.min.js',
                             'form.js',
-                            'validator.js'
+                            'validator.js',
+                            'axios.min.js',
+                            'app.js',
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1670,7 +1676,9 @@ async function processArchive(archive, session, userId, ctx) {
                             'loader.js',
                             'i18n.min.js',
                             'form.js',
-                            'validator.js'
+                            'validator.js',
+                            'axios.min.js',
+                            'app.js',
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1865,13 +1873,12 @@ async function processArchive(archive, session, userId, ctx) {
 
                         $form.find('.iti').each(function () {
                             const $iti = $(this);
-                            const $phoneInput = $iti.find('input[type="tel"], input[type="phone"]').first();
 
-                            if ($phoneInput.length) {
-                                const $group = $iti.closest('.form-group');
-                                const $label = $group.find('label').first();
-                                $label.before($phoneInput);
-                            }
+                            const $visibleInputs = $iti.find('input:not([type="hidden"])');
+
+                            $visibleInputs.each(function () {
+                                $(this).detach().insertBefore($iti);
+                            });
 
                             $iti.remove();
                         });
@@ -2005,6 +2012,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 
                                 $input.removeAttr('pattern');
                                 $input.removeAttr('value');
+                                $input.removeAttr('title');
                                 $input.removeAttr('data-input');
                                 $input.removeAttr('data-valid');
                             }
@@ -2021,6 +2029,7 @@ async function processArchive(archive, session, userId, ctx) {
 
                                 $input.removeAttr('pattern');
                                 $input.removeAttr('value');
+                                $input.removeAttr('title');
                                 $input.removeAttr('data-input');
                                 $input.removeAttr('data-valid');
                             }
@@ -2037,6 +2046,7 @@ async function processArchive(archive, session, userId, ctx) {
 
                                 $input.removeAttr('pattern');
                                 $input.removeAttr('value');
+                                $input.removeAttr('title');
                                 $input.removeAttr('data-input');
                                 $input.removeAttr('data-valid');
                             }
@@ -2133,8 +2143,8 @@ async function processArchive(archive, session, userId, ctx) {
                         $('head').append('\n', this);
                     });
 
-                    if ($('head link[rel="shortcut icon"]').length === 0) {
-                        $('head').append('<link rel="shortcut icon" href="favicon.ico">');
+                    if ($('head link[rel*="icon"]').length === 0) {
+                        $('head').append('<link rel="icon" href="favicon.ico">');
                     }
 
                     $('body').append(`\n<script src="intlTelInput.min.js"></script>`);
