@@ -16,6 +16,7 @@ const userSessions = {};
 
 const ORDER_TEMPLATE_PATH = './order_template.php';
 const { generateFormScriptsContent } = require('./form-scripts');
+const { generateFormHTML } = require('./form');
 const messages = require('./messages.json');
 
 
@@ -24,6 +25,7 @@ bot.telegram.setMyCommands([
     { command: 'land', description: 'Ленденги' },
     { command: 'preland', description: 'Прилендинги' },
     { command: 'prokla_land', description: 'Проклолендинги' },
+    { command: 'land_form', description: 'Добавить форму и настроить ленд' },
     { command: 'edit_order', description: 'Изменить фйал ордер' },
     { command: 'domonetka', description: 'Домонетки' },
     { command: 'phone_code', description: 'Коды телефонов стран' },
@@ -40,6 +42,7 @@ bot.start((ctx) => {
                     [{ text: "/land" }],
                     [{ text: "/preland" }],
                     [{ text: "/prokla_land" }],
+                    [{ text: "/land_form" }],
                     [{ text: "/edit_order" }],
                     [{ text: "/domonetka" }],
                     [{ text: "/phone_code" }],
@@ -145,7 +148,7 @@ bot.command('preland', (ctx) => {
             processingMultiple: false
         };
         return ctx.reply(
-            messages.prelandMessage,
+            messages.preLandMessage,
             {
                 reply_markup: {
                     inline_keyboard: [
@@ -202,7 +205,7 @@ bot.command('prokla_land', (ctx) => {
 
     if (!paramStr) {
         return ctx.reply(
-            messages.proklalandMessage,
+            messages.proklaLandMessage,
             {
                 reply_markup: {
                     inline_keyboard: [
@@ -264,6 +267,108 @@ bot.command('prokla_land', (ctx) => {
     );
 });
 
+/* ------------------------ land_form ------------------------ */
+bot.command('land_form', (ctx) => {
+    const userId = ctx.from.id;
+    const text = ctx.message.text || '';
+
+    const paramStr = text.replace('/land_form', '').trim();
+
+    if (!paramStr) {
+        userSessions[userId] = {
+            type: 'land_form',
+            waitParams: true,
+            params: null,
+            marker: null,
+            archives: [],
+            processingMultiple: false,
+            chatId: ctx.chat.id
+        };
+
+        return ctx.reply(messages.landFormMessage,
+            {
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "📋 Скопировать команду",
+                                copy_text: {
+                                    text: "/land_form\nmarker=Official site\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0"
+                                }
+                            }
+                        ]
+                    ]
+                }
+            }
+        );
+    }
+
+    const lines = paramStr.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+
+    if (lines.length === 0) {
+        return ctx.reply(
+            '⛔️ Неверный формат.\nИспользуйте:\n/land_form\nmarker=Official site\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0'
+        );
+    }
+
+    const params = {};
+    let marker = null;
+
+    lines.forEach(line => {
+        const [k, v] = line.split('=');
+        if (k && v) {
+            const key = k.trim();
+            const value = decodeURIComponent(v.trim());
+            
+            if (key === 'marker') {
+                marker = value;
+            } else {
+                params[key] = value;
+            }
+        }
+    });
+
+    if (!marker) {
+        return ctx.reply('⛔️ Параметр "marker" обязателен! Укажите текст, который нужно заменить на форму.');
+    }
+
+    if (Object.keys(params).length === 0) {
+        return ctx.reply('⛔️ Не указаны параметры для формы (kt, metka, country и т.д.)');
+    }
+
+    userSessions[userId] = { 
+        type: 'land_form', 
+        waitParams: false, 
+        params: params,
+        marker: marker,
+        archives: [],
+        processingMultiple: false,
+        chatId: ctx.chat.id
+    };
+
+    ctx.reply(
+        `✅ Параметры сохранены!\n\n` +
+        `🎯 Marker: "${marker}"\n` +
+        `📋 Параметры формы: ${Object.keys(params).length} параметров\n\n` +
+        `📦 Теперь отправьте ZIP архив(ы).\n\n` +
+        `⚠️ ВАЖНО: После отправки ВСЕХ архивов нажмите кнопку для копирования команды или напишите "process".`,
+        {
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        {
+                            text: "📋 Скопировать команду",
+                            copy_text: {
+                                text: "process"
+                            }
+                        }
+                    ]
+                ]
+            }
+        }
+    );
+});
+
 /* ------------------------ /edit_order ------------------------ */
 bot.command('edit_order', (ctx) => {
     const userId = ctx.from.id;
@@ -301,7 +406,7 @@ bot.command("domonetka", (ctx) => {
     };
 
     return ctx.reply(
-        `📌 Выберите домонетку, чтобы получить код:\n\n⚠️ Метку указываем так — [цифра+первая буква имени], например: 11A`,
+        messages.domonetkaMessage,
         keyboard
     );
 });
@@ -353,8 +458,7 @@ bot.command('phone_code', (ctx) => {
     const parts = message.split(' ');
 
     if (parts.length < 2) {
-        return ctx.reply(
-            'Укажите код страны. Пример: /phone_code RU',
+        return ctx.reply(messages.phoneCodeMessage,
             {
                 reply_markup: {
                     inline_keyboard: [
@@ -561,6 +665,10 @@ bot.on('text', async (ctx) => {
             
             try {
                 const resultFile = await processArchive(archive, session, userId, ctx);
+                if (!resultFile || resultFile.skipped) {
+                    await ctx.reply(`⚠️ Маркер "${session.marker}" не найден в файле ${archive.fileName}. Файл не обработан.`);
+                    continue;
+                }
                 processedFiles.push(resultFile);
 
                 await ctx.replyWithDocument({ 
@@ -641,7 +749,7 @@ async function processArchive(archive, session, userId, ctx) {
             if (fs.existsSync(p)) fs.unlinkSync(p);
         });
 
-        if (session.type === 'landing' || session.type === 'prokla_land') {
+        if (session.type === 'landing' || session.type === 'prokla_land' || session.type === 'land_form') {
             handleOrderAndScripts(session, rootPath);
         }
 
@@ -652,7 +760,7 @@ async function processArchive(archive, session, userId, ctx) {
             if (file.endsWith('index.html') || file.endsWith('.htm') || file.endsWith('index.php')) {
                 let html = fs.readFileSync(filePath, 'utf8');
 
-                if (['landing', 'prelanding', 'prokla_land'].includes(session.type)) {
+                if (['landing', 'prelanding', 'prokla_land', 'land_form'].includes(session.type)) {
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<!DOCTYPE html>)/i, '');
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html>)/i, '');
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html\b[^>]*>)/i, '');
@@ -719,12 +827,16 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                     });
 
+                    $('html').removeAttr('data-scrapbook-source');
+                    $('html').removeAttr('data-scrapbook-create');
+
                     $('script').each((i, el) => {
                         const $el = $(el);
                         const src = $el.attr('src') || '';
                         const html = $el.html() || '';
                         const asyncAttr = $el.attr('async');
                         if (html.includes('.main-chat')) return;
+                        if (html.includes('#chatbox')) return;
 
                         if (html.includes('updateTimer') && html.includes('countdown(')) {
                             return;
@@ -1307,12 +1419,16 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                     });
 
+                    $('html').removeAttr('data-scrapbook-source');
+                    $('html').removeAttr('data-scrapbook-create');
+
                     $('script').each((i, el) => {
                         const $el = $(el);
                         const src = $el.attr('src') || '';
                         const html = $el.html() || '';
                         const asyncAttr = $el.attr('async');
                         if (html.includes('.main-chat')) return;
+                        if (html.includes('#chatbox')) return;
 
                         if (html.includes('updateTimer') && html.includes('countdown(')) {
                             return;
@@ -1614,12 +1730,16 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                     });
 
+                    $('html').removeAttr('data-scrapbook-source');
+                    $('html').removeAttr('data-scrapbook-create');
+
                     $('script').each((i, el) => {
                         const $el = $(el);
                         const src = $el.attr('src') || '';
                         const html = $el.html() || '';
                         const asyncAttr = $el.attr('async');
                         if (html.includes('.main-chat')) return;
+                        if (html.includes('#chatbox')) return;
 
                         if (html.includes('updateTimer') && html.includes('countdown(')) {
                             return;
@@ -2186,7 +2306,428 @@ async function processArchive(archive, session, userId, ctx) {
 
                     fs.writeFileSync(filePath, finalHtml, 'utf8');
                 }
+                
+                /* ------------------------ LANDING-FORM ------------------------ */
+                try {
+                    if (session.type === 'land_form') {
+                        const marker = session.marker || '';
+                        const formHTML = generateFormHTML(session.params);
 
+                        let html = fs.readFileSync(filePath, 'utf-8');
+
+                        html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<!DOCTYPE html>)/i, '');
+                        html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html>)/i, '');
+                        html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html\b[^>]*>)/i, '');
+                        html = html.replace(/<!--\s*<\?php[\s\S]*?\?>\s*-->/gi, '');
+
+                        const $ = cheerio.load(html);
+
+                        let replaced = false;
+
+                        $('button, a').each((i, el) => {
+                            const $el = $(el);
+                            const text = $el.text().trim();
+                            if (text.toLowerCase() === marker.toLowerCase()) {
+                                $el.replaceWith(formHTML);
+                                replaced = true;
+                                return false;
+                            }
+                        });
+
+                        if (!replaced) {
+                            $('*').each((i, el) => {
+                                const $el = $(el);
+                                if ($el.is('script, style, form')) return;
+
+                                const htmlContent = $el.html();
+                                if (htmlContent && typeof htmlContent === 'string' && htmlContent.includes(marker) && !htmlContent.includes('<')) {
+                                    $el.html(htmlContent.replace(marker, formHTML));
+                                    replaced = true;
+                                    return false;
+                                }
+                            });
+                        }
+
+                        if (!replaced && html.includes(marker)) {
+                            html = html.replace(marker, formHTML);
+                            replaced = true;
+                        }
+
+                        if (!replaced) {
+                            return;
+                        }
+
+
+                        if (replaced) {
+                            $('meta[name="msapplication"]').each((i, el) => {
+                                const content = $(el).attr('content') || '';
+                                if (/^0x[0-9A-Za-z]*$/.test(content)) {
+                                    $(el).remove();
+                                }
+                            });
+
+                            $('link[rel="stylesheet"]').each((i, el) => {
+                                const href = $(el).attr('href') || '';
+                                if (href.includes('intlTelInput.min.css') || href.includes('intlTelInput.css')) {
+                                    $(el).remove();
+                                }
+                            });
+
+                            $('html').removeAttr('data-scrapbook-source');
+                            $('html').removeAttr('data-scrapbook-create');
+
+                            $('script').each((i, el) => {
+                                const $el = $(el);
+                                const src = $el.attr('src') || '';
+                                const html = $el.html() || '';
+                                const asyncAttr = $el.attr('async');
+                                if (html.includes('.main-chat')) return;
+                                if (html.includes('#chatbox')) return;
+
+                                if (html.includes('updateTimer') && html.includes('countdown(')) {
+                                    return;
+                                }
+
+                                const isScrollAndLinkFixScript = (
+                                    html.includes('link.href = link.href.replace(\'https:///\',') &&
+                                    html.includes('maxScroll') &&
+                                    html.includes('window.addEventListener("scroll"')
+                                );
+
+                                if (isScrollAndLinkFixScript) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                const isFbPixelInline = html.includes('fbq(');
+                                if (isFbPixelInline) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                const removeFiles = [
+                                    'backfix.js',
+                                    'fbevents.js',
+                                    'auth.js',
+                                    'utils.js',
+                                    'utils.min.js',
+                                    'jquery-3.7.1.min.js',
+                                    'bean-script.js',
+                                    'messages_es.min.js',
+                                    'messages_fr.min.js',
+                                    'functions.js',
+                                    'intl-tel-input/17.0.8/js/utils.min.js',
+                                    'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
+                                    'vli6872tq8hqh810mp/uqv3y0lxc.js',
+                                    'intlTelInput.js',
+                                    'intlTelInput.min.js',
+                                    'jquery-migration-3.7.1.min.js',
+                                    'lib.js',
+                                    'plgintlTel',
+                                    'validation.js',
+                                    'email-decode.min',
+                                    'uwt.js',
+                                    'track.js',
+                                    'translations.js',
+                                    '/aio-static/sdk/main.js',
+                                    '/aio-static/sdk/',
+                                    '/_cdn/production/landing-cdn/',
+                                    'time-scripts/main.js',
+                                    'bundle.umd.min.js',
+                                    './index/track.js',
+                                    'loader.js',
+                                    'i18n.min.js',
+                                    'form.js',
+                                    'validator.js',
+                                    'axios.min.js',
+                                    'app.js',
+                                ];
+
+                                if (removeFiles.some(f => src.includes(f))) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (src === 'scripts.js') {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (
+                                    src.includes('code.jquery.com/jquery') ||
+                                    src.includes('ajax.googleapis.com/ajax/libs/jquery') ||
+                                    src.includes('cdnjs.cloudflare.com/ajax/libs/jquery') ||
+                                    src.includes('jquery.min.js') ||
+                                    src.includes('jquery.js') ||
+                                    src.includes('jquery-1.11.1.min.js')
+                                ) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (
+                                    src.includes('googletagmanager.com') ||
+                                    src.includes('gtag/js') ||
+                                    html.includes('gtag(') ||
+                                    html.includes('dataLayer') ||
+                                    html.includes('GoogleAnalyticsObject') ||
+                                    html.includes('GTM-') ||
+                                    html.includes('googletagmanager.com/gtag/js') ||
+                                    html.includes('googletagmanager.com')
+                                ) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (
+                                    src.includes('mc.yandex.ru') ||
+                                    src.includes('yandex.ru/metrika') ||
+                                    html.includes('Ya.Metrika') ||
+                                    html.includes('ym(') ||
+                                    html.includes('yandex_metrika_callbacks') ||
+                                    html.includes('metrika') ||
+                                    html.includes('yandex')
+                                ) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (
+                                    html.includes('intlTelInput') ||
+                                    html.includes('window.intlTelInput') ||
+                                    html.includes('separateDialCode') ||
+                                    html.includes('initialCountry') ||
+                                    html.includes('utilsScript')
+                                ) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (
+                                    html.includes('history.pushState') ||
+                                    html.includes('vitBack') ||
+                                    html.includes('minfobiz') ||
+                                    html.includes('domonet') ||
+                                    html.includes('domonetka') ||
+                                    html.includes('IMask') ||
+                                    html.includes('x_order_form') ||
+                                    html.includes("on('submit', 'form'") ||
+                                    html.includes('order-in-progress__popup') ||
+                                    html.includes('leadprofit') ||
+                                    html.includes('initBacklink') ||
+                                    html.includes('land-form') ||
+                                    html.includes('_signup_form') ||
+                                    html.includes('querySelectorAll("a")') ||
+                                    html.includes('scrollIntoView') ||
+                                    html.includes('submit-btn') ||
+                                    html.includes('.Hear-from-You-Form') ||
+                                    html.includes('patternSubid') ||
+                                    html.includes('cleanedPad') ||
+                                    html.includes('.subid') ||
+                                    html.includes('.pad') ||
+                                    html.includes('uwt.js') ||
+                                    html.includes('window.aioBus')
+                                ) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (src.includes('minfobiz.online')) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (src.includes('form-scripts.js')) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (/\.on\(\s*["']submit["']\s*,\s*['"]form['"]/.test(html)) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (/(\$|jQuery)\(\s*["']a["']\s*\)\.click\s*\(/.test(html)) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                const removeInlinePatterns = [
+                                    'ipapi.co',
+                                    '_d',
+                                    '_chk',
+                                    '_t',
+                                    'vid'
+                                ];
+
+                                if (!src && removeInlinePatterns.some(pattern => html.includes(pattern))) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (html.includes('querySelectorAll(".form")') && html.includes('iti__selected-dial-code')) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (html.includes('window.aioBus') && html.includes('aio.landing')) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (!src && html.includes('googletag.cmd.push')) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                const removeClickHandlerScript = /"\s*a,\s*button\s*"\)\.click\s*\(\s*function\s*\(e\)\s*\{\s*e\.preventDefault\(\)/.test(html);
+                                if (removeClickHandlerScript) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (!src && html.trim() === '' && ($el.attr('async') || $el.attr('charset'))) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if ($el.attr('data-cf-beacon')) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                const removeScreenResizeScript = /let\s+screenResize\s*=\s*'';\s*if\s*\(screenResize !== 'yes'\)/.test(html);
+                                if (removeScreenResizeScript) {
+                                    $el.remove();
+                                    return;
+                                }
+                            });
+
+                            $('form').each((i, form) => {
+                                const $form = $(form);
+                                
+                                var isSearchForm =
+                                    ($form.find('input[type="text"], input[type="search"]').length === 1) &&
+                                    $form.find('input').length <= 3 &&
+                                    !$form.find('input[type="email"], input[type="tel"]').length;
+
+                                var isLoginForm =
+                                    $form.find('input[type="email"]').length === 1 &&
+                                    $form.find('input[type="password"]').length === 1;
+
+                                var isNewsletterForm =
+                                    $form.is('[data-type="subscription"]') ||
+                                    $form.find('input[type="email"]').length === 1 &&
+                                    $form.find('input[type="submit"], button[type="submit"]').length === 1 &&
+                                    $form.find('input').length === 2;
+                                
+                                var isNewsletterForm2 =
+                                    $form.is('[data-type="subscription"]') ||
+                                    $form.attr('id')?.startsWith('sib-form') ||
+                                    $form.find('.sib-form-block, .sib-input').length > 0;
+
+                                if (isSearchForm || isLoginForm || isNewsletterForm || isNewsletterForm2) {
+                                    $form.find('input[type="hidden"]').remove();
+
+                                    if ($form.attr('action') === "order.php") {
+                                        $form.attr('action', "");
+                                    }
+                                    var action = $form.attr('action');
+                                    if (
+                                        action === "order.php" ||
+                                        action === "#" ||
+                                        (action && action.startsWith("https")) ||
+                                        (action && action.startsWith("/"))
+                                    ) {
+                                        $form.attr('action', "");
+                                    }
+                                    return;
+                                }
+                                if (
+                                    $form.find('input[type="text"]').length === 1 &&
+                                    $form.find('input').length <= 3 &&
+                                    !$form.find('input[type="email"], input[type="tel"]').length
+                                ) {
+                                    var action = $form.attr('action');
+                                    if (
+                                        action === "order.php" ||
+                                        action === "#" ||
+                                        (action && action.startsWith("https")) ||
+                                        (action && action.startsWith("/"))
+                                    ) {
+                                        $form.attr('action', "");
+                                    }
+                                    return;
+                                }
+
+                                if (
+                                    $form.find('input[type="text"]').length === 1 ||
+                                    $form.find('textarea').length === 1 ||
+                                    $form.find('input[type="checkbox"]').length > 1
+                                ) {
+                                    var action = $form.attr('action');
+                                    if (
+                                        action === "order.php" ||
+                                        action === "#" ||
+                                        (action && action.startsWith("https")) ||
+                                        (action && action.startsWith("/"))
+                                    ) {
+                                        $form.attr('action', "");
+                                    }
+                                    return;
+                                }
+                            });
+
+                            $('body [href]').each((i, el) => {
+                                const $el = $(el);
+                                const href = $el.attr('href') || '';
+                                if (
+                                    href === '{offer}' ||
+                                    href === '#' ||
+                                    href === '/' ||
+                                    href.startsWith('http') ||
+                                    href.startsWith('/') ||
+                                    href.startsWith('#')
+                                ) {
+                                    $el.attr('href', '');
+                                }
+                            });
+
+                            const ASSETS_DIR = path.join(__dirname, 'assets');
+                            if (fs.existsSync(ASSETS_DIR)) {
+                                const assetFiles = fs.readdirSync(ASSETS_DIR);
+                                assetFiles.forEach(file => {
+                                    const src = path.join(ASSETS_DIR, file);
+                                    const dest = path.join(rootPath, file);
+                                    if (fs.existsSync(src)) fs.copyFileSync(src, dest);
+                                });
+                            }
+
+                            const FORM_CSS_FILE = path.join(__dirname, 'form_style', 'form_1.css');
+                            const DEST_CSS_FILE = path.join(rootPath, 'form_1.css');
+                            if (fs.existsSync(FORM_CSS_FILE)) {
+                                fs.copyFileSync(FORM_CSS_FILE, DEST_CSS_FILE);
+                            }
+
+                            const landingHead = require('./landing-head');
+                            if ($('head').length) {
+                                $('head').prepend(landingHead);
+                            }
+
+                            $('body').append(`\n<script src="intlTelInput.min.js"></script>`);
+                            $('body').append(`\n<script src="form-scripts.js"></script>\n\n`);
+
+                            fs.writeFileSync(filePath, $.html());
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error processing landing page:", err);
+                    if (fs.existsSync(tempFolderPath)) {
+                        rimraf.sync(tempFolderPath);
+                    }
+
+                    await ctx.reply("❌ Something went wrong while processing the landing page.");
+                }
             }
         }
 
@@ -2209,6 +2750,8 @@ async function processArchive(archive, session, userId, ctx) {
             newFileName = `Preland_${folderNameForZip}${ext}`;
         } else if (session.type === 'prokla_land') {
             newFileName = `Proklaland_${folderNameForZip}${ext}`;
+        } else if (session.type === 'land_form') {
+            newFileName = `LandForm_${folderNameForZip}${ext}`;
         } else {
             newFileName = `Result_${folderNameForZip}${ext}`;
         }
@@ -2233,6 +2776,18 @@ async function processArchive(archive, session, userId, ctx) {
             fs.unlinkSync(localFile);
         }
         throw err;
+    } finally {
+        try {
+            if (tempDir && fs.existsSync(tempDir)) {
+                fs.rmSync(tempDir, { recursive: true, force: true });
+            }
+        } catch {}
+
+        try {
+            if (localFile && fs.existsSync(localFile)) {
+                fs.unlinkSync(localFile);
+            }
+        } catch {}
     }
 }
 
