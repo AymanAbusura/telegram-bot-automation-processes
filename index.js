@@ -830,6 +830,16 @@ async function processArchive(archive, session, userId, ctx) {
                     $('html').removeAttr('data-scrapbook-source');
                     $('html').removeAttr('data-scrapbook-create');
 
+                    $('*').contents().each(function () {
+                        if (this.nodeType === 8) {
+                            const text = this.nodeValue;
+
+                            if (text && text.toLowerCase().includes('<script')) {
+                                $(this).remove();
+                            }
+                        }
+                    });
+
                     $('script').each((i, el) => {
                         const $el = $(el);
                         const src = $el.attr('src') || '';
@@ -980,7 +990,10 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('.subid') ||
                             html.includes('.pad') ||
                             html.includes('uwt.js') ||
-                            html.includes('window.aioBus')
+                            html.includes('window.aioBus') ||
+                            html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
+                            html.includes("'first_name', 'last_name'") ||
+                            html.includes('"first_name", "last_name"')
                         ) {
                             $el.remove();
                             return;
@@ -1422,6 +1435,16 @@ async function processArchive(archive, session, userId, ctx) {
                     $('html').removeAttr('data-scrapbook-source');
                     $('html').removeAttr('data-scrapbook-create');
 
+                    $('*').contents().each(function () {
+                        if (this.nodeType === 8) {
+                            const text = this.nodeValue;
+
+                            if (text && text.toLowerCase().includes('<script')) {
+                                $(this).remove();
+                            }
+                        }
+                    });
+
                     $('script').each((i, el) => {
                         const $el = $(el);
                         const src = $el.attr('src') || '';
@@ -1572,7 +1595,10 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('.subid') ||
                             html.includes('.pad') ||
                             html.includes('uwt.js') ||
-                            html.includes('window.aioBus')
+                            html.includes('window.aioBus') ||
+                            html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
+                            html.includes("'first_name', 'last_name'") ||
+                            html.includes('"first_name", "last_name"')
                         ) {
                             $el.remove();
                             return;
@@ -1733,6 +1759,16 @@ async function processArchive(archive, session, userId, ctx) {
                     $('html').removeAttr('data-scrapbook-source');
                     $('html').removeAttr('data-scrapbook-create');
 
+                    $('*').contents().each(function () {
+                        if (this.nodeType === 8) {
+                            const text = this.nodeValue;
+
+                            if (text && text.toLowerCase().includes('<script')) {
+                                $(this).remove();
+                            }
+                        }
+                    });
+
                     $('script').each((i, el) => {
                         const $el = $(el);
                         const src = $el.attr('src') || '';
@@ -1883,7 +1919,10 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('.subid') ||
                             html.includes('.pad') ||
                             html.includes('uwt.js') ||
-                            html.includes('window.aioBus')
+                            html.includes('window.aioBus') ||
+                            html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
+                            html.includes("'first_name', 'last_name'") ||
+                            html.includes('"first_name", "last_name"')
                         ) {
                             $el.remove();
                             return;
@@ -2376,6 +2415,16 @@ async function processArchive(archive, session, userId, ctx) {
                             $('html').removeAttr('data-scrapbook-source');
                             $('html').removeAttr('data-scrapbook-create');
 
+                            $('*').contents().each(function () {
+                                if (this.nodeType === 8) {
+                                    const text = this.nodeValue;
+
+                                    if (text && text.toLowerCase().includes('<script')) {
+                                        $(this).remove();
+                                    }
+                                }
+                            });
+
                             $('script').each((i, el) => {
                                 const $el = $(el);
                                 const src = $el.attr('src') || '';
@@ -2526,7 +2575,10 @@ async function processArchive(archive, session, userId, ctx) {
                                     html.includes('.subid') ||
                                     html.includes('.pad') ||
                                     html.includes('uwt.js') ||
-                                    html.includes('window.aioBus')
+                                    html.includes('window.aioBus') ||
+                                    html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
+                                    html.includes("'first_name', 'last_name'") ||
+                                    html.includes('"first_name", "last_name"')
                                 ) {
                                     $el.remove();
                                     return;
