@@ -108,6 +108,30 @@ const FORM_TRANSLATIONS = {
         submit: "Trimite"
     },
 
+    RS: {
+        first_name_pl: "Ime",
+        last_name_pl: "Prezime",
+        email_pl: "Email",
+        phone_pl: "Broj telefona",
+        err_first: "Ime je prekratko (najmanje 2 karaktera)",
+        err_last: "Prezime je prekratko (najmanje 2 karaktera)",
+        err_email: "Unesite važeću email adresu",
+        err_phone: "Unesite važeći broj telefona",
+        submit: "Pošalji"
+    },
+
+    BA: {
+        first_name_pl: "Ime",
+        last_name_pl: "Prezime",
+        email_pl: "Email",
+        phone_pl: "Broj telefona",
+        err_first: "Ime je prekratko (najmanje 2 karaktera)",
+        err_last: "Prezime je prekratko (najmanje 2 karaktera)",
+        err_email: "Unesite ispravnu email adresu",
+        err_phone: "Unesite važeći broj telefona",
+        submit: "Pošalji"
+    },
+
     BG: {
         first_name_pl: "Име",
         last_name_pl: "Фамилия",
@@ -192,6 +216,42 @@ const FORM_TRANSLATIONS = {
         submit: "Skicka"
     },
 
+    SI: {
+        first_name_pl: "Ime",
+        last_name_pl: "Priimek",
+        email_pl: "E-pošta",
+        phone_pl: "Vaša mobilna številka",
+        err_first: "Vaše ime je prekratko (vsaj 2 znaka)",
+        err_last: "Vaš priimek je prekratek (vsaj 2 znaka)",
+        err_email: "Vnesite pravi e-poštni naslov",
+        err_phone: "Vnesite veljavno telefonsko številko",
+        submit: "Pošlji"
+    },
+
+    MK: {
+        first_name_pl: "Име",
+        last_name_pl: "Презиме",
+        email_pl: "Е-пошта",
+        phone_pl: "Телефонски број",
+        err_first: "Името е премногу кратко (минимум 2 знаци)",
+        err_last: "Презимето е премногу кратко (минимум 2 знаци)",
+        err_email: "Внесете важечка е-пошта",
+        err_phone: "Внесете важечки телефонски број",
+        submit: "Испрати"
+    },
+
+    HR: {
+        first_name_pl: "Ime",
+        last_name_pl: "Prezime",
+        email_pl: "Email",
+        phone_pl: "Vaš mobitel",
+        err_first: "Vaše ime je prekratko (najmanje 2 znaka)",
+        err_last: "Vaše prezime je prekratko (najmanje 2 znaka)",
+        err_email: "Unesite ispravnu email adresu",
+        err_phone: "Unesite valjani broj mobitela",
+        submit: "Pošalji"
+    },
+
     FI: {
         first_name_pl: "Etunimi",
         last_name_pl: "Sukunimi",
@@ -214,6 +274,42 @@ const FORM_TRANSLATIONS = {
         err_email: "Indtast en gyldig emailadresse",
         err_phone: "Indtast et gyldigt telefonnummer",
         submit: "Send"
+    },
+
+    LT: {
+        first_name_pl: "Vardas",
+        last_name_pl: "Pavardė",
+        email_pl: "El. paštas",
+        phone_pl: "Telefono numeris",
+        err_first: "Vardas per trumpas (mažiausiai 2 simboliai)",
+        err_last: "Pavardė per trumpa (mažiausiai 2 simboliai)",
+        err_email: "Įveskite galiojantį el. paštą",
+        err_phone: "Įveskite galiojantį telefono numerį",
+        submit: "Siųsti"
+    },
+
+    LV: {
+        first_name_pl: "Vārds",
+        last_name_pl: "Uzvārds",
+        email_pl: "E-pasts",
+        phone_pl: "Tālruņa numurs",
+        err_first: "Vārds ir pārāk īss (vismaz 2 simboli)",
+        err_last: "Uzvārds ir pārāk īss (vismaz 2 simboli)",
+        err_email: "Lūdzu, ievadiet derīgu e-pastu",
+        err_phone: "Lūdzu, ievadiet derīgu tālruņa numuru",
+        submit: "Sūtīt"
+    },
+
+    EE: {
+        first_name_pl: "Eesnimi",
+        last_name_pl: "Perekonnanimi",
+        email_pl: "E-post",
+        phone_pl: "Telefoninumber",
+        err_first: "Eesnimi on liiga lühike (vähemalt 2 märki)",
+        err_last: "Perekonnanimi on liiga lühike (vähemalt 2 märki)",
+        err_email: "Palun sisestage kehtiv e-posti aadress",
+        err_phone: "Palun sisestage kehtiv telefoninumber",
+        submit: "Saada"
     },
 
     GR: {
