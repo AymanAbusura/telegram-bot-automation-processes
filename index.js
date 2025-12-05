@@ -2359,6 +2359,31 @@ async function processArchive(archive, session, userId, ctx) {
                         html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html\b[^>]*>)/i, '');
                         html = html.replace(/<!--\s*<\?php[\s\S]*?\?>\s*-->/gi, '');
 
+                        const p = session.params || {};
+                        const funnelNames = [
+                            'Nearest Edge', 'Paragonix Edge', 'Pantera Edge', 'Ethereon Edge',
+                            'Nearest Finance', 'Atom Capital', 'Nearest Earn', 'Eclipse Earn',
+                            'Paragonix Earn', 'Equinox Earn', 'Iron Earn', 'Arcane Trade',
+                            'EdgeVaultra', 'SBI Earn', 'ParagonixPrimeX', 'NetherexPro',
+                            'Pantera Earn', 'San Miguel Corporation', 'Finesse Serendipidade',
+                            'ShaddersAgent', 'FortuixAgent', 'SecuroomAi', 'MonitrexPRO',
+                            'AffinexisAgent', 'NethertoxAGENT', 'FinovexPro', 'PrimeAura',
+                            'SpectraX', 'SpectraX Bot', 'BlockJet', 'NovusX', 'Blizzetrix',
+                            'Coinsterix', 'PrimeAurora', 'Fluxorium Corporation'
+                        ];
+
+                        if (p.funnel && funnelNames.includes(p.funnel)) {
+                            const sortedNames = funnelNames.sort((a, b) => b.length - a.length);
+                            const pattern = new RegExp(
+                                sortedNames
+                                    .map(name => '\\b' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b')
+                                    .join('|'),
+                                'gi'
+                            );
+
+                            html = html.replace(pattern, p.funnel);
+                        }
+
                         const $ = cheerio.load(html);
 
                         let replaced = false;
