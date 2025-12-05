@@ -276,6 +276,30 @@ const FORM_TRANSLATIONS = {
         submit: "Send"
     },
 
+    IC: {
+        first_name_pl: "Fornafn",
+        last_name_pl: "Eftirnafn",
+        email_pl: "Netfang",
+        phone_pl: "Símanúmerið þitt",
+        err_first: "Fornafnið er of stutt (að minnsta kosti 2 stafir)",
+        err_last: "Eftirnafnið er of stutt (að minnsta kosti 2 stafir)",
+        err_email: "Vinsamlegast sláðu inn gilt netfang",
+        err_phone: "Vinsamlegast sláðu inn gilt símanúmer",
+        submit: "Senda"
+    },
+
+    IR: {
+        first_name_pl: "Céad ainm",
+        last_name_pl: "Sloinne",
+        email_pl: "Ríomhphost",
+        phone_pl: "D’uimhir ghutháin",
+        err_first: "Tá do chéad ainm ró-ghearr (ar a laghad 2 charachtar)",
+        err_last: "Tá do shloinne ró-ghearr (ar a laghad 2 charachtar)",
+        err_email: "Cuir isteach fíor-sheoladh ríomhphoist le do thoil",
+        err_phone: "Cuir isteach uimhir ghutháin bhailí le do thoil",
+        submit: "Seol"
+    },
+
     LT: {
         first_name_pl: "Vardas",
         last_name_pl: "Pavardė",
@@ -357,6 +381,18 @@ const FORM_TRANSLATIONS = {
         err_last: "姓氏太短（至少2个字符）",
         err_email: "请输入有效的电子邮箱",
         err_phone: "请输入有效的电话号码",
+        submit: "提交"
+    },
+
+    HK: {
+        first_name_pl: "名字",
+        last_name_pl: "姓氏",
+        email_pl: "電郵",
+        phone_pl: "你的手機號碼",
+        err_first: "你的名字太短（至少需要 2 個字）",
+        err_last: "你的姓氏太短（至少需要 2 個字）",
+        err_email: "請輸入真實的電郵地址",
+        err_phone: "請輸入有效的電話號碼",
         submit: "提交"
     },
 
@@ -444,6 +480,18 @@ const FORM_TRANSLATIONS = {
         submit: "Hantar"
     },
 
+    PH: {
+        first_name_pl: "Pangalan",
+        last_name_pl: "Apelyido",
+        email_pl: "Email",
+        phone_pl: "Iyong mobile na numero",
+        err_first: "Masyadong maikli ang iyong pangalan (dapat ay hindi bababa sa 2 karakter)",
+        err_last: "Masyadong maikli ang iyong apelyido (dapat ay hindi bababa sa 2 karakter)",
+        err_email: "Pakilagay ang iyong tunay na email address",
+        err_phone: "Pakilagay ang isang wastong numero ng telepono",
+        submit: "Isumite"
+    },
+
     IN: {
         first_name_pl: "पहला नाम",
         last_name_pl: "उपनाम",
@@ -454,6 +502,18 @@ const FORM_TRANSLATIONS = {
         err_email: "कृपया एक मान्य ईमेल दर्ज करें",
         err_phone: "कृपया एक मान्य फ़ोन नंबर दर्ज करें",
         submit: "जमा करें"
+    },
+
+    BD: {
+        first_name_pl: "নাম",
+        last_name_pl: "পদবি",
+        email_pl: "ইমেইল",
+        phone_pl: "আপনার মোবাইল নম্বর",
+        err_first: "আপনার নাম খুব ছোট (কমপক্ষে ২ অক্ষর হতে হবে)",
+        err_last: "আপনার পদবি খুব ছোট (কমপক্ষে ২ অক্ষর হতে হবে)",
+        err_email: "দয়া করে একটি সঠিক ইমেইল ঠিকানা দিন",
+        err_phone: "দয়া করে একটি বৈধ ফোন নম্বর দিন",
+        submit: "জমা দিন"
     },
 
     AF: {
