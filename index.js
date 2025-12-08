@@ -905,6 +905,7 @@ async function processArchive(archive, session, userId, ctx) {
                             'validator.js',
                             'axios.min.js',
                             'app.js',
+                            'jquery.maskedinput.min.js',
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -962,6 +963,15 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('separateDialCode') ||
                             html.includes('initialCountry') ||
                             html.includes('utilsScript')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('(function(c,l,a,r,i,t,y)') ||
+                            html.includes('clarity') ||
+                            html.includes('clarity("set"')
                         ) {
                             $el.remove();
                             return;
@@ -1212,6 +1222,7 @@ async function processArchive(archive, session, userId, ctx) {
                         $form.removeAttr('onsubmit');
                         $form.find('input[type="submit"]#ds').removeAttr('id');
                         $form.find('.flag-container').remove();
+                        $form.find('input[name="areaCode"]').remove();
 
                         $form.find('input[type="hidden"]').remove();
 
@@ -1263,7 +1274,7 @@ async function processArchive(archive, session, userId, ctx) {
                             }
 
                             const emailVariants = [
-                                '1-email', 'form-email', 'email'
+                                '1-email', 'form-email', 'email', 'solrka'
                             ];
 
                             if (emailVariants.includes(name.toLowerCase())) {
@@ -1280,7 +1291,7 @@ async function processArchive(archive, session, userId, ctx) {
                             }
 
                             const phoneVariants = [
-                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1'
+                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2'
                             ];
 
                             if (phoneVariants.includes(name.toLowerCase())) {
@@ -1510,6 +1521,7 @@ async function processArchive(archive, session, userId, ctx) {
                             'validator.js',
                             'axios.min.js',
                             'app.js',
+                            'jquery.maskedinput.min.js',
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1556,6 +1568,15 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('yandex_metrika_callbacks') ||
                             html.includes('metrika') ||
                             html.includes('yandex')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('(function(c,l,a,r,i,t,y)') ||
+                            html.includes('clarity') ||
+                            html.includes('clarity("set"')
                         ) {
                             $el.remove();
                             return;
@@ -1834,6 +1855,7 @@ async function processArchive(archive, session, userId, ctx) {
                             'validator.js',
                             'axios.min.js',
                             'app.js',
+                            'jquery.maskedinput.min.js',
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1880,6 +1902,15 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('yandex_metrika_callbacks') ||
                             html.includes('metrika') ||
                             html.includes('yandex')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('(function(c,l,a,r,i,t,y)') ||
+                            html.includes('clarity') ||
+                            html.includes('clarity("set"')
                         ) {
                             $el.remove();
                             return;
@@ -2141,6 +2172,7 @@ async function processArchive(archive, session, userId, ctx) {
                         $form.removeAttr('onsubmit');
                         $form.find('input[type="submit"]#ds').removeAttr('id');
                         $form.find('.flag-container').remove();
+                        $form.find('input[name="areaCode"]').remove();
 
                         $form.find('input[type="hidden"]').remove();
 
@@ -2192,7 +2224,7 @@ async function processArchive(archive, session, userId, ctx) {
                             }
 
                             const emailVariants = [
-                                '1-email', 'form-email', 'email'
+                                '1-email', 'form-email', 'email', 'solrka'
                             ];
 
                             if (emailVariants.includes(name.toLowerCase())) {
@@ -2209,7 +2241,7 @@ async function processArchive(archive, session, userId, ctx) {
                             }
 
                             const phoneVariants = [
-                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1'
+                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2'
                             ];
 
                             if (phoneVariants.includes(name.toLowerCase())) {
@@ -2515,6 +2547,7 @@ async function processArchive(archive, session, userId, ctx) {
                                     'validator.js',
                                     'axios.min.js',
                                     'app.js',
+                                    'jquery.maskedinput.min.js',
                                 ];
 
                                 if (removeFiles.some(f => src.includes(f))) {
@@ -2561,6 +2594,15 @@ async function processArchive(archive, session, userId, ctx) {
                                     html.includes('yandex_metrika_callbacks') ||
                                     html.includes('metrika') ||
                                     html.includes('yandex')
+                                ) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (
+                                    html.includes('(function(c,l,a,r,i,t,y)') ||
+                                    html.includes('clarity') ||
+                                    html.includes('clarity("set"')
                                 ) {
                                     $el.remove();
                                     return;
