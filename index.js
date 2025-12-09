@@ -857,9 +857,23 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('maxScroll') &&
                             html.includes('window.addEventListener("scroll"')
                         );
+                        
 
                         if (isScrollAndLinkFixScript) {
                             $el.remove();
+                            return;
+                        }
+
+                        const isDateScript =
+                            html.includes('Date') ||
+                            html.includes('getDate') ||
+                            html.includes('getMonth') ||
+                            html.includes('getFullYear') ||
+                            html.match(/\bday\b/i) ||
+                            html.match(/\bmonth\b/i) ||
+                            html.match(/\byear\b/i);
+
+                        if (isDateScript) {
                             return;
                         }
 
@@ -906,6 +920,7 @@ async function processArchive(archive, session, userId, ctx) {
                             'axios.min.js',
                             'app.js',
                             'jquery.maskedinput.min.js',
+                            'polyfill.min.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1069,6 +1084,11 @@ async function processArchive(archive, session, userId, ctx) {
                         }
 
                         if ($el.attr('data-cf-beacon')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (html.includes('window.F1TFunnelsSdkConfig')) {
                             $el.remove();
                             return;
                         }
@@ -1479,6 +1499,19 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        const isDateScript =
+                            html.includes('Date') ||
+                            html.includes('getDate') ||
+                            html.includes('getMonth') ||
+                            html.includes('getFullYear') ||
+                            html.match(/\bday\b/i) ||
+                            html.match(/\bmonth\b/i) ||
+                            html.match(/\byear\b/i);
+
+                        if (isDateScript) {
+                            return;
+                        }
+
                         const isFbPixelInline = html.includes('fbq(');
                         if (isFbPixelInline) {
                             $el.remove();
@@ -1522,6 +1555,7 @@ async function processArchive(archive, session, userId, ctx) {
                             'axios.min.js',
                             'app.js',
                             'jquery.maskedinput.min.js',
+                            'polyfill.min.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1685,6 +1719,11 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                         
                         if ($el.attr('data-cf-beacon')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (html.includes('window.F1TFunnelsSdkConfig')) {
                             $el.remove();
                             return;
                         }
@@ -1813,6 +1852,19 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        const isDateScript =
+                            html.includes('Date') ||
+                            html.includes('getDate') ||
+                            html.includes('getMonth') ||
+                            html.includes('getFullYear') ||
+                            html.match(/\bday\b/i) ||
+                            html.match(/\bmonth\b/i) ||
+                            html.match(/\byear\b/i);
+
+                        if (isDateScript) {
+                            return;
+                        }
+
                         const isFbPixelInline = html.includes('fbq(');
                         if (isFbPixelInline) {
                             $el.remove();
@@ -1856,6 +1908,7 @@ async function processArchive(archive, session, userId, ctx) {
                             'axios.min.js',
                             'app.js',
                             'jquery.maskedinput.min.js',
+                            'polyfill.min.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -2019,6 +2072,11 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                         
                         if ($el.attr('data-cf-beacon')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (html.includes('window.F1TFunnelsSdkConfig')) {
                             $el.remove();
                             return;
                         }
@@ -2505,6 +2563,19 @@ async function processArchive(archive, session, userId, ctx) {
                                     return;
                                 }
 
+                                const isDateScript =
+                                    html.includes('Date') ||
+                                    html.includes('getDate') ||
+                                    html.includes('getMonth') ||
+                                    html.includes('getFullYear') ||
+                                    html.match(/\bday\b/i) ||
+                                    html.match(/\bmonth\b/i) ||
+                                    html.match(/\byear\b/i);
+
+                                if (isDateScript) {
+                                    return;
+                                }
+
                                 const isFbPixelInline = html.includes('fbq(');
                                 if (isFbPixelInline) {
                                     $el.remove();
@@ -2548,6 +2619,7 @@ async function processArchive(archive, session, userId, ctx) {
                                     'axios.min.js',
                                     'app.js',
                                     'jquery.maskedinput.min.js',
+                                    'polyfill.min.js'
                                 ];
 
                                 if (removeFiles.some(f => src.includes(f))) {
@@ -2711,6 +2783,11 @@ async function processArchive(archive, session, userId, ctx) {
                                 }
 
                                 if ($el.attr('data-cf-beacon')) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (html.includes('window.F1TFunnelsSdkConfig')) {
                                     $el.remove();
                                     return;
                                 }
