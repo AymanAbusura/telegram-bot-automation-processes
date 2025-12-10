@@ -845,6 +845,7 @@ async function processArchive(archive, session, userId, ctx) {
                         const src = $el.attr('src') || '';
                         const html = $el.html() || '';
                         const asyncAttr = $el.attr('async');
+                        
                         if (html.includes('.main-chat')) return;
                         if (html.includes('#chatbox')) return;
 
@@ -858,8 +859,77 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('window.addEventListener("scroll"')
                         );
                         
-
                         if (isScrollAndLinkFixScript) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('history.pushState') ||
+                            html.includes('vitBack') ||
+                            html.includes('minfobiz') ||
+                            html.includes('domonet') ||
+                            html.includes('domonetka') ||
+                            html.includes('IMask') ||
+                            html.includes('x_order_form') ||
+                            html.includes("on('submit', 'form'") ||
+                            html.includes('on("submit", \'form\'') ||
+                            html.includes('on("submit", "form"') ||
+                            html.includes('order-in-progress__popup') ||
+                            html.includes('leadprofit') ||
+                            html.includes('initBacklink') ||
+                            html.includes('land-form') ||
+                            html.includes('_signup_form') ||
+                            html.includes('querySelectorAll("a")') ||
+                            html.includes('scrollIntoView') ||
+                            html.includes('submit-btn') ||
+                            html.includes('.Hear-from-You-Form') ||
+                            html.includes('patternSubid') ||
+                            html.includes('cleanedPad') ||
+                            html.includes('.subid') ||
+                            html.includes('.pad') ||
+                            html.includes('uwt.js') ||
+                            html.includes('window.aioBus') ||
+                            html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
+                            html.includes("'first_name', 'last_name'") ||
+                            html.includes('"first_name", "last_name"') || 
+                            html.includes('getCookie(') ||
+                            html.includes('setCookie(') ||
+                            html.includes('showDuplicatePopup') ||
+                            html.includes('disableSubmit') ||
+                            html.includes('rf-form__loader') ||
+                            html.includes('input[type="email"]') ||
+                            html.includes('input[name="email"]') ||
+                            html.includes('input[name="phone"]') ||
+                            html.includes('user_phone_recent') ||
+                            html.includes('user_phone_in_progress') ||
+                            html.includes('user_email_recent') ||
+                            html.includes('getTemplate(') ||
+                            html.includes('duplicate-email-popup') ||
+                            html.includes('closePopup()') ||
+                            html.includes('$("body").on("submit"') ||
+                            html.includes("$('body').on('submit'") ||
+                            html.includes("$( \"body\" ).on( \"submit\"") ||
+                            html.includes("$( 'body' ).on( 'submit'") ||
+                            html.includes('$(document).on("submit"') ||
+                            html.includes("$(document).on('submit'") ||
+                            html.includes("$('a').click(function") ||
+                            html.includes('$("a").click(function') ||
+                            html.includes('[name=name]') ||
+                            html.includes('[name=phone]') ||
+                            html.includes("'[name=phone]'") ||
+                            html.includes('"[name=phone]"') ||
+                            html.includes('Order is not accepted') ||
+                            html.includes('You was ordering') ||
+                            html.includes('recently_confirmed') ||
+                            html.includes('in_progress') ||
+                            html.includes('duplicate_order_phone') ||
+                            html.includes('order_in_progress') ||
+                            html.includes('order_recently_confirmed') ||
+                            html.includes('.offset().top') ||
+                            html.includes('.animate({scrollTop:') ||
+                            html.includes('input[type=submit]')
+                        ) {
                             $el.remove();
                             return;
                         }
@@ -987,45 +1057,6 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('(function(c,l,a,r,i,t,y)') ||
                             html.includes('clarity') ||
                             html.includes('clarity("set"')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
-                            html.includes('history.pushState') ||
-                            html.includes('vitBack') ||
-                            html.includes('minfobiz') ||
-                            html.includes('domonet') ||
-                            html.includes('domonetka') ||
-                            html.includes('IMask') ||
-                            html.includes('x_order_form') ||
-                            html.includes("on('submit', 'form'") ||
-                            html.includes('order-in-progress__popup') ||
-                            html.includes('leadprofit') ||
-                            html.includes('initBacklink') ||
-                            html.includes('land-form') ||
-                            html.includes('_signup_form') ||
-                            html.includes('querySelectorAll("a")') ||
-                            html.includes('scrollIntoView') ||
-                            html.includes('submit-btn') ||
-                            html.includes('.Hear-from-You-Form') ||
-                            html.includes('patternSubid') ||
-                            html.includes('cleanedPad') ||
-                            html.includes('.subid') ||
-                            html.includes('.pad') ||
-                            html.includes('uwt.js') ||
-                            html.includes('window.aioBus') ||
-                            html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
-                            html.includes("'first_name', 'last_name'") ||
-                            html.includes('"first_name", "last_name"') ||
-                            html.includes('getCookie(') ||
-                            html.includes('setCookie(') ||
-                            html.includes('showDuplicatePopup') ||
-                            html.includes('disableSubmit') ||
-                            html.includes('rf-form__loader') ||
-                            html.includes('input[name="email"]') ||
-                            html.includes('input[name="phone"]')
                         ) {
                             $el.remove();
                             return;
@@ -1488,6 +1519,7 @@ async function processArchive(archive, session, userId, ctx) {
                         const src = $el.attr('src') || '';
                         const html = $el.html() || '';
                         const asyncAttr = $el.attr('async');
+                        
                         if (html.includes('.main-chat')) return;
                         if (html.includes('#chatbox')) return;
 
@@ -1500,8 +1532,78 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('maxScroll') &&
                             html.includes('window.addEventListener("scroll"')
                         );
-
+                        
                         if (isScrollAndLinkFixScript) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('history.pushState') ||
+                            html.includes('vitBack') ||
+                            html.includes('minfobiz') ||
+                            html.includes('domonet') ||
+                            html.includes('domonetka') ||
+                            html.includes('IMask') ||
+                            html.includes('x_order_form') ||
+                            html.includes("on('submit', 'form'") ||
+                            html.includes('on("submit", \'form\'') ||
+                            html.includes('on("submit", "form"') ||
+                            html.includes('order-in-progress__popup') ||
+                            html.includes('leadprofit') ||
+                            html.includes('initBacklink') ||
+                            html.includes('land-form') ||
+                            html.includes('_signup_form') ||
+                            html.includes('querySelectorAll("a")') ||
+                            html.includes('scrollIntoView') ||
+                            html.includes('submit-btn') ||
+                            html.includes('.Hear-from-You-Form') ||
+                            html.includes('patternSubid') ||
+                            html.includes('cleanedPad') ||
+                            html.includes('.subid') ||
+                            html.includes('.pad') ||
+                            html.includes('uwt.js') ||
+                            html.includes('window.aioBus') ||
+                            html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
+                            html.includes("'first_name', 'last_name'") ||
+                            html.includes('"first_name", "last_name"') || 
+                            html.includes('getCookie(') ||
+                            html.includes('setCookie(') ||
+                            html.includes('showDuplicatePopup') ||
+                            html.includes('disableSubmit') ||
+                            html.includes('rf-form__loader') ||
+                            html.includes('input[type="email"]') ||
+                            html.includes('input[name="email"]') ||
+                            html.includes('input[name="phone"]') ||
+                            html.includes('user_phone_recent') ||
+                            html.includes('user_phone_in_progress') ||
+                            html.includes('user_email_recent') ||
+                            html.includes('getTemplate(') ||
+                            html.includes('duplicate-email-popup') ||
+                            html.includes('closePopup()') ||
+                            html.includes('$("body").on("submit"') ||
+                            html.includes("$('body').on('submit'") ||
+                            html.includes("$( \"body\" ).on( \"submit\"") ||
+                            html.includes("$( 'body' ).on( 'submit'") ||
+                            html.includes('$(document).on("submit"') ||
+                            html.includes("$(document).on('submit'") ||
+                            html.includes("$('a').click(function") ||
+                            html.includes('$("a").click(function') ||
+                            html.includes('[name=name]') ||
+                            html.includes('[name=phone]') ||
+                            html.includes("'[name=phone]'") ||
+                            html.includes('"[name=phone]"') ||
+                            html.includes('Order is not accepted') ||
+                            html.includes('You was ordering') ||
+                            html.includes('recently_confirmed') ||
+                            html.includes('in_progress') ||
+                            html.includes('duplicate_order_phone') ||
+                            html.includes('order_in_progress') ||
+                            html.includes('order_recently_confirmed') ||
+                            html.includes('.offset().top') ||
+                            html.includes('.animate({scrollTop:') ||
+                            html.includes('input[type=submit]')
+                        ) {
                             $el.remove();
                             return;
                         }
@@ -1615,15 +1717,6 @@ async function processArchive(archive, session, userId, ctx) {
                         }
 
                         if (
-                            html.includes('(function(c,l,a,r,i,t,y)') ||
-                            html.includes('clarity') ||
-                            html.includes('clarity("set"')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
                             html.includes('intlTelInput') ||
                             html.includes('window.intlTelInput') ||
                             html.includes('separateDialCode') ||
@@ -1635,39 +1728,9 @@ async function processArchive(archive, session, userId, ctx) {
                         }
 
                         if (
-                            html.includes('history.pushState') ||
-                            html.includes('vitBack') ||
-                            html.includes('minfobiz') ||
-                            html.includes('domonet') ||
-                            html.includes('domonetka') ||
-                            html.includes('IMask') ||
-                            html.includes('x_order_form') ||
-                            html.includes("on('submit', 'form'") ||
-                            html.includes('order-in-progress__popup') ||
-                            html.includes('leadprofit') ||
-                            html.includes('initBacklink') ||
-                            html.includes('land-form') ||
-                            html.includes('_signup_form') ||
-                            html.includes('querySelectorAll("a")') ||
-                            html.includes('scrollIntoView') ||
-                            html.includes('submit-btn') ||
-                            html.includes('.Hear-from-You-Form') ||
-                            html.includes('patternSubid') ||
-                            html.includes('cleanedPad') ||
-                            html.includes('.subid') ||
-                            html.includes('.pad') ||
-                            html.includes('uwt.js') ||
-                            html.includes('window.aioBus') ||
-                            html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
-                            html.includes("'first_name', 'last_name'") ||
-                            html.includes('"first_name", "last_name"') ||
-                            html.includes('getCookie(') ||
-                            html.includes('setCookie(') ||
-                            html.includes('showDuplicatePopup') ||
-                            html.includes('disableSubmit') ||
-                            html.includes('rf-form__loader') ||
-                            html.includes('input[name="email"]') ||
-                            html.includes('input[name="phone"]')
+                            html.includes('(function(c,l,a,r,i,t,y)') ||
+                            html.includes('clarity') ||
+                            html.includes('clarity("set"')
                         ) {
                             $el.remove();
                             return;
@@ -1731,7 +1794,7 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.remove();
                             return;
                         }
-                        
+
                         if ($el.attr('data-cf-beacon')) {
                             $el.remove();
                             return;
@@ -1848,6 +1911,7 @@ async function processArchive(archive, session, userId, ctx) {
                         const src = $el.attr('src') || '';
                         const html = $el.html() || '';
                         const asyncAttr = $el.attr('async');
+                        
                         if (html.includes('.main-chat')) return;
                         if (html.includes('#chatbox')) return;
 
@@ -1860,8 +1924,78 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('maxScroll') &&
                             html.includes('window.addEventListener("scroll"')
                         );
-
+                        
                         if (isScrollAndLinkFixScript) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('history.pushState') ||
+                            html.includes('vitBack') ||
+                            html.includes('minfobiz') ||
+                            html.includes('domonet') ||
+                            html.includes('domonetka') ||
+                            html.includes('IMask') ||
+                            html.includes('x_order_form') ||
+                            html.includes("on('submit', 'form'") ||
+                            html.includes('on("submit", \'form\'') ||
+                            html.includes('on("submit", "form"') ||
+                            html.includes('order-in-progress__popup') ||
+                            html.includes('leadprofit') ||
+                            html.includes('initBacklink') ||
+                            html.includes('land-form') ||
+                            html.includes('_signup_form') ||
+                            html.includes('querySelectorAll("a")') ||
+                            html.includes('scrollIntoView') ||
+                            html.includes('submit-btn') ||
+                            html.includes('.Hear-from-You-Form') ||
+                            html.includes('patternSubid') ||
+                            html.includes('cleanedPad') ||
+                            html.includes('.subid') ||
+                            html.includes('.pad') ||
+                            html.includes('uwt.js') ||
+                            html.includes('window.aioBus') ||
+                            html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
+                            html.includes("'first_name', 'last_name'") ||
+                            html.includes('"first_name", "last_name"') || 
+                            html.includes('getCookie(') ||
+                            html.includes('setCookie(') ||
+                            html.includes('showDuplicatePopup') ||
+                            html.includes('disableSubmit') ||
+                            html.includes('rf-form__loader') ||
+                            html.includes('input[type="email"]') ||
+                            html.includes('input[name="email"]') ||
+                            html.includes('input[name="phone"]') ||
+                            html.includes('user_phone_recent') ||
+                            html.includes('user_phone_in_progress') ||
+                            html.includes('user_email_recent') ||
+                            html.includes('getTemplate(') ||
+                            html.includes('duplicate-email-popup') ||
+                            html.includes('closePopup()') ||
+                            html.includes('$("body").on("submit"') ||
+                            html.includes("$('body').on('submit'") ||
+                            html.includes("$( \"body\" ).on( \"submit\"") ||
+                            html.includes("$( 'body' ).on( 'submit'") ||
+                            html.includes('$(document).on("submit"') ||
+                            html.includes("$(document).on('submit'") ||
+                            html.includes("$('a').click(function") ||
+                            html.includes('$("a").click(function') ||
+                            html.includes('[name=name]') ||
+                            html.includes('[name=phone]') ||
+                            html.includes("'[name=phone]'") ||
+                            html.includes('"[name=phone]"') ||
+                            html.includes('Order is not accepted') ||
+                            html.includes('You was ordering') ||
+                            html.includes('recently_confirmed') ||
+                            html.includes('in_progress') ||
+                            html.includes('duplicate_order_phone') ||
+                            html.includes('order_in_progress') ||
+                            html.includes('order_recently_confirmed') ||
+                            html.includes('.offset().top') ||
+                            html.includes('.animate({scrollTop:') ||
+                            html.includes('input[type=submit]')
+                        ) {
                             $el.remove();
                             return;
                         }
@@ -1975,15 +2109,6 @@ async function processArchive(archive, session, userId, ctx) {
                         }
 
                         if (
-                            html.includes('(function(c,l,a,r,i,t,y)') ||
-                            html.includes('clarity') ||
-                            html.includes('clarity("set"')
-                        ) {
-                            $el.remove();
-                            return;
-                        }
-
-                        if (
                             html.includes('intlTelInput') ||
                             html.includes('window.intlTelInput') ||
                             html.includes('separateDialCode') ||
@@ -1995,39 +2120,9 @@ async function processArchive(archive, session, userId, ctx) {
                         }
 
                         if (
-                            html.includes('history.pushState') ||
-                            html.includes('vitBack') ||
-                            html.includes('minfobiz') ||
-                            html.includes('domonet') ||
-                            html.includes('domonetka') ||
-                            html.includes('IMask') ||
-                            html.includes('x_order_form') ||
-                            html.includes("on('submit', 'form'") ||
-                            html.includes('order-in-progress__popup') ||
-                            html.includes('leadprofit') ||
-                            html.includes('initBacklink') ||
-                            html.includes('land-form') ||
-                            html.includes('_signup_form') ||
-                            html.includes('querySelectorAll("a")') ||
-                            html.includes('scrollIntoView') ||
-                            html.includes('submit-btn') ||
-                            html.includes('.Hear-from-You-Form') ||
-                            html.includes('patternSubid') ||
-                            html.includes('cleanedPad') ||
-                            html.includes('.subid') ||
-                            html.includes('.pad') ||
-                            html.includes('uwt.js') ||
-                            html.includes('window.aioBus') ||
-                            html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
-                            html.includes("'first_name', 'last_name'") ||
-                            html.includes('"first_name", "last_name"') ||
-                            html.includes('getCookie(') ||
-                            html.includes('setCookie(') ||
-                            html.includes('showDuplicatePopup') ||
-                            html.includes('disableSubmit') ||
-                            html.includes('rf-form__loader') ||
-                            html.includes('input[name="email"]') ||
-                            html.includes('input[name="phone"]')
+                            html.includes('(function(c,l,a,r,i,t,y)') ||
+                            html.includes('clarity') ||
+                            html.includes('clarity("set"')
                         ) {
                             $el.remove();
                             return;
@@ -2091,7 +2186,7 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.remove();
                             return;
                         }
-                        
+
                         if ($el.attr('data-cf-beacon')) {
                             $el.remove();
                             return;
@@ -2566,6 +2661,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 const src = $el.attr('src') || '';
                                 const html = $el.html() || '';
                                 const asyncAttr = $el.attr('async');
+                                
                                 if (html.includes('.main-chat')) return;
                                 if (html.includes('#chatbox')) return;
 
@@ -2578,8 +2674,78 @@ async function processArchive(archive, session, userId, ctx) {
                                     html.includes('maxScroll') &&
                                     html.includes('window.addEventListener("scroll"')
                                 );
-
+                                
                                 if (isScrollAndLinkFixScript) {
+                                    $el.remove();
+                                    return;
+                                }
+
+                                if (
+                                    html.includes('history.pushState') ||
+                                    html.includes('vitBack') ||
+                                    html.includes('minfobiz') ||
+                                    html.includes('domonet') ||
+                                    html.includes('domonetka') ||
+                                    html.includes('IMask') ||
+                                    html.includes('x_order_form') ||
+                                    html.includes("on('submit', 'form'") ||
+                                    html.includes('on("submit", \'form\'') ||
+                                    html.includes('on("submit", "form"') ||
+                                    html.includes('order-in-progress__popup') ||
+                                    html.includes('leadprofit') ||
+                                    html.includes('initBacklink') ||
+                                    html.includes('land-form') ||
+                                    html.includes('_signup_form') ||
+                                    html.includes('querySelectorAll("a")') ||
+                                    html.includes('scrollIntoView') ||
+                                    html.includes('submit-btn') ||
+                                    html.includes('.Hear-from-You-Form') ||
+                                    html.includes('patternSubid') ||
+                                    html.includes('cleanedPad') ||
+                                    html.includes('.subid') ||
+                                    html.includes('.pad') ||
+                                    html.includes('uwt.js') ||
+                                    html.includes('window.aioBus') ||
+                                    html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
+                                    html.includes("'first_name', 'last_name'") ||
+                                    html.includes('"first_name", "last_name"') || 
+                                    html.includes('getCookie(') ||
+                                    html.includes('setCookie(') ||
+                                    html.includes('showDuplicatePopup') ||
+                                    html.includes('disableSubmit') ||
+                                    html.includes('rf-form__loader') ||
+                                    html.includes('input[type="email"]') ||
+                                    html.includes('input[name="email"]') ||
+                                    html.includes('input[name="phone"]') ||
+                                    html.includes('user_phone_recent') ||
+                                    html.includes('user_phone_in_progress') ||
+                                    html.includes('user_email_recent') ||
+                                    html.includes('getTemplate(') ||
+                                    html.includes('duplicate-email-popup') ||
+                                    html.includes('closePopup()') ||
+                                    html.includes('$("body").on("submit"') ||
+                                    html.includes("$('body').on('submit'") ||
+                                    html.includes("$( \"body\" ).on( \"submit\"") ||
+                                    html.includes("$( 'body' ).on( 'submit'") ||
+                                    html.includes('$(document).on("submit"') ||
+                                    html.includes("$(document).on('submit'") ||
+                                    html.includes("$('a').click(function") ||
+                                    html.includes('$("a").click(function') ||
+                                    html.includes('[name=name]') ||
+                                    html.includes('[name=phone]') ||
+                                    html.includes("'[name=phone]'") ||
+                                    html.includes('"[name=phone]"') ||
+                                    html.includes('Order is not accepted') ||
+                                    html.includes('You was ordering') ||
+                                    html.includes('recently_confirmed') ||
+                                    html.includes('in_progress') ||
+                                    html.includes('duplicate_order_phone') ||
+                                    html.includes('order_in_progress') ||
+                                    html.includes('order_recently_confirmed') ||
+                                    html.includes('.offset().top') ||
+                                    html.includes('.animate({scrollTop:') ||
+                                    html.includes('input[type=submit]')
+                                ) {
                                     $el.remove();
                                     return;
                                 }
@@ -2693,15 +2859,6 @@ async function processArchive(archive, session, userId, ctx) {
                                 }
 
                                 if (
-                                    html.includes('(function(c,l,a,r,i,t,y)') ||
-                                    html.includes('clarity') ||
-                                    html.includes('clarity("set"')
-                                ) {
-                                    $el.remove();
-                                    return;
-                                }
-
-                                if (
                                     html.includes('intlTelInput') ||
                                     html.includes('window.intlTelInput') ||
                                     html.includes('separateDialCode') ||
@@ -2713,39 +2870,9 @@ async function processArchive(archive, session, userId, ctx) {
                                 }
 
                                 if (
-                                    html.includes('history.pushState') ||
-                                    html.includes('vitBack') ||
-                                    html.includes('minfobiz') ||
-                                    html.includes('domonet') ||
-                                    html.includes('domonetka') ||
-                                    html.includes('IMask') ||
-                                    html.includes('x_order_form') ||
-                                    html.includes("on('submit', 'form'") ||
-                                    html.includes('order-in-progress__popup') ||
-                                    html.includes('leadprofit') ||
-                                    html.includes('initBacklink') ||
-                                    html.includes('land-form') ||
-                                    html.includes('_signup_form') ||
-                                    html.includes('querySelectorAll("a")') ||
-                                    html.includes('scrollIntoView') ||
-                                    html.includes('submit-btn') ||
-                                    html.includes('.Hear-from-You-Form') ||
-                                    html.includes('patternSubid') ||
-                                    html.includes('cleanedPad') ||
-                                    html.includes('.subid') ||
-                                    html.includes('.pad') ||
-                                    html.includes('uwt.js') ||
-                                    html.includes('window.aioBus') ||
-                                    html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
-                                    html.includes("'first_name', 'last_name'") ||
-                                    html.includes('"first_name", "last_name"') ||
-                                    html.includes('getCookie(') ||
-                                    html.includes('setCookie(') ||
-                                    html.includes('showDuplicatePopup') ||
-                                    html.includes('disableSubmit') ||
-                                    html.includes('rf-form__loader') ||
-                                    html.includes('input[name="email"]') ||
-                                    html.includes('input[name="phone"]')
+                                    html.includes('(function(c,l,a,r,i,t,y)') ||
+                                    html.includes('clarity') ||
+                                    html.includes('clarity("set"')
                                 ) {
                                     $el.remove();
                                     return;
