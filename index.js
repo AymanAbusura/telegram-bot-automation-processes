@@ -1024,7 +1024,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('showDuplicatePopup') ||
                             html.includes('disableSubmit') ||
                             html.includes('rf-form__loader') ||
-                            html.includes('input[name="email"]')
+                            html.includes('input[name="email"]') ||
+                            html.includes('input[name="phone"]')
                         ) {
                             $el.remove();
                             return;
@@ -1665,7 +1666,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('showDuplicatePopup') ||
                             html.includes('disableSubmit') ||
                             html.includes('rf-form__loader') ||
-                            html.includes('input[name="email"]')
+                            html.includes('input[name="email"]') ||
+                            html.includes('input[name="phone"]')
                         ) {
                             $el.remove();
                             return;
@@ -2024,7 +2026,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('showDuplicatePopup') ||
                             html.includes('disableSubmit') ||
                             html.includes('rf-form__loader') ||
-                            html.includes('input[name="email"]')
+                            html.includes('input[name="email"]') ||
+                            html.includes('input[name="phone"]')
                         ) {
                             $el.remove();
                             return;
@@ -2741,7 +2744,8 @@ async function processArchive(archive, session, userId, ctx) {
                                     html.includes('showDuplicatePopup') ||
                                     html.includes('disableSubmit') ||
                                     html.includes('rf-form__loader') ||
-                                    html.includes('input[name="email"]')
+                                    html.includes('input[name="email"]') ||
+                                    html.includes('input[name="phone"]')
                                 ) {
                                     $el.remove();
                                     return;
