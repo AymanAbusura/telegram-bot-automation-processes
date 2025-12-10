@@ -1018,7 +1018,13 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('window.aioBus') ||
                             html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
                             html.includes("'first_name', 'last_name'") ||
-                            html.includes('"first_name", "last_name"')
+                            html.includes('"first_name", "last_name"') ||
+                            html.includes('getCookie(') ||
+                            html.includes('setCookie(') ||
+                            html.includes('showDuplicatePopup') ||
+                            html.includes('disableSubmit') ||
+                            html.includes('rf-form__loader') ||
+                            html.includes('input[name="email"]')
                         ) {
                             $el.remove();
                             return;
@@ -1653,7 +1659,13 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('window.aioBus') ||
                             html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
                             html.includes("'first_name', 'last_name'") ||
-                            html.includes('"first_name", "last_name"')
+                            html.includes('"first_name", "last_name"') ||
+                            html.includes('getCookie(') ||
+                            html.includes('setCookie(') ||
+                            html.includes('showDuplicatePopup') ||
+                            html.includes('disableSubmit') ||
+                            html.includes('rf-form__loader') ||
+                            html.includes('input[name="email"]')
                         ) {
                             $el.remove();
                             return;
@@ -2006,7 +2018,13 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('window.aioBus') ||
                             html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
                             html.includes("'first_name', 'last_name'") ||
-                            html.includes('"first_name", "last_name"')
+                            html.includes('"first_name", "last_name"') ||
+                            html.includes('getCookie(') ||
+                            html.includes('setCookie(') ||
+                            html.includes('showDuplicatePopup') ||
+                            html.includes('disableSubmit') ||
+                            html.includes('rf-form__loader') ||
+                            html.includes('input[name="email"]')
                         ) {
                             $el.remove();
                             return;
@@ -2717,7 +2735,13 @@ async function processArchive(archive, session, userId, ctx) {
                                     html.includes('window.aioBus') ||
                                     html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
                                     html.includes("'first_name', 'last_name'") ||
-                                    html.includes('"first_name", "last_name"')
+                                    html.includes('"first_name", "last_name"') ||
+                                    html.includes('getCookie(') ||
+                                    html.includes('setCookie(') ||
+                                    html.includes('showDuplicatePopup') ||
+                                    html.includes('disableSubmit') ||
+                                    html.includes('rf-form__loader') ||
+                                    html.includes('input[name="email"]')
                                 ) {
                                     $el.remove();
                                     return;
