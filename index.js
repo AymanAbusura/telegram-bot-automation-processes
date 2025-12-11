@@ -17,6 +17,7 @@ const userSessions = {};
 const ORDER_TEMPLATE_PATH = './api/order_template.php';
 const { generateFormScriptsContent } = require('./scripts/form-scripts');
 const { generateFormHTML } = require('./scripts/form');
+const getButtonHtml = require('./scripts/buttonTemplate.js');
 const messages = require('./data/messages.json');
 
 
@@ -26,6 +27,7 @@ bot.telegram.setMyCommands([
     { command: 'preland', description: 'Прилендинги' },
     { command: 'prokla_land', description: 'Проклолендинги' },
     { command: 'land_form', description: 'Добавить форму и настроить ленд' },
+    { command: 'land_to_preland', description: 'Заменить форму на кнопку' },
     { command: 'edit_order', description: 'Изменить фйал ордер' },
     { command: 'domonetka', description: 'Домонетки' },
     { command: 'phone_code', description: 'Коды телефонов стран' },
@@ -43,6 +45,7 @@ bot.start((ctx) => {
                     [{ text: "/preland" }],
                     [{ text: "/prokla_land" }],
                     [{ text: "/land_form" }],
+                    [{ text: "/land_to_preland" }],
                     [{ text: "/edit_order" }],
                     [{ text: "/domonetka" }],
                     [{ text: "/phone_code" }],
@@ -352,6 +355,81 @@ bot.command('land_form', (ctx) => {
         `📋 Параметры формы: ${Object.keys(params).length} параметров\n\n` +
         `📦 Теперь отправьте ZIP архив(ы).\n\n` +
         `⚠️ ВАЖНО: После отправки ВСЕХ архивов нажмите кнопку для копирования команды или напишите "process".`,
+        {
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        {
+                            text: "📋 Скопировать команду",
+                            copy_text: {
+                                text: "process"
+                            }
+                        }
+                    ]
+                ]
+            }
+        }
+    );
+});
+
+/* ------------------------ /land_to_preland ------------------------ */
+bot.command('land_to_preland', (ctx) => {
+    const userId = ctx.from.id;
+    const text = ctx.message.text || '';
+    const paramStr = text.replace('/land_to_preland', '').trim();
+
+    if (!paramStr) {
+        return ctx.reply(messages.landToPrelandMessage,
+            {
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "📋 Скопировать команду",
+                                copy_text: {
+                                    text: "/land_to_preland\nkey=value\nmarker=Official Website"
+                                }
+                            }
+                        ]
+                    ]
+                }
+            }
+        );
+    }
+
+    const lines = paramStr.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    if (lines.length === 0) {
+        return ctx.reply('⛔️ Неверный формат.\nИспользуйте:\n/land_to_preland\nkey=value\nmarker=Official Website');
+    }
+
+    const keyValueMatch = lines[0].match(/^([^=\s]+)=([^=\s]+)$/);
+    if (!keyValueMatch) return ctx.reply('⛔️ Неверный формат первой строки.\nИспользуйте:\n/land_to_preland\nkey=value\nmarker=Official Website');
+
+    const [, key, value] = keyValueMatch;
+
+    const params = {};
+    let marker = 'process';
+    lines.slice(1).forEach(line => {
+        const [k, v] = line.split('=');
+        if (k && v) {
+            const trimmedKey = k.trim();
+            const trimmedValue = decodeURIComponent(v.trim());
+            if (trimmedKey.toLowerCase() === 'marker') marker = trimmedValue;
+            else params[trimmedKey] = trimmedValue;
+        }
+    });
+
+    userSessions[userId] = { 
+        type: 'land_to_preland', 
+        prelandParam: { key, value },
+        marker: marker,
+        params: Object.keys(params).length ? params : null,
+        archives: [],
+        processingMultiple: false
+    };
+
+    ctx.reply(
+        `✅ Параметры сохранены!\n\n📦 Теперь отправьте ZIP архив(ы).\n\n⚠️ После отправки всех архивов нажмите кнопку или напишите "process".`,
         {
             reply_markup: {
                 inline_keyboard: [
@@ -760,7 +838,7 @@ async function processArchive(archive, session, userId, ctx) {
             if (file.endsWith('index.html') || file.endsWith('.htm') || file.endsWith('index.php')) {
                 let html = fs.readFileSync(filePath, 'utf8');
 
-                if (['landing', 'prelanding', 'prokla_land', 'land_form'].includes(session.type)) {
+                if (['landing', 'prelanding', 'prokla_land', 'land_to_preland', 'land_form'].includes(session.type)) {
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<!DOCTYPE html>)/i, '');
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html>)/i, '');
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html\b[^>]*>)/i, '');
@@ -2575,6 +2653,404 @@ async function processArchive(archive, session, userId, ctx) {
 
                     fs.writeFileSync(filePath, finalHtml, 'utf8');
                 }
+
+                if (session.type === 'land_to_preland') {
+                    const prelandScriptPath = path.join(__dirname, 'scripts', 'preland-script.js');
+                    const scriptContent = fs.readFileSync(prelandScriptPath, 'utf8');
+
+                    $('link[rel="stylesheet"]').each((i, el) => {
+                        const href = $(el).attr('href') || '';
+                        if (
+                            href.includes('intlTelInput.min.css') ||
+                            href.includes('intlTelInput.css') ||
+                            href.includes('tel.css')
+                        ) {
+                            $(el).remove();
+                        }
+                    });
+                    $('style').each((i, el) => {
+                        const styleContent = $(el).html() || '';
+                        if (styleContent.includes('.rf-form__loader')) {
+                            $(el).remove();
+                        }
+                    });
+
+                    $('meta[name="msapplication"]').each((i, el) => {
+                        const content = $(el).attr('content') || '';
+                        if (/^0x[0-9A-Za-z]*$/.test(content)) {
+                            $(el).remove();
+                        }
+                    });
+
+                    $('html').removeAttr('data-scrapbook-source');
+                    $('html').removeAttr('data-scrapbook-create');
+                    $('html').removeAttr('data-scrapbook-title');
+
+                    $('*').contents().each(function () {
+                        if (this.nodeType === 8) {
+                            const text = this.nodeValue;
+
+                            if (text && text.toLowerCase().includes('<script')) {
+                                $(this).remove();
+                            }
+                        }
+                    });
+
+                    $('script').each((i, el) => {
+                        const $el = $(el);
+                        const src = $el.attr('src') || '';
+                        const html = $el.html() || '';
+                        const asyncAttr = $el.attr('async');
+                        
+                        if (html.includes('.main-chat')) return;
+                        if (html.includes('#chatbox')) return;
+
+                        if (html.includes('updateTimer') && html.includes('countdown(')) {
+                            return;
+                        }
+
+                        const isScrollAndLinkFixScript = (
+                            html.includes('link.href = link.href.replace(\'https:///\',') &&
+                            html.includes('maxScroll') &&
+                            html.includes('window.addEventListener("scroll"')
+                        );
+                        
+                        if (isScrollAndLinkFixScript) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('history.pushState') ||
+                            html.includes('vitBack') ||
+                            html.includes('minfobiz') ||
+                            html.includes('domonet') ||
+                            html.includes('domonetka') ||
+                            html.includes('IMask') ||
+                            html.includes('x_order_form') ||
+                            html.includes("on('submit', 'form'") ||
+                            html.includes('on("submit", \'form\'') ||
+                            html.includes('on("submit", "form"') ||
+                            html.includes('order-in-progress__popup') ||
+                            html.includes('leadprofit') ||
+                            html.includes('initBacklink') ||
+                            html.includes('land-form') ||
+                            html.includes('_signup_form') ||
+                            html.includes('querySelectorAll("a")') ||
+                            html.includes('scrollIntoView') ||
+                            html.includes('submit-btn') ||
+                            html.includes('.Hear-from-You-Form') ||
+                            html.includes('patternSubid') ||
+                            html.includes('cleanedPad') ||
+                            html.includes('.subid') ||
+                            html.includes('.pad') ||
+                            html.includes('uwt.js') ||
+                            html.includes('window.aioBus') ||
+                            html.includes('.iti--allow-dropdown.iti--separate-dial-code') ||
+                            html.includes("'first_name', 'last_name'") ||
+                            html.includes('"first_name", "last_name"') || 
+                            html.includes('getCookie(') ||
+                            html.includes('setCookie(') ||
+                            html.includes('showDuplicatePopup') ||
+                            html.includes('disableSubmit') ||
+                            html.includes('rf-form__loader') ||
+                            html.includes('input[type="email"]') ||
+                            html.includes('input[name="email"]') ||
+                            html.includes('input[name="phone"]') ||
+                            html.includes('user_phone_recent') ||
+                            html.includes('user_phone_in_progress') ||
+                            html.includes('user_email_recent') ||
+                            html.includes('getTemplate(') ||
+                            html.includes('duplicate-email-popup') ||
+                            html.includes('closePopup()') ||
+                            html.includes('$("body").on("submit"') ||
+                            html.includes("$('body').on('submit'") ||
+                            html.includes("$( \"body\" ).on( \"submit\"") ||
+                            html.includes("$( 'body' ).on( 'submit'") ||
+                            html.includes('$(document).on("submit"') ||
+                            html.includes("$(document).on('submit'") ||
+                            html.includes("$('a').click(function") ||
+                            html.includes('$("a").click(function') ||
+                            html.includes('[name=name]') ||
+                            html.includes('[name=phone]') ||
+                            html.includes("'[name=phone]'") ||
+                            html.includes('"[name=phone]"') ||
+                            html.includes('Order is not accepted') ||
+                            html.includes('You was ordering') ||
+                            html.includes('recently_confirmed') ||
+                            html.includes('in_progress') ||
+                            html.includes('duplicate_order_phone') ||
+                            html.includes('order_in_progress') ||
+                            html.includes('order_recently_confirmed') ||
+                            html.includes('.offset().top') ||
+                            html.includes('.animate({scrollTop:') ||
+                            html.includes('input[type=submit]')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const isFbPixelInline = html.includes('fbq(');
+                        if (isFbPixelInline) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const removeFiles = [
+                            'backfix.js',
+                            'fbevents.js',
+                            'auth.js',
+                            'utils.js',
+                            'utils.min.js',
+                            'jquery-3.7.1.min.js',
+                            'bean-script.js',
+                            'messages_es.min.js',
+                            'messages_fr.min.js',
+                            'functions.js',
+                            'intl-tel-input/17.0.8/js/utils.min.js',
+                            'ivl867tq2h8q/h18mp0quv3y0kzh57o.js',
+                            'vli6872tq8hqh810mp/uqv3y0lxc.js',
+                            'intlTelInput.js',
+                            'intlTelInput.min.js',
+                            'jquery-migration-3.7.1.min.js',
+                            'lib.js',
+                            'plgintlTel',
+                            'validation.js',
+                            'email-decode.min',
+                            'uwt.js',
+                            'track.js',
+                            'translations.js',
+                            '/aio-static/sdk/main.js',
+                            '/aio-static/sdk/',
+                            '/_cdn/production/landing-cdn/',
+                            'time-scripts/main.js',
+                            'bundle.umd.min.js',
+                            './index/track.js',
+                            'loader.js',
+                            'i18n.min.js',
+                            'form.js',
+                            'validator.js',
+                            'axios.min.js',
+                            'app.js',
+                            'jquery.maskedinput.min.js',
+                            'polyfill.min.js',
+                            'handlers.js'
+                        ];
+
+                        if (removeFiles.some(f => src.includes(f))) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (src === 'scripts.js') {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            src.includes('code.jquery.com/jquery') ||
+                            src.includes('ajax.googleapis.com/ajax/libs/jquery') ||
+                            src.includes('cdnjs.cloudflare.com/ajax/libs/jquery') ||
+                            src.includes('jquery.min.js') ||
+                            src.includes('jquery.js') ||
+                            src.includes('jquery-1.11.1.min.js')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            src.includes('googletagmanager.com') ||
+                            src.includes('gtag/js') ||
+                            html.includes('gtag(') ||
+                            html.includes('dataLayer') ||
+                            html.includes('GoogleAnalyticsObject') ||
+                            html.includes('GTM-') ||
+                            html.includes('googletagmanager.com/gtag/js') ||
+                            html.includes('googletagmanager.com')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            src.includes('mc.yandex.ru') ||
+                            src.includes('yandex.ru/metrika') ||
+                            html.includes('Ya.Metrika') ||
+                            html.includes('ym(') ||
+                            html.includes('yandex_metrika_callbacks') ||
+                            html.includes('metrika') ||
+                            html.includes('yandex')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('intlTelInput') ||
+                            html.includes('window.intlTelInput') ||
+                            html.includes('separateDialCode') ||
+                            html.includes('initialCountry') ||
+                            html.includes('utilsScript')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (
+                            html.includes('(function(c,l,a,r,i,t,y)') ||
+                            html.includes('clarity') ||
+                            html.includes('clarity("set"')
+                        ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (src.includes('minfobiz.online')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (src.includes('form-scripts.js')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (/\.on\(\s*["']submit["']\s*,\s*['"]form['"]/.test(html)) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (/(\$|jQuery)\(\s*["']a["']\s*\)\.click\s*\(/.test(html)) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const removeInlinePatterns = [
+                            'ipapi.co',
+                            '_d',
+                            '_chk',
+                            '_t',
+                            'vid'
+                        ];
+
+                        if (!src && removeInlinePatterns.some(pattern => html.includes(pattern))) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (html.includes('querySelectorAll(".form")') && html.includes('iti__selected-dial-code')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (html.includes('window.aioBus') && html.includes('aio.landing')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (!src && html.includes('googletag.cmd.push')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const removeClickHandlerScript = /"\s*a,\s*button\s*"\)\.click\s*\(\s*function\s*\(e\)\s*\{\s*e\.preventDefault\(\)/.test(html);
+                        if (removeClickHandlerScript) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (!src && html.trim() === '' && ($el.attr('async') || $el.attr('charset'))) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if ($el.attr('data-cf-beacon')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (html.includes('window.F1TFunnelsSdkConfig')) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const removeScreenResizeScript = /let\s+screenResize\s*=\s*'';\s*if\s*\(screenResize !== 'yes'\)/.test(html);
+                        if (removeScreenResizeScript) {
+                            $el.remove();
+                            return;
+                        }
+
+                        const isDateScript =
+                            html.includes('Date') ||
+                            html.includes('getDate') ||
+                            html.includes('getMonth') ||
+                            html.includes('getFullYear') ||
+                            html.match(/\bday\b/i) ||
+                            html.match(/\bmonth\b/i) ||
+                            html.match(/\byear\b/i);
+
+                        if (isDateScript) {
+                            return;
+                        }
+                    });
+
+                    const markerText = session.marker || 'Official Site';
+                    $('form').each((i, el) => {
+                        const hasTargetInputs = $(el).find('input[name="first_name"], input[name="last_name"], input[name="email"], input[name="phone"]'
+                        ).length > 0;
+
+                        if (hasTargetInputs) {
+                            $(el).replaceWith(getButtonHtml(markerText));
+                        }
+                    });
+
+                    $('form').each((i, el) => {
+                        $(el).attr('action', '');
+                    });
+
+                    $('noscript').remove();
+
+                    $('body').find('[target]').each(function () {
+                        $(this).attr('target', '');
+                    });
+
+                    $('body').find('[onclick]').each(function () {
+                        $(this).attr('onclick', '');
+                    });
+
+                    $('body a').each((i, el) => {
+                        $(el).attr('href', '{offer}');
+                    });
+
+                    $('head, body').contents().filter((i, node) => node.type === 'comment').remove();
+
+                    const inlineScript = `<script>\n${scriptContent}\n</script>\n\n`;
+                    $('body').append(inlineScript);
+
+                    const migrationScript = `<script src="../jquery-migration-3.7.1.min.js"></script>\n`;
+                    if ($('head').length) {
+                        $('head').append(migrationScript);
+                    } else {
+                        $('html').prepend(migrationScript);
+                    }
+
+                    let finalHtml = $.html();
+
+                    const { key, value } = session.prelandParam || {};
+                    if (key && value && !(key === '0' && value === '0')) {
+                        const phpCode =
+                            `<?php if ($_GET["${key}"] != "${value}") { echo '<script>window.location.replace("https://www.google.com/");document.location.href="https://www.google.com/";</script>'; exit; } ?>\n\n`;
+
+                        if (finalHtml.includes('<!DOCTYPE')) {
+                            finalHtml = finalHtml.replace('<!DOCTYPE', phpCode + '<!DOCTYPE');
+                        } else {
+                            finalHtml = phpCode + finalHtml;
+                        }
+                    }
+
+                    fs.writeFileSync(filePath, finalHtml, 'utf8');
+                }
                 
                 /* ------------------------ LANDING-FORM ------------------------ */
                 try {
@@ -3134,6 +3610,8 @@ async function processArchive(archive, session, userId, ctx) {
             newFileName = `Proklaland_${folderNameForZip}${ext}`;
         } else if (session.type === 'land_form') {
             newFileName = `LandForm_${folderNameForZip}${ext}`;
+        } else if (session.type === 'land_to_preland') {
+            newFileName = `LandToPreland_${folderNameForZip}${ext}`;
         } else {
             newFileName = `Result_${folderNameForZip}${ext}`;
         }
