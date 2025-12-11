@@ -807,7 +807,8 @@ async function processArchive(archive, session, userId, ctx) {
                         const href = $(el).attr('href') || '';
                         if (
                             href.includes('intlTelInput.min.css') ||
-                            href.includes('intlTelInput.css')
+                            href.includes('intlTelInput.css') ||
+                            href.includes('tel.css')
                         ) {
                             $(el).remove();
                         }
@@ -932,19 +933,6 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('input[type=submit]')
                         ) {
                             $el.remove();
-                            return;
-                        }
-
-                        const isDateScript =
-                            html.includes('Date') ||
-                            html.includes('getDate') ||
-                            html.includes('getMonth') ||
-                            html.includes('getFullYear') ||
-                            html.match(/\bday\b/i) ||
-                            html.match(/\bmonth\b/i) ||
-                            html.match(/\byear\b/i);
-
-                        if (isDateScript) {
                             return;
                         }
 
@@ -1136,6 +1124,19 @@ async function processArchive(archive, session, userId, ctx) {
                         const removeScreenResizeScript = /let\s+screenResize\s*=\s*'';\s*if\s*\(screenResize !== 'yes'\)/.test(html);
                         if (removeScreenResizeScript) {
                             $el.remove();
+                            return;
+                        }
+
+                        const isDateScript =
+                            html.includes('Date') ||
+                            html.includes('getDate') ||
+                            html.includes('getMonth') ||
+                            html.includes('getFullYear') ||
+                            html.match(/\bday\b/i) ||
+                            html.match(/\bmonth\b/i) ||
+                            html.match(/\byear\b/i);
+
+                        if (isDateScript) {
                             return;
                         }
                     });
@@ -1490,7 +1491,8 @@ async function processArchive(archive, session, userId, ctx) {
                         const href = $(el).attr('href') || '';
                         if (
                             href.includes('intlTelInput.min.css') ||
-                            href.includes('intlTelInput.css')
+                            href.includes('intlTelInput.css') ||
+                            href.includes('tel.css')
                         ) {
                             $(el).remove();
                         }
@@ -1614,19 +1616,6 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('input[type=submit]')
                         ) {
                             $el.remove();
-                            return;
-                        }
-
-                        const isDateScript =
-                            html.includes('Date') ||
-                            html.includes('getDate') ||
-                            html.includes('getMonth') ||
-                            html.includes('getFullYear') ||
-                            html.match(/\bday\b/i) ||
-                            html.match(/\bmonth\b/i) ||
-                            html.match(/\byear\b/i);
-
-                        if (isDateScript) {
                             return;
                         }
 
@@ -1820,6 +1809,19 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.remove();
                             return;
                         }
+
+                        const isDateScript =
+                            html.includes('Date') ||
+                            html.includes('getDate') ||
+                            html.includes('getMonth') ||
+                            html.includes('getFullYear') ||
+                            html.match(/\bday\b/i) ||
+                            html.match(/\bmonth\b/i) ||
+                            html.match(/\byear\b/i);
+
+                        if (isDateScript) {
+                            return;
+                        }
                     });
 
                     $('form').each((i, el) => {
@@ -1876,7 +1878,8 @@ async function processArchive(archive, session, userId, ctx) {
                         const href = $(el).attr('href') || '';
                         if (
                             href.includes('intlTelInput.min.css') ||
-                            href.includes('intlTelInput.css')
+                            href.includes('intlTelInput.css') ||
+                            href.includes('tel.css')
                         ) {
                             $(el).remove();
                         }
@@ -2011,19 +2014,6 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
-                        const isDateScript =
-                            html.includes('Date') ||
-                            html.includes('getDate') ||
-                            html.includes('getMonth') ||
-                            html.includes('getFullYear') ||
-                            html.match(/\bday\b/i) ||
-                            html.match(/\bmonth\b/i) ||
-                            html.match(/\byear\b/i);
-
-                        if (isDateScript) {
-                            return;
-                        }
-
                         const isFbPixelInline = html.includes('fbq(');
                         if (isFbPixelInline) {
                             $el.remove();
@@ -2103,6 +2093,11 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('googletagmanager.com/gtag/js') ||
                             html.includes('googletagmanager.com')
                         ) {
+                            $el.remove();
+                            return;
+                        }
+
+                        if (html.includes('querySelectorAll(\'a[href*="')) {
                             $el.remove();
                             return;
                         }
@@ -2212,6 +2207,19 @@ async function processArchive(archive, session, userId, ctx) {
                         const removeScreenResizeScript = /let\s+screenResize\s*=\s*'';\s*if\s*\(screenResize !== 'yes'\)/.test(html);
                         if (removeScreenResizeScript) {
                             $el.remove();
+                            return;
+                        }
+
+                        const isDateScript =
+                            html.includes('Date') ||
+                            html.includes('getDate') ||
+                            html.includes('getMonth') ||
+                            html.includes('getFullYear') ||
+                            html.match(/\bday\b/i) ||
+                            html.match(/\bmonth\b/i) ||
+                            html.match(/\byear\b/i);
+
+                        if (isDateScript) {
                             return;
                         }
                     });
@@ -2654,7 +2662,7 @@ async function processArchive(archive, session, userId, ctx) {
 
                             $('link[rel="stylesheet"]').each((i, el) => {
                                 const href = $(el).attr('href') || '';
-                                if (href.includes('intlTelInput.min.css') || href.includes('intlTelInput.css')) {
+                                if (href.includes('intlTelInput.min.css') || href.includes('intlTelInput.css') || href.includes('tel.css')) {
                                     $(el).remove();
                                 }
                             });
@@ -2764,19 +2772,6 @@ async function processArchive(archive, session, userId, ctx) {
                                     html.includes('input[type=submit]')
                                 ) {
                                     $el.remove();
-                                    return;
-                                }
-
-                                const isDateScript =
-                                    html.includes('Date') ||
-                                    html.includes('getDate') ||
-                                    html.includes('getMonth') ||
-                                    html.includes('getFullYear') ||
-                                    html.match(/\bday\b/i) ||
-                                    html.match(/\bmonth\b/i) ||
-                                    html.match(/\byear\b/i);
-
-                                if (isDateScript) {
                                     return;
                                 }
 
@@ -2968,6 +2963,19 @@ async function processArchive(archive, session, userId, ctx) {
                                 const removeScreenResizeScript = /let\s+screenResize\s*=\s*'';\s*if\s*\(screenResize !== 'yes'\)/.test(html);
                                 if (removeScreenResizeScript) {
                                     $el.remove();
+                                    return;
+                                }
+
+                                const isDateScript =
+                                    html.includes('Date') ||
+                                    html.includes('getDate') ||
+                                    html.includes('getMonth') ||
+                                    html.includes('getFullYear') ||
+                                    html.match(/\bday\b/i) ||
+                                    html.match(/\bmonth\b/i) ||
+                                    html.match(/\byear\b/i);
+
+                                if (isDateScript) {
                                     return;
                                 }
                             });
