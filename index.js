@@ -14,10 +14,10 @@ const fetch = (...args) =>
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const userSessions = {};
 
-const ORDER_TEMPLATE_PATH = './order_template.php';
-const { generateFormScriptsContent } = require('./form-scripts');
-const { generateFormHTML } = require('./form');
-const messages = require('./messages.json');
+const ORDER_TEMPLATE_PATH = './api/order_template.php';
+const { generateFormScriptsContent } = require('./scripts/form-scripts');
+const { generateFormHTML } = require('./scripts/form');
+const messages = require('./data/messages.json');
 
 
 /* ---------------------- TELEGRAM COMMAND MENU ---------------------- */
@@ -435,7 +435,7 @@ bot.on("callback_query", async (ctx) => {
 /* ------------------------ /phone_code ------------------------ */
 let countryMap = {};
 try {
-    let data = fs.readFileSync(path.join(__dirname, 'countryPhoneCodes.json'), 'utf8');
+    let data = fs.readFileSync(path.join(__dirname, 'data', 'countryPhoneCodes.json'), 'utf8');
     if (!data.trim().startsWith('[')) {
         data = '[' + data + ']';
     }
@@ -829,6 +829,7 @@ async function processArchive(archive, session, userId, ctx) {
 
                     $('html').removeAttr('data-scrapbook-source');
                     $('html').removeAttr('data-scrapbook-create');
+                    $('html').removeAttr('data-scrapbook-title');
 
                     $('*').contents().each(function () {
                         if (this.nodeType === 8) {
@@ -990,7 +991,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'axios.min.js',
                             'app.js',
                             'jquery.maskedinput.min.js',
-                            'polyfill.min.js'
+                            'polyfill.min.js',
+                            'handlers.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1216,6 +1218,7 @@ async function processArchive(archive, session, userId, ctx) {
                             }
                             return;
                         }
+
                         if (
                             $form.find('input[type="text"]').length === 1 &&
                             $form.find('input').length <= 3 &&
@@ -1429,7 +1432,7 @@ async function processArchive(archive, session, userId, ctx) {
                         });
                     }
 
-                    const landingHead = require('./landing-head');
+                    const landingHead = require('./scripts/landing-head');
                     if ($('head').length) {
                         $('head').prepend(landingHead);
                     } else {
@@ -1449,6 +1452,11 @@ async function processArchive(archive, session, userId, ctx) {
 
                     $('body [href]').each((i, el) => {
                         const $el = $(el);
+                        
+                        if ($el.is('use') && $el.closest('svg').length) {
+                            return;
+                        }
+
                         const href = $el.attr('href') || '';
                         if (
                             href === '{offer}' ||
@@ -1475,7 +1483,7 @@ async function processArchive(archive, session, userId, ctx) {
 
                 /* ------------------------ PRELANDING ------------------------ */
                 if (session.type === 'prelanding') {
-                    const prelandScriptPath = path.join(__dirname, 'preland-script.js');
+                    const prelandScriptPath = path.join(__dirname, 'scripts', 'preland-script.js');
                     const scriptContent = fs.readFileSync(prelandScriptPath, 'utf8');
 
                     $('link[rel="stylesheet"]').each((i, el) => {
@@ -1503,6 +1511,7 @@ async function processArchive(archive, session, userId, ctx) {
 
                     $('html').removeAttr('data-scrapbook-source');
                     $('html').removeAttr('data-scrapbook-create');
+                    $('html').removeAttr('data-scrapbook-title');
 
                     $('*').contents().each(function () {
                         if (this.nodeType === 8) {
@@ -1664,7 +1673,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'axios.min.js',
                             'app.js',
                             'jquery.maskedinput.min.js',
-                            'polyfill.min.js'
+                            'polyfill.min.js',
+                            'handlers.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1895,6 +1905,7 @@ async function processArchive(archive, session, userId, ctx) {
 
                     $('html').removeAttr('data-scrapbook-source');
                     $('html').removeAttr('data-scrapbook-create');
+                    $('html').removeAttr('data-scrapbook-title');
 
                     $('*').contents().each(function () {
                         if (this.nodeType === 8) {
@@ -2056,7 +2067,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'axios.min.js',
                             'app.js',
                             'jquery.maskedinput.min.js',
-                            'polyfill.min.js'
+                            'polyfill.min.js',
+                            'handlers.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -2495,7 +2507,7 @@ async function processArchive(archive, session, userId, ctx) {
                         });
                     }
 
-                    const landingHead = require('./landing-head');
+                    const landingHead = require('./scripts/landing-head');
                     if ($('head').length) {
                         $('head').prepend(landingHead);
                     } else {
@@ -2523,6 +2535,10 @@ async function processArchive(archive, session, userId, ctx) {
 
                     $('body [href]').each((i, el) => {
                         const $el = $(el);
+
+                        if ($el.is('use') && $el.closest('svg').length) {
+                            return;
+                        }
                         const href = $el.attr('href') || '';
                         if (
                             href === '{offer}' ||
@@ -2645,6 +2661,7 @@ async function processArchive(archive, session, userId, ctx) {
 
                             $('html').removeAttr('data-scrapbook-source');
                             $('html').removeAttr('data-scrapbook-create');
+                            $('html').removeAttr('data-scrapbook-title');
 
                             $('*').contents().each(function () {
                                 if (this.nodeType === 8) {
@@ -2806,7 +2823,8 @@ async function processArchive(archive, session, userId, ctx) {
                                     'axios.min.js',
                                     'app.js',
                                     'jquery.maskedinput.min.js',
-                                    'polyfill.min.js'
+                                    'polyfill.min.js',
+                                    'handlers.js'
                                 ];
 
                                 if (removeFiles.some(f => src.includes(f))) {
@@ -3031,6 +3049,11 @@ async function processArchive(archive, session, userId, ctx) {
 
                             $('body [href]').each((i, el) => {
                                 const $el = $(el);
+
+                                if ($el.is('use') && $el.closest('svg').length) {
+                                    return;
+                                }
+
                                 const href = $el.attr('href') || '';
                                 if (
                                     href === '{offer}' ||
@@ -3060,7 +3083,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 fs.copyFileSync(FORM_CSS_FILE, DEST_CSS_FILE);
                             }
 
-                            const landingHead = require('./landing-head');
+                            const landingHead = require('./scripts/landing-head');
                             if ($('head').length) {
                                 $('head').prepend(landingHead);
                             }
