@@ -3127,7 +3127,6 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
-
                         if (replaced) {
                             $('meta[name="msapplication"]').each((i, el) => {
                                 const content = $(el).attr('content') || '';
@@ -3549,6 +3548,10 @@ async function processArchive(archive, session, userId, ctx) {
                                 ) {
                                     $el.attr('href', '');
                                 }
+                            });
+
+                            $('body').find('[target]').each(function () {
+                                $(this).attr('target', '');
                             });
 
                             const ASSETS_DIR = path.join(__dirname, 'assets');
