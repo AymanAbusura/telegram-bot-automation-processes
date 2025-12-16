@@ -870,19 +870,6 @@ async function processArchive(archive, session, userId, ctx) {
                         'Coinsterix', 'PrimeAurora', 'Fluxorium Corporation'
                     ];
 
-                    // IF JUST FOR THE INCLUDED IN LIST FUNNELS
-                    // if (p.funnel && funnelNames.includes(p.funnel)) {
-                    //     const sortedNames = funnelNames.sort((a, b) => b.length - a.length);
-                    //     const pattern = new RegExp(
-                    //         sortedNames
-                    //             .map(name => '\\b' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b')
-                    //             .join('|'),
-                    //         'gi'
-                    //     );
-
-                    //     html = html.replace(pattern, p.funnel);
-                    // }
-
                     if (p.funnel) {
                         const sortedNames = [...funnelNames].sort((a, b) => b.length - a.length);
                         const pattern = new RegExp(
@@ -3118,19 +3105,6 @@ async function processArchive(archive, session, userId, ctx) {
                             'SpectraX', 'SpectraX Bot', 'BlockJet', 'NovusX', 'Blizzetrix',
                             'Coinsterix', 'PrimeAurora', 'Fluxorium Corporation'
                         ];
-
-                        // IF JUST FOR THE INCLUDED IN LIST FUNNELS
-                        // if (p.funnel && funnelNames.includes(p.funnel)) {
-                        //     const sortedNames = funnelNames.sort((a, b) => b.length - a.length);
-                        //     const pattern = new RegExp(
-                        //         sortedNames
-                        //             .map(name => '\\b' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b')
-                        //             .join('|'),
-                        //         'gi'
-                        //     );
-
-                        //     html = html.replace(pattern, p.funnel);
-                        // }
 
                         if (p.funnel) {
                             const sortedNames = [...funnelNames].sort((a, b) => b.length - a.length);
