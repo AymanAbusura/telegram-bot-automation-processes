@@ -843,6 +843,19 @@ async function processArchive(archive, session, userId, ctx) {
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html>)/i, '');
                     html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html\b[^>]*>)/i, '');
                     html = html.replace(/<!--\s*<\?php[\s\S]*?\?>\s*-->/gi, '');
+
+                    const doctypeIndex = html.search(/<!DOCTYPE\s+html/i);
+                    if (doctypeIndex > 0) {
+                        html = html.substring(doctypeIndex);
+                    } else {
+                        const htmlMatch = html.match(/(?:^|>)\s*(<html[\s>])/i);
+                        if (htmlMatch && htmlMatch.index !== undefined) {
+                            const htmlIndex = html.indexOf(htmlMatch[1], htmlMatch.index);
+                            if (htmlIndex > 0) {
+                                html = html.substring(htmlIndex);
+                            }
+                        }
+                    }
                     
                     const p = session.params || {};
                     const funnelNames = [
@@ -3064,6 +3077,19 @@ async function processArchive(archive, session, userId, ctx) {
                         html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html>)/i, '');
                         html = html.replace(/^(?:\s*<\?php[\s\S]*?\?>\s*)+(?=<html\b[^>]*>)/i, '');
                         html = html.replace(/<!--\s*<\?php[\s\S]*?\?>\s*-->/gi, '');
+
+                        const doctypeIndex = html.search(/<!DOCTYPE\s+html/i);
+                        if (doctypeIndex > 0) {
+                            html = html.substring(doctypeIndex);
+                        } else {
+                            const htmlMatch = html.match(/(?:^|>)\s*(<html[\s>])/i);
+                            if (htmlMatch && htmlMatch.index !== undefined) {
+                                const htmlIndex = html.indexOf(htmlMatch[1], htmlMatch.index);
+                                if (htmlIndex > 0) {
+                                    html = html.substring(htmlIndex);
+                                }
+                            }
+                        }
 
                         const p = session.params || {};
                         const funnelNames = [
