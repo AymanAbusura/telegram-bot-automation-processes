@@ -1429,7 +1429,7 @@ async function processArchive(archive, session, userId, ctx) {
                             }
 
                             const emailVariants = [
-                                '1-email', 'form-email', 'email', 'solrka'
+                                '1-email', 'form-email', 'email', 'solrka', 'sendingmail'
                             ];
 
                             if (emailVariants.includes(name.toLowerCase())) {
@@ -1446,7 +1446,7 @@ async function processArchive(archive, session, userId, ctx) {
                             }
 
                             const phoneVariants = [
-                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2'
+                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2', 'phone-num'
                             ];
 
                             if (phoneVariants.includes(name.toLowerCase())) {
@@ -2511,7 +2511,7 @@ async function processArchive(archive, session, userId, ctx) {
                             }
 
                             const emailVariants = [
-                                '1-email', 'form-email', 'email', 'solrka'
+                                '1-email', 'form-email', 'email', 'solrka', 'sendingmail'
                             ];
 
                             if (emailVariants.includes(name.toLowerCase())) {
@@ -2528,7 +2528,7 @@ async function processArchive(archive, session, userId, ctx) {
                             }
 
                             const phoneVariants = [
-                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2'
+                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2', 'phone-num'
                             ];
 
                             if (phoneVariants.includes(name.toLowerCase())) {
