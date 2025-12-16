@@ -870,11 +870,26 @@ async function processArchive(archive, session, userId, ctx) {
                         'Coinsterix', 'PrimeAurora', 'Fluxorium Corporation'
                     ];
 
-                    if (p.funnel && funnelNames.includes(p.funnel)) {
-                        const sortedNames = funnelNames.sort((a, b) => b.length - a.length);
+                    // IF JUST FOR THE INCLUDED IN LIST FUNNELS
+                    // if (p.funnel && funnelNames.includes(p.funnel)) {
+                    //     const sortedNames = funnelNames.sort((a, b) => b.length - a.length);
+                    //     const pattern = new RegExp(
+                    //         sortedNames
+                    //             .map(name => '\\b' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b')
+                    //             .join('|'),
+                    //         'gi'
+                    //     );
+
+                    //     html = html.replace(pattern, p.funnel);
+                    // }
+
+                    if (p.funnel) {
+                        const sortedNames = [...funnelNames].sort((a, b) => b.length - a.length);
                         const pattern = new RegExp(
                             sortedNames
-                                .map(name => '\\b' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b')
+                                .map(name =>
+                                    `\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`
+                                )
                                 .join('|'),
                             'gi'
                         );
@@ -3104,11 +3119,26 @@ async function processArchive(archive, session, userId, ctx) {
                             'Coinsterix', 'PrimeAurora', 'Fluxorium Corporation'
                         ];
 
-                        if (p.funnel && funnelNames.includes(p.funnel)) {
-                            const sortedNames = funnelNames.sort((a, b) => b.length - a.length);
+                        // IF JUST FOR THE INCLUDED IN LIST FUNNELS
+                        // if (p.funnel && funnelNames.includes(p.funnel)) {
+                        //     const sortedNames = funnelNames.sort((a, b) => b.length - a.length);
+                        //     const pattern = new RegExp(
+                        //         sortedNames
+                        //             .map(name => '\\b' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b')
+                        //             .join('|'),
+                        //         'gi'
+                        //     );
+
+                        //     html = html.replace(pattern, p.funnel);
+                        // }
+
+                        if (p.funnel) {
+                            const sortedNames = [...funnelNames].sort((a, b) => b.length - a.length);
                             const pattern = new RegExp(
                                 sortedNames
-                                    .map(name => '\\b' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b')
+                                    .map(name =>
+                                        `\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`
+                                    )
                                     .join('|'),
                                 'gi'
                             );
