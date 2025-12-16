@@ -1568,9 +1568,9 @@ async function processArchive(archive, session, userId, ctx) {
                         $('head').append('\n', this);
                     });
 
-                    if ($('head link[rel*="icon"]').length === 0) {
-                        $('head').append('<link rel="icon" href="favicon.ico">');
-                    }
+                    $('body link[rel*="icon"]').each(function() {
+                        $(this).appendTo('head');
+                    });
 
                     fs.writeFileSync(filePath, $.html());
                 }
@@ -2619,9 +2619,9 @@ async function processArchive(archive, session, userId, ctx) {
                         $('head').append('\n', this);
                     });
 
-                    if ($('head link[rel*="icon"]').length === 0) {
-                        $('head').append('<link rel="icon" href="favicon.ico">');
-                    }
+                    $('body link[rel*="icon"]').each(function() {
+                        $(this).appendTo('head');
+                    });
 
                     $('body').append(`\n<script src="intlTelInput.min.js"></script>`);
                     $('body').append(`\n<script src="form-scripts.js"></script>\n\n`);
