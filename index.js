@@ -1275,6 +1275,16 @@ async function processArchive(archive, session, userId, ctx) {
                             $iti.remove();
                         });
 
+                        $form.find('.phone__input').each(function () {
+                            const $wrapper = $(this);
+                            const $phoneInput = $wrapper.find('input[name="phone"], input[id="phone"], input[id="phone_raw"], input[type="tel"], input[data-intl-tel-input-id]');
+
+                            if ($phoneInput.length) {
+                                $phoneInput.insertBefore($wrapper);
+                            }
+                            $wrapper.remove();
+                        });
+
                         var isSearchForm =
                             ($form.find('input[type="text"], input[type="search"]').length === 1) &&
                             $form.find('input').length <= 3 &&
@@ -1541,7 +1551,11 @@ async function processArchive(archive, session, userId, ctx) {
                     });
 
                     $('body').find('[onclick]').each(function () {
-                        $(this).attr('onclick', '');
+                        const onclickVal = $(this).attr('onclick');
+
+                        if (!onclickVal || !onclickVal.includes('func()')) {
+                            $(this).removeAttr('onclick');
+                        }
                     });
 
                     $('body [href]').each((i, el) => {
@@ -1928,7 +1942,11 @@ async function processArchive(archive, session, userId, ctx) {
                     });
 
                     $('body').find('[onclick]').each(function () {
-                        $(this).attr('onclick', '');
+                        const onclickVal = $(this).attr('onclick');
+
+                        if (!onclickVal || !onclickVal.includes('func()')) {
+                            $(this).removeAttr('onclick');
+                        }
                     });
 
                     $('body a').each((i, el) => {
@@ -2358,6 +2376,16 @@ async function processArchive(archive, session, userId, ctx) {
                             $iti.remove();
                         });
 
+                        $form.find('.phone__input').each(function () {
+                            const $wrapper = $(this);
+                            const $phoneInput = $wrapper.find('input[name="phone"], input[id="phone"], input[id="phone_raw"], input[type="tel"], input[data-intl-tel-input-id]');
+
+                            if ($phoneInput.length) {
+                                $phoneInput.insertBefore($wrapper);
+                            }
+                            $wrapper.remove();
+                        });
+
                         var isSearchForm =
                             ($form.find('input[type="text"], input[type="search"]').length === 1) &&
                             $form.find('input').length <= 3 &&
@@ -2631,7 +2659,11 @@ async function processArchive(archive, session, userId, ctx) {
                     });
 
                     $('body').find('[onclick]').each(function () {
-                        $(this).attr('onclick', '');
+                        const onclickVal = $(this).attr('onclick');
+
+                        if (!onclickVal || !onclickVal.includes('func()')) {
+                            $(this).removeAttr('onclick');
+                        }
                     });
 
                     $('body [href]').each((i, el) => {
@@ -3031,7 +3063,11 @@ async function processArchive(archive, session, userId, ctx) {
                     });
 
                     $('body').find('[onclick]').each(function () {
-                        $(this).attr('onclick', '');
+                        const onclickVal = $(this).attr('onclick');
+
+                        if (!onclickVal || !onclickVal.includes('func()')) {
+                            $(this).removeAttr('onclick');
+                        }
                     });
 
                     $('body a').each((i, el) => {
