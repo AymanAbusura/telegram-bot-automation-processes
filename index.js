@@ -1463,7 +1463,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 $input.removeAttr('data-valid');
                             }
 
-                            if ($input.attr('type') !== 'submit' && !$input.attr('data-validation-status')) {
+                            if ($input.attr('type') !== 'submit' && $input.attr('type') !== 'checkbox' && !$input.attr('data-validation-status')) {
                                 $input.attr('data-validation-status', 'inactive');
                             }
 
@@ -2545,7 +2545,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 $input.removeAttr('data-valid');
                             }
 
-                            if ($input.attr('type') !== 'submit' && !$input.attr('data-validation-status')) {
+                            if ($input.attr('type') !== 'submit' && $input.attr('type') !== 'checkbox' && !$input.attr('data-validation-status')) {
                                 $input.attr('data-validation-status', 'inactive');
                             }
 
