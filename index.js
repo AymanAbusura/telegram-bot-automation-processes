@@ -1084,7 +1084,9 @@ async function processArchive(archive, session, userId, ctx) {
                             'app.js',
                             'jquery.maskedinput.min.js',
                             'polyfill.min.js',
-                            'handlers.js'
+                            'handlers.js',
+                            'con0.js',
+                            'form_short.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1765,7 +1767,9 @@ async function processArchive(archive, session, userId, ctx) {
                             'app.js',
                             'jquery.maskedinput.min.js',
                             'polyfill.min.js',
-                            'handlers.js'
+                            'handlers.js',
+                            'con0.js',
+                            'form_short.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -2158,7 +2162,9 @@ async function processArchive(archive, session, userId, ctx) {
                             'app.js',
                             'jquery.maskedinput.min.js',
                             'polyfill.min.js',
-                            'handlers.js'
+                            'handlers.js',
+                            'con0.js',
+                            'form_short.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -2854,7 +2860,9 @@ async function processArchive(archive, session, userId, ctx) {
                             'app.js',
                             'jquery.maskedinput.min.js',
                             'polyfill.min.js',
-                            'handlers.js'
+                            'handlers.js',
+                            'con0.js',
+                            'form_short.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -3327,7 +3335,9 @@ async function processArchive(archive, session, userId, ctx) {
                                     'app.js',
                                     'jquery.maskedinput.min.js',
                                     'polyfill.min.js',
-                                    'handlers.js'
+                                    'handlers.js',
+                                    'con0.js',
+                                    'form_short.js'
                                 ];
 
                                 if (removeFiles.some(f => src.includes(f))) {
