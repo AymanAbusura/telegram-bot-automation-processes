@@ -948,6 +948,17 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        const isDateScript =
+                            html.includes('getDate') ||
+                            html.includes('getMonth') ||
+                            html.includes('getFullYear') ||
+                            html.includes('dtime_nums(') ||  
+                            html.includes('dtime_time(');
+
+                        if (isDateScript) {
+                            return;
+                        }
+
                         const isScrollAndLinkFixScript = (
                             html.includes('link.href = link.href.replace(\'https:///\',') &&
                             html.includes('maxScroll') &&
@@ -1217,19 +1228,6 @@ async function processArchive(archive, session, userId, ctx) {
                         const removeScreenResizeScript = /let\s+screenResize\s*=\s*'';\s*if\s*\(screenResize !== 'yes'\)/.test(html);
                         if (removeScreenResizeScript) {
                             $el.remove();
-                            return;
-                        }
-
-                        const isDateScript =
-                            html.includes('Date') ||
-                            html.includes('getDate') ||
-                            html.includes('getMonth') ||
-                            html.includes('getFullYear') ||
-                            html.match(/\bday\b/i) ||
-                            html.match(/\bmonth\b/i) ||
-                            html.match(/\byear\b/i);
-
-                        if (isDateScript) {
                             return;
                         }
                     });
@@ -1631,6 +1629,17 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        const isDateScript =
+                            html.includes('getDate') ||
+                            html.includes('getMonth') ||
+                            html.includes('getFullYear') ||
+                            html.includes('dtime_nums(') ||  
+                            html.includes('dtime_time(');
+
+                        if (isDateScript) {
+                            return;
+                        }
+
                         const isScrollAndLinkFixScript = (
                             html.includes('link.href = link.href.replace(\'https:///\',') &&
                             html.includes('maxScroll') &&
@@ -1902,19 +1911,6 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.remove();
                             return;
                         }
-
-                        const isDateScript =
-                            html.includes('Date') ||
-                            html.includes('getDate') ||
-                            html.includes('getMonth') ||
-                            html.includes('getFullYear') ||
-                            html.match(/\bday\b/i) ||
-                            html.match(/\bmonth\b/i) ||
-                            html.match(/\byear\b/i);
-
-                        if (isDateScript) {
-                            return;
-                        }
                     });
 
                     $('form').each((i, el) => {
@@ -2023,6 +2019,17 @@ async function processArchive(archive, session, userId, ctx) {
                         if (html.includes('#chatbox')) return;
 
                         if (html.includes('updateTimer') && html.includes('countdown(')) {
+                            return;
+                        }
+
+                        const isDateScript =
+                            html.includes('getDate') ||
+                            html.includes('getMonth') ||
+                            html.includes('getFullYear') ||
+                            html.includes('dtime_nums(') ||  
+                            html.includes('dtime_time(');
+
+                        if (isDateScript) {
                             return;
                         }
 
@@ -2300,19 +2307,6 @@ async function processArchive(archive, session, userId, ctx) {
                         const removeScreenResizeScript = /let\s+screenResize\s*=\s*'';\s*if\s*\(screenResize !== 'yes'\)/.test(html);
                         if (removeScreenResizeScript) {
                             $el.remove();
-                            return;
-                        }
-
-                        const isDateScript =
-                            html.includes('Date') ||
-                            html.includes('getDate') ||
-                            html.includes('getMonth') ||
-                            html.includes('getFullYear') ||
-                            html.match(/\bday\b/i) ||
-                            html.match(/\bmonth\b/i) ||
-                            html.match(/\byear\b/i);
-
-                        if (isDateScript) {
                             return;
                         }
                     });
@@ -2724,6 +2718,17 @@ async function processArchive(archive, session, userId, ctx) {
                             return;
                         }
 
+                        const isDateScript =
+                            html.includes('getDate') ||
+                            html.includes('getMonth') ||
+                            html.includes('getFullYear') ||
+                            html.includes('dtime_nums(') ||  
+                            html.includes('dtime_time(');
+
+                        if (isDateScript) {
+                            return;
+                        }
+
                         const isScrollAndLinkFixScript = (
                             html.includes('link.href = link.href.replace(\'https:///\',') &&
                             html.includes('maxScroll') &&
@@ -2995,19 +3000,6 @@ async function processArchive(archive, session, userId, ctx) {
                             $el.remove();
                             return;
                         }
-
-                        const isDateScript =
-                            html.includes('Date') ||
-                            html.includes('getDate') ||
-                            html.includes('getMonth') ||
-                            html.includes('getFullYear') ||
-                            html.match(/\bday\b/i) ||
-                            html.match(/\bmonth\b/i) ||
-                            html.match(/\byear\b/i);
-
-                        if (isDateScript) {
-                            return;
-                        }
                     });
 
                     const markerText = session.marker || 'Official Site';
@@ -3196,6 +3188,17 @@ async function processArchive(archive, session, userId, ctx) {
                                 if (html.includes('#chatbox')) return;
 
                                 if (html.includes('updateTimer') && html.includes('countdown(')) {
+                                    return;
+                                }
+
+                                const isDateScript =
+                                    html.includes('getDate') ||
+                                    html.includes('getMonth') ||
+                                    html.includes('getFullYear') ||
+                                    html.includes('dtime_nums(') ||  
+                                    html.includes('dtime_time(');
+
+                                if (isDateScript) {
                                     return;
                                 }
 
@@ -3468,19 +3471,6 @@ async function processArchive(archive, session, userId, ctx) {
                                 const removeScreenResizeScript = /let\s+screenResize\s*=\s*'';\s*if\s*\(screenResize !== 'yes'\)/.test(html);
                                 if (removeScreenResizeScript) {
                                     $el.remove();
-                                    return;
-                                }
-
-                                const isDateScript =
-                                    html.includes('Date') ||
-                                    html.includes('getDate') ||
-                                    html.includes('getMonth') ||
-                                    html.includes('getFullYear') ||
-                                    html.match(/\bday\b/i) ||
-                                    html.match(/\bmonth\b/i) ||
-                                    html.match(/\byear\b/i);
-
-                                if (isDateScript) {
                                     return;
                                 }
                             });
