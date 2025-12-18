@@ -845,15 +845,12 @@ async function processArchive(archive, session, userId, ctx) {
                     html = html.replace(/<!--\s*<\?php[\s\S]*?\?>\s*-->/gi, '');
 
                     const doctypeIndex = html.search(/<!DOCTYPE\s+html/i);
-                    if (doctypeIndex > 0) {
+                    if (doctypeIndex !== -1) {
                         html = html.substring(doctypeIndex);
                     } else {
-                        const htmlMatch = html.match(/(?:^|>)\s*(<html[\s>])/i);
-                        if (htmlMatch && htmlMatch.index !== undefined) {
-                            const htmlIndex = html.indexOf(htmlMatch[1], htmlMatch.index);
-                            if (htmlIndex > 0) {
-                                html = html.substring(htmlIndex);
-                            }
+                        const htmlIndex = html.search(/<html\b[^>]*>/i);
+                        if (htmlIndex !== -1) {
+                            html = html.substring(htmlIndex);
                         }
                     }
                     
@@ -3117,15 +3114,12 @@ async function processArchive(archive, session, userId, ctx) {
                         html = html.replace(/<!--\s*<\?php[\s\S]*?\?>\s*-->/gi, '');
 
                         const doctypeIndex = html.search(/<!DOCTYPE\s+html/i);
-                        if (doctypeIndex > 0) {
+                        if (doctypeIndex !== -1) {
                             html = html.substring(doctypeIndex);
                         } else {
-                            const htmlMatch = html.match(/(?:^|>)\s*(<html[\s>])/i);
-                            if (htmlMatch && htmlMatch.index !== undefined) {
-                                const htmlIndex = html.indexOf(htmlMatch[1], htmlMatch.index);
-                                if (htmlIndex > 0) {
-                                    html = html.substring(htmlIndex);
-                                }
+                            const htmlIndex = html.search(/<html\b[^>]*>/i);
+                            if (htmlIndex !== -1) {
+                                html = html.substring(htmlIndex);
                             }
                         }
 
