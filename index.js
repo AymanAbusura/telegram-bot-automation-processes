@@ -1031,7 +1031,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('order_recently_confirmed') ||
                             html.includes('.offset().top') ||
                             html.includes('.animate({scrollTop:') ||
-                            html.includes('input[type=submit]')
+                            html.includes('input[type=submit]') ||
+                            html.includes('href*="?')
                         ) {
                             $el.remove();
                             return;
@@ -1729,7 +1730,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('order_recently_confirmed') ||
                             html.includes('.offset().top') ||
                             html.includes('.animate({scrollTop:') ||
-                            html.includes('input[type=submit]')
+                            html.includes('input[type=submit]') ||
+                            html.includes('href*="?')
                         ) {
                             $el.remove();
                             return;
@@ -2129,7 +2131,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('order_recently_confirmed') ||
                             html.includes('.offset().top') ||
                             html.includes('.animate({scrollTop:') ||
-                            html.includes('input[type=submit]')
+                            html.includes('input[type=submit]') ||
+                            html.includes('href*="?')
                         ) {
                             $el.remove();
                             return;
@@ -2842,7 +2845,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('order_recently_confirmed') ||
                             html.includes('.offset().top') ||
                             html.includes('.animate({scrollTop:') ||
-                            html.includes('input[type=submit]')
+                            html.includes('input[type=submit]') ||
+                            html.includes('href*="?')
                         ) {
                             $el.remove();
                             return;
@@ -3319,7 +3323,8 @@ async function processArchive(archive, session, userId, ctx) {
                                     html.includes('order_recently_confirmed') ||
                                     html.includes('.offset().top') ||
                                     html.includes('.animate({scrollTop:') ||
-                                    html.includes('input[type=submit]')
+                                    html.includes('input[type=submit]') ||
+                                    html.includes('href*="?')
                                 ) {
                                     $el.remove();
                                     return;
