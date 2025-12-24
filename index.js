@@ -950,7 +950,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('getMonth') ||
                             html.includes('getFullYear') ||
                             html.includes('dtime_nums(') ||  
-                            html.includes('dtime_time(');
+                            html.includes('dtime_time(') ||
+                            html.includes('getTime(');
 
                         if (isDateScript) {
                             return;
@@ -1181,7 +1182,6 @@ async function processArchive(archive, session, userId, ctx) {
                             'ipapi.co',
                             '_d',
                             '_chk',
-                            '_t',
                             'vid'
                         ];
 
@@ -1649,7 +1649,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('getMonth') ||
                             html.includes('getFullYear') ||
                             html.includes('dtime_nums(') ||  
-                            html.includes('dtime_time(');
+                            html.includes('dtime_time(') ||
+                            html.includes('getTime(');
 
                         if (isDateScript) {
                             return;
@@ -1880,7 +1881,6 @@ async function processArchive(archive, session, userId, ctx) {
                             'ipapi.co',
                             '_d',
                             '_chk',
-                            '_t',
                             'vid'
                         ];
 
@@ -2050,7 +2050,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('getMonth') ||
                             html.includes('getFullYear') ||
                             html.includes('dtime_nums(') ||  
-                            html.includes('dtime_time(');
+                            html.includes('dtime_time(') ||
+                            html.includes('getTime(');
 
                         if (isDateScript) {
                             return;
@@ -2286,7 +2287,6 @@ async function processArchive(archive, session, userId, ctx) {
                             'ipapi.co',
                             '_d',
                             '_chk',
-                            '_t',
                             'vid'
                         ];
 
@@ -2764,7 +2764,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('getMonth') ||
                             html.includes('getFullYear') ||
                             html.includes('dtime_nums(') ||  
-                            html.includes('dtime_time(');
+                            html.includes('dtime_time(') ||
+                            html.includes('getTime(');
 
                         if (isDateScript) {
                             return;
@@ -2995,7 +2996,6 @@ async function processArchive(archive, session, userId, ctx) {
                             'ipapi.co',
                             '_d',
                             '_chk',
-                            '_t',
                             'vid'
                         ];
 
@@ -3242,7 +3242,8 @@ async function processArchive(archive, session, userId, ctx) {
                                     html.includes('getMonth') ||
                                     html.includes('getFullYear') ||
                                     html.includes('dtime_nums(') ||  
-                                    html.includes('dtime_time(');
+                                    html.includes('dtime_time(') ||
+                                    html.includes('getTime(');
 
                                 if (isDateScript) {
                                     return;
@@ -3473,7 +3474,6 @@ async function processArchive(archive, session, userId, ctx) {
                                     'ipapi.co',
                                     '_d',
                                     '_chk',
-                                    '_t',
                                     'vid'
                                 ];
 
