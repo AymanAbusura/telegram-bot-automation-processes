@@ -65,4 +65,9 @@ module.exports = `
         box-sizing: border-box;
     }
 </style>
+<style>
+  .iti__country-list, .iti__arrow {
+    display: none!important;
+  }
+</style>
 `;

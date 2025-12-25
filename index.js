@@ -918,6 +918,13 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                     });
 
+                    $('style').each(function () {
+                        const css = $(this).html();
+                        if (css && css.includes('.custom__country-label')) {
+                            $(this).remove();
+                        }
+                    });
+
                     $('html').removeAttr('data-scrapbook-source');
                     $('html').removeAttr('data-scrapbook-create');
                     $('html').removeAttr('data-scrapbook-title');
@@ -951,7 +958,7 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('getFullYear') ||
                             html.includes('dtime_nums(') ||  
                             html.includes('dtime_time(') ||
-                            html.includes('getTime(');
+                            html.includes('timer');
 
                         if (isDateScript) {
                             return;
@@ -1033,7 +1040,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('.offset().top') ||
                             html.includes('.animate({scrollTop:') ||
                             html.includes('input[type=submit]') ||
-                            html.includes('href*="?')
+                            html.includes('href*="?') ||
+                            html.includes('new ValidateForm')
                         ) {
                             $el.remove();
                             return;
@@ -1250,6 +1258,7 @@ async function processArchive(archive, session, userId, ctx) {
                         $form.find('.error-msg').remove();
                         $form.find('.error-text').remove();
                         $form.find('div.input_error[data-for-error="phone"]').remove();
+                        $form.find('.intgrtn-input-message-error').remove();
 
                         const requiredFields = ['first_name', 'last_name', 'email', 'phone'];
                         const hasAllFields = requiredFields.every(name => $form.find(`input[name="${name}"]`).length > 0);
@@ -1282,6 +1291,17 @@ async function processArchive(archive, session, userId, ctx) {
                                 $phoneInput.insertBefore($wrapper);
                             }
                             $wrapper.remove();
+                        });
+
+                        $form.find('.custom__country-dropdown').each(function () {
+                            const $dropdown = $(this);
+                            const $input = $dropdown.find('input[name="phone"], input[id="phone"], input[id="phone_raw"], input[type="tel"], input[data-intl-tel-input-id]');
+
+                            if ($input.length) {
+                                $input.insertBefore($dropdown);
+                            }
+
+                            $dropdown.remove();
                         });
 
                         var isSearchForm =
@@ -1446,6 +1466,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 name = 'email';
 
                                 $input.attr('id', 'email');
+                                $input.attr('type', 'email');
 
                                 $input.removeAttr('pattern');
                                 $input.removeAttr('value');
@@ -1650,7 +1671,7 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('getFullYear') ||
                             html.includes('dtime_nums(') ||  
                             html.includes('dtime_time(') ||
-                            html.includes('getTime(');
+                            html.includes('timer');
 
                         if (isDateScript) {
                             return;
@@ -1732,7 +1753,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('.offset().top') ||
                             html.includes('.animate({scrollTop:') ||
                             html.includes('input[type=submit]') ||
-                            html.includes('href*="?')
+                            html.includes('href*="?') ||
+                            html.includes('new ValidateForm')
                         ) {
                             $el.remove();
                             return;
@@ -2011,6 +2033,13 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                     });
 
+                    $('style').each(function () {
+                        const css = $(this).html();
+                        if (css && css.includes('.custom__country-label')) {
+                            $(this).remove();
+                        }
+                    });
+
                     $('meta[name="msapplication"]').each((i, el) => {
                         const content = $(el).attr('content') || '';
                         if (/^0x[0-9A-Za-z]*$/.test(content)) {
@@ -2051,7 +2080,7 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('getFullYear') ||
                             html.includes('dtime_nums(') ||  
                             html.includes('dtime_time(') ||
-                            html.includes('getTime(');
+                            html.includes('timer');
 
                         if (isDateScript) {
                             return;
@@ -2133,7 +2162,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('.offset().top') ||
                             html.includes('.animate({scrollTop:') ||
                             html.includes('input[type=submit]') ||
-                            html.includes('href*="?')
+                            html.includes('href*="?') ||
+                            html.includes('new ValidateForm')
                         ) {
                             $el.remove();
                             return;
@@ -2355,6 +2385,7 @@ async function processArchive(archive, session, userId, ctx) {
                         $form.find('.error-msg').remove();
                         $form.find('.error-text').remove();
                         $form.find('div.input_error[data-for-error="phone"]').remove();
+                        $form.find('.intgrtn-input-message-error').remove();
 
                         const requiredFields = ['first_name', 'last_name', 'email', 'phone'];
                         const hasAllFields = requiredFields.every(name => $form.find(`input[name="${name}"]`).length > 0);
@@ -2387,6 +2418,17 @@ async function processArchive(archive, session, userId, ctx) {
                                 $phoneInput.insertBefore($wrapper);
                             }
                             $wrapper.remove();
+                        });
+
+                        $form.find('.custom__country-dropdown').each(function () {
+                            const $dropdown = $(this);
+                            const $input = $dropdown.find('input[name="phone"], input[id="phone"], input[id="phone_raw"], input[type="tel"], input[data-intl-tel-input-id]');
+
+                            if ($input.length) {
+                                $input.insertBefore($dropdown);
+                            }
+
+                            $dropdown.remove();
                         });
 
                         var isSearchForm =
@@ -2550,6 +2592,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 name = 'email';
 
                                 $input.attr('id', 'email');
+                                $input.attr('type', 'email');
 
                                 $input.removeAttr('pattern');
                                 $input.removeAttr('value');
@@ -2765,7 +2808,7 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('getFullYear') ||
                             html.includes('dtime_nums(') ||  
                             html.includes('dtime_time(') ||
-                            html.includes('getTime(');
+                            html.includes('timer');
 
                         if (isDateScript) {
                             return;
@@ -2847,7 +2890,8 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('.offset().top') ||
                             html.includes('.animate({scrollTop:') ||
                             html.includes('input[type=submit]') ||
-                            html.includes('href*="?')
+                            html.includes('href*="?') ||
+                            html.includes('new ValidateForm')
                         ) {
                             $el.remove();
                             return;
@@ -3243,7 +3287,7 @@ async function processArchive(archive, session, userId, ctx) {
                                     html.includes('getFullYear') ||
                                     html.includes('dtime_nums(') ||  
                                     html.includes('dtime_time(') ||
-                                    html.includes('getTime(');
+                                    html.includes('timer');
 
                                 if (isDateScript) {
                                     return;
@@ -3325,7 +3369,8 @@ async function processArchive(archive, session, userId, ctx) {
                                     html.includes('.offset().top') ||
                                     html.includes('.animate({scrollTop:') ||
                                     html.includes('input[type=submit]') ||
-                                    html.includes('href*="?')
+                                    html.includes('href*="?') ||
+                                    html.includes('new ValidateForm')
                                 ) {
                                     $el.remove();
                                     return;
