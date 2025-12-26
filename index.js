@@ -1597,7 +1597,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'polyfill.min.js',
                             'handlers.js',
                             'con0.js',
-                            'tm.js'
+                            'intlTelInputWithUtils.min.js',
+                            'index-aGoeQGI3.js'
                         ];
                         
                         filesToDeleteInIndex.forEach(fileName => {
@@ -2115,7 +2116,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'polyfill.min.js',
                             'handlers.js',
                             'con0.js',
-                            'tm.js'
+                            'intlTelInputWithUtils.min.js',
+                            'index-aGoeQGI3.js'
                         ];
                         
                         filesToDeleteInIndex.forEach(fileName => {
@@ -2846,7 +2848,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'polyfill.min.js',
                             'handlers.js',
                             'con0.js',
-                            'tm.js'
+                            'intlTelInputWithUtils.min.js',
+                            'index-aGoeQGI3.js'
                         ];
                         
                         filesToDeleteInIndex.forEach(fileName => {
@@ -3385,7 +3388,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'polyfill.min.js',
                             'handlers.js',
                             'con0.js',
-                            'tm.js'
+                            'intlTelInputWithUtils.min.js',
+                            'index-aGoeQGI3.js'
                         ];
                         
                         filesToDeleteInIndex.forEach(fileName => {
@@ -3967,7 +3971,8 @@ async function processArchive(archive, session, userId, ctx) {
                                     'polyfill.min.js',
                                     'handlers.js',
                                     'con0.js',
-                                    'tm.js'
+                                    'intlTelInputWithUtils.min.js',
+                                    'index-aGoeQGI3.js'
                                 ];
                                 
                                 filesToDeleteInIndex.forEach(fileName => {

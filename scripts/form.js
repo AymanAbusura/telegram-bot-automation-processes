@@ -240,6 +240,18 @@ const FORM_TRANSLATIONS = {
         submit: "Испрати"
     },
 
+    ME: {
+        first_name_pl: "Ime",
+        last_name_pl: "Prezime",
+        email_pl: "Email",
+        phone_pl: "Vaš broj mobilnog telefona",
+        err_first: "Vaše ime je prekratko (najmanje 2 karaktera)",
+        err_last: "Vaše prezime je prekratko (najmanje 2 karaktera)",
+        err_email: "Molimo unesite važeću email adresu",
+        err_phone: "Molimo unesite važeći broj telefona",
+        submit: "Pošalji"
+    },
+
     HR: {
         first_name_pl: "Ime",
         last_name_pl: "Prezime",
