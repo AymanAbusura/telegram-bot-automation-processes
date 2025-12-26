@@ -1546,6 +1546,66 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                     });
 
+                    const filesToDelete = ['index1.html', 'offer_index.html', 'videoPreview.webp', 'preview.webp', 'full_preview.webp'];
+                    filesToDelete.forEach(fileName => {
+                        const fileToDelete = path.join(rootPath, fileName);
+                        if (fs.existsSync(fileToDelete)) {
+                            fs.unlinkSync(fileToDelete);
+                        }
+                    });
+
+                    const indexFolderPath = path.join(rootPath, 'index');
+                    if (fs.existsSync(indexFolderPath) && fs.statSync(indexFolderPath).isDirectory()) {
+                        const filesToDeleteInIndex = [
+                            'index.html',
+                            'index.php',
+                            'flags.png',
+                            'flags@2x.png',
+                            'flags.webp',
+                            'flags@2x.webp',
+                            'i18n.min.js',
+                            'intlTelInput.css',
+                            'intlTelInput.min.css',
+                            'intlTelInput.min.js',
+                            'utils.js',
+                            'utils.min.js',
+                            'tel.js',
+                            'tm.js',
+                            'track.js',
+                            'backfix.js',
+                            'fbevents.js',
+                            'form_short.js',
+                            'auth.js',
+                            'jquery-3.7.1.min.js',
+                            'functions.js',
+                            'jquery-migration-3.7.1.min.js',
+                            'lib.js',
+                            'plgintlTel.js',
+                            'validation.js',
+                            'validate.js',
+                            'email-decode.min.js',
+                            'uwt.js',
+                            'translations.js',
+                            'bundle.umd.min.js',
+                            'loader.js',
+                            'form.js',
+                            'validator.js',
+                            'axios.min.js',
+                            'app.js',
+                            'jquery.maskedinput.min.js',
+                            'polyfill.min.js',
+                            'handlers.js',
+                            'con0.js'
+                        ];
+                        
+                        filesToDeleteInIndex.forEach(fileName => {
+                            const fileToDelete = path.join(indexFolderPath, fileName);
+                            if (fs.existsSync(fileToDelete)) {
+                                fs.unlinkSync(fileToDelete);
+                            }
+                        });
+                    }
+
                     const ASSETS_DIR = path.join(__dirname, 'assets');
                     if (fs.existsSync(ASSETS_DIR)) {
                         const assetFiles = fs.readdirSync(ASSETS_DIR);
@@ -2002,6 +2062,65 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                     }
 
+                    const filesToDelete = ['index1.html', 'offer_index.html', 'videoPreview.webp', 'preview.webp', 'full_preview.webp'];
+                    filesToDelete.forEach(fileName => {
+                        const fileToDelete = path.join(rootPath, fileName);
+                        if (fs.existsSync(fileToDelete)) {
+                            fs.unlinkSync(fileToDelete);
+                        }
+                    });
+
+                    const indexFolderPath = path.join(rootPath, 'index');
+                    if (fs.existsSync(indexFolderPath) && fs.statSync(indexFolderPath).isDirectory()) {
+                        const filesToDeleteInIndex = [
+                            'index.html',
+                            'index.php',
+                            'flags.png',
+                            'flags@2x.png',
+                            'flags.webp',
+                            'flags@2x.webp',
+                            'i18n.min.js',
+                            'intlTelInput.css',
+                            'intlTelInput.min.css',
+                            'intlTelInput.min.js',
+                            'utils.js',
+                            'utils.min.js',
+                            'tel.js',
+                            'tm.js',
+                            'track.js',
+                            'backfix.js',
+                            'fbevents.js',
+                            'form_short.js',
+                            'auth.js',
+                            'jquery-3.7.1.min.js',
+                            'functions.js',
+                            'jquery-migration-3.7.1.min.js',
+                            'lib.js',
+                            'plgintlTel.js',
+                            'validation.js',
+                            'validate.js',
+                            'email-decode.min.js',
+                            'uwt.js',
+                            'translations.js',
+                            'bundle.umd.min.js',
+                            'loader.js',
+                            'form.js',
+                            'validator.js',
+                            'axios.min.js',
+                            'app.js',
+                            'jquery.maskedinput.min.js',
+                            'polyfill.min.js',
+                            'handlers.js',
+                            'con0.js'
+                        ];
+                        
+                        filesToDeleteInIndex.forEach(fileName => {
+                            const fileToDelete = path.join(indexFolderPath, fileName);
+                            if (fs.existsSync(fileToDelete)) {
+                                fs.unlinkSync(fileToDelete);
+                            }
+                        });
+                    }
 
                     fs.writeFileSync(filePath, finalHtml, 'utf8');
                 }
@@ -2672,6 +2791,66 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                     });
 
+                    const filesToDelete = ['index1.html', 'offer_index.html', 'videoPreview.webp', 'preview.webp', 'full_preview.webp'];
+                    filesToDelete.forEach(fileName => {
+                        const fileToDelete = path.join(rootPath, fileName);
+                        if (fs.existsSync(fileToDelete)) {
+                            fs.unlinkSync(fileToDelete);
+                        }
+                    });
+
+                    const indexFolderPath = path.join(rootPath, 'index');
+                    if (fs.existsSync(indexFolderPath) && fs.statSync(indexFolderPath).isDirectory()) {
+                        const filesToDeleteInIndex = [
+                            'index.html',
+                            'index.php',
+                            'flags.png',
+                            'flags@2x.png',
+                            'flags.webp',
+                            'flags@2x.webp',
+                            'i18n.min.js',
+                            'intlTelInput.css',
+                            'intlTelInput.min.css',
+                            'intlTelInput.min.js',
+                            'utils.js',
+                            'utils.min.js',
+                            'tel.js',
+                            'tm.js',
+                            'track.js',
+                            'backfix.js',
+                            'fbevents.js',
+                            'form_short.js',
+                            'auth.js',
+                            'jquery-3.7.1.min.js',
+                            'functions.js',
+                            'jquery-migration-3.7.1.min.js',
+                            'lib.js',
+                            'plgintlTel.js',
+                            'validation.js',
+                            'validate.js',
+                            'email-decode.min.js',
+                            'uwt.js',
+                            'translations.js',
+                            'bundle.umd.min.js',
+                            'loader.js',
+                            'form.js',
+                            'validator.js',
+                            'axios.min.js',
+                            'app.js',
+                            'jquery.maskedinput.min.js',
+                            'polyfill.min.js',
+                            'handlers.js',
+                            'con0.js'
+                        ];
+                        
+                        filesToDeleteInIndex.forEach(fileName => {
+                            const fileToDelete = path.join(indexFolderPath, fileName);
+                            if (fs.existsSync(fileToDelete)) {
+                                fs.unlinkSync(fileToDelete);
+                            }
+                        });
+                    }
+
                     const ASSETS_DIR = path.join(__dirname, 'assets');
                     if (fs.existsSync(ASSETS_DIR)) {
                         const assetFiles = fs.readdirSync(ASSETS_DIR);
@@ -3147,6 +3326,66 @@ async function processArchive(archive, session, userId, ctx) {
                         } else {
                             finalHtml = phpCode + finalHtml;
                         }
+                    }
+
+                    const filesToDelete = ['index1.html', 'offer_index.html', 'videoPreview.webp', 'preview.webp', 'full_preview.webp'];
+                    filesToDelete.forEach(fileName => {
+                        const fileToDelete = path.join(rootPath, fileName);
+                        if (fs.existsSync(fileToDelete)) {
+                            fs.unlinkSync(fileToDelete);
+                        }
+                    });
+
+                    const indexFolderPath = path.join(rootPath, 'index');
+                    if (fs.existsSync(indexFolderPath) && fs.statSync(indexFolderPath).isDirectory()) {
+                        const filesToDeleteInIndex = [
+                            'index.html',
+                            'index.php',
+                            'flags.png',
+                            'flags@2x.png',
+                            'flags.webp',
+                            'flags@2x.webp',
+                            'i18n.min.js',
+                            'intlTelInput.css',
+                            'intlTelInput.min.css',
+                            'intlTelInput.min.js',
+                            'utils.js',
+                            'utils.min.js',
+                            'tel.js',
+                            'tm.js',
+                            'track.js',
+                            'backfix.js',
+                            'fbevents.js',
+                            'form_short.js',
+                            'auth.js',
+                            'jquery-3.7.1.min.js',
+                            'functions.js',
+                            'jquery-migration-3.7.1.min.js',
+                            'lib.js',
+                            'plgintlTel.js',
+                            'validation.js',
+                            'validate.js',
+                            'email-decode.min.js',
+                            'uwt.js',
+                            'translations.js',
+                            'bundle.umd.min.js',
+                            'loader.js',
+                            'form.js',
+                            'validator.js',
+                            'axios.min.js',
+                            'app.js',
+                            'jquery.maskedinput.min.js',
+                            'polyfill.min.js',
+                            'handlers.js',
+                            'con0.js'
+                        ];
+                        
+                        filesToDeleteInIndex.forEach(fileName => {
+                            const fileToDelete = path.join(indexFolderPath, fileName);
+                            if (fs.existsSync(fileToDelete)) {
+                                fs.unlinkSync(fileToDelete);
+                            }
+                        });
                     }
 
                     fs.writeFileSync(filePath, finalHtml, 'utf8');
@@ -3668,6 +3907,66 @@ async function processArchive(archive, session, userId, ctx) {
                             $('body').find('[target]').each(function () {
                                 $(this).attr('target', '');
                             });
+
+                            const filesToDelete = ['index1.html', 'offer_index.html', 'videoPreview.webp', 'preview.webp', 'full_preview.webp'];
+                            filesToDelete.forEach(fileName => {
+                                const fileToDelete = path.join(rootPath, fileName);
+                                if (fs.existsSync(fileToDelete)) {
+                                    fs.unlinkSync(fileToDelete);
+                                }
+                            });
+
+                            const indexFolderPath = path.join(rootPath, 'index');
+                            if (fs.existsSync(indexFolderPath) && fs.statSync(indexFolderPath).isDirectory()) {
+                                const filesToDeleteInIndex = [
+                                    'index.html',
+                                    'index.php',
+                                    'flags.png',
+                                    'flags@2x.png',
+                                    'flags.webp',
+                                    'flags@2x.webp',
+                                    'i18n.min.js',
+                                    'intlTelInput.css',
+                                    'intlTelInput.min.css',
+                                    'intlTelInput.min.js',
+                                    'utils.js',
+                                    'utils.min.js',
+                                    'tel.js',
+                                    'tm.js',
+                                    'track.js',
+                                    'backfix.js',
+                                    'fbevents.js',
+                                    'form_short.js',
+                                    'auth.js',
+                                    'jquery-3.7.1.min.js',
+                                    'functions.js',
+                                    'jquery-migration-3.7.1.min.js',
+                                    'lib.js',
+                                    'plgintlTel.js',
+                                    'validation.js',
+                                    'validate.js',
+                                    'email-decode.min.js',
+                                    'uwt.js',
+                                    'translations.js',
+                                    'bundle.umd.min.js',
+                                    'loader.js',
+                                    'form.js',
+                                    'validator.js',
+                                    'axios.min.js',
+                                    'app.js',
+                                    'jquery.maskedinput.min.js',
+                                    'polyfill.min.js',
+                                    'handlers.js',
+                                    'con0.js'
+                                ];
+                                
+                                filesToDeleteInIndex.forEach(fileName => {
+                                    const fileToDelete = path.join(indexFolderPath, fileName);
+                                    if (fs.existsSync(fileToDelete)) {
+                                        fs.unlinkSync(fileToDelete);
+                                    }
+                                });
+                            }
 
                             const ASSETS_DIR = path.join(__dirname, 'assets');
                             if (fs.existsSync(ASSETS_DIR)) {
