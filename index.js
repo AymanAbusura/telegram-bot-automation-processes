@@ -1094,7 +1094,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'polyfill.min.js',
                             'handlers.js',
                             'con0.js',
-                            'form_short.js'
+                            'form_short.js',
+                            'tm.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1595,7 +1596,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'jquery.maskedinput.min.js',
                             'polyfill.min.js',
                             'handlers.js',
-                            'con0.js'
+                            'con0.js',
+                            'tm.js'
                         ];
                         
                         filesToDeleteInIndex.forEach(fileName => {
@@ -1867,7 +1869,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'polyfill.min.js',
                             'handlers.js',
                             'con0.js',
-                            'form_short.js'
+                            'form_short.js',
+                            'tm.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -2111,7 +2114,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'jquery.maskedinput.min.js',
                             'polyfill.min.js',
                             'handlers.js',
-                            'con0.js'
+                            'con0.js',
+                            'tm.js'
                         ];
                         
                         filesToDeleteInIndex.forEach(fileName => {
@@ -2335,7 +2339,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'polyfill.min.js',
                             'handlers.js',
                             'con0.js',
-                            'form_short.js'
+                            'form_short.js',
+                            'tm.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -2840,7 +2845,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'jquery.maskedinput.min.js',
                             'polyfill.min.js',
                             'handlers.js',
-                            'con0.js'
+                            'con0.js',
+                            'tm.js'
                         ];
                         
                         filesToDeleteInIndex.forEach(fileName => {
@@ -3123,7 +3129,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'polyfill.min.js',
                             'handlers.js',
                             'con0.js',
-                            'form_short.js'
+                            'form_short.js',
+                            'tm.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -3377,7 +3384,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'jquery.maskedinput.min.js',
                             'polyfill.min.js',
                             'handlers.js',
-                            'con0.js'
+                            'con0.js',
+                            'tm.js'
                         ];
                         
                         filesToDeleteInIndex.forEach(fileName => {
@@ -3662,7 +3670,8 @@ async function processArchive(archive, session, userId, ctx) {
                                     'polyfill.min.js',
                                     'handlers.js',
                                     'con0.js',
-                                    'form_short.js'
+                                    'form_short.js',
+                                    'tm.js'
                                 ];
 
                                 if (removeFiles.some(f => src.includes(f))) {
@@ -3957,7 +3966,8 @@ async function processArchive(archive, session, userId, ctx) {
                                     'jquery.maskedinput.min.js',
                                     'polyfill.min.js',
                                     'handlers.js',
-                                    'con0.js'
+                                    'con0.js',
+                                    'tm.js'
                                 ];
                                 
                                 filesToDeleteInIndex.forEach(fileName => {
