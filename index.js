@@ -1095,7 +1095,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'handlers.js',
                             'con0.js',
                             'form_short.js',
-                            'tm.js'
+                            'tm.js',
+                            'main3.js',
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -1568,8 +1569,10 @@ async function processArchive(archive, session, userId, ctx) {
                             'intlTelInput.css',
                             'intlTelInput.min.css',
                             'intlTelInput.min.js',
+                            'intlTelInput.js',
                             'utils.js',
                             'utils.min.js',
+                            'main3.js',
                             'tel.js',
                             'tm.js',
                             'track.js',
@@ -1871,7 +1874,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'handlers.js',
                             'con0.js',
                             'form_short.js',
-                            'tm.js'
+                            'tm.js',
+                            'main3.js',
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -2087,8 +2091,10 @@ async function processArchive(archive, session, userId, ctx) {
                             'intlTelInput.css',
                             'intlTelInput.min.css',
                             'intlTelInput.min.js',
+                            'intlTelInput.js',
                             'utils.js',
                             'utils.min.js',
+                            'main3.js',
                             'tel.js',
                             'tm.js',
                             'track.js',
@@ -2342,7 +2348,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'handlers.js',
                             'con0.js',
                             'form_short.js',
-                            'tm.js'
+                            'tm.js',
+                            'main3.js',
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -2819,8 +2826,10 @@ async function processArchive(archive, session, userId, ctx) {
                             'intlTelInput.css',
                             'intlTelInput.min.css',
                             'intlTelInput.min.js',
+                            'intlTelInput.js',
                             'utils.js',
                             'utils.min.js',
+                            'main3.js',
                             'tel.js',
                             'tm.js',
                             'track.js',
@@ -3133,7 +3142,8 @@ async function processArchive(archive, session, userId, ctx) {
                             'handlers.js',
                             'con0.js',
                             'form_short.js',
-                            'tm.js'
+                            'tm.js',
+                            'main3.js',
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -3359,8 +3369,10 @@ async function processArchive(archive, session, userId, ctx) {
                             'intlTelInput.css',
                             'intlTelInput.min.css',
                             'intlTelInput.min.js',
+                            'intlTelInput.js',
                             'utils.js',
                             'utils.min.js',
+                            'main3.js',
                             'tel.js',
                             'tm.js',
                             'track.js',
@@ -3675,7 +3687,8 @@ async function processArchive(archive, session, userId, ctx) {
                                     'handlers.js',
                                     'con0.js',
                                     'form_short.js',
-                                    'tm.js'
+                                    'tm.js',
+                                    'main3.js',
                                 ];
 
                                 if (removeFiles.some(f => src.includes(f))) {
@@ -3942,6 +3955,8 @@ async function processArchive(archive, session, userId, ctx) {
                                     'intlTelInput.css',
                                     'intlTelInput.min.css',
                                     'intlTelInput.min.js',
+                                    'intlTelInput.js',
+                                    'main3.js',
                                     'utils.js',
                                     'utils.min.js',
                                     'tel.js',
