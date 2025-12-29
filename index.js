@@ -1410,7 +1410,7 @@ async function processArchive(archive, session, userId, ctx) {
                         $form.find('.flag-container').remove();
                         $form.find('input[name="areaCode"]').remove();
 
-                        $form.find('input[type="hidden"]').remove();
+                        $form.find('input[type="hidden"]').not('[name="querys"]').remove();
 
                         const sub1 = `<input type="hidden" name="sub1" value="{subid}">`;
                         const ip   = `<input type="hidden" name="ip" value="{ip}">`;
