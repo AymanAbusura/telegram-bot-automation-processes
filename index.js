@@ -1247,6 +1247,9 @@ async function processArchive(archive, session, userId, ctx) {
 
                     $('body .rf-form__loader.js-rf-loader').remove();
                     $('body .rf-form__loader1.js-rf-loader1').remove();
+                    
+                    $('body #loading').remove();
+                    $('body .custom-form__mask').remove();
 
                     $('form').each((i, form) => {
                         const $form = $(form);
