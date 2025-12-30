@@ -5,6 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const AdmZip = require('adm-zip');
 const cheerio = require('cheerio');
+const FormData = require('form-data');
+const axios = require('axios');
 
 const app = express();
 
@@ -20,6 +22,8 @@ const { generateFormHTML } = require('./scripts/form');
 const getButtonHtml = require('./scripts/buttonTemplate.js');
 const messages = require('./data/messages.json');
 
+const DEEPL_API_KEY = process.env.DEEPL_API_KEY || "your_deepl_api_key_here";
+const DEEPL_API_URL = 'https://api-free.deepl.com/v2'; // For PRO use: https://api.deepl.com/v2
 
 /* ---------------------- TELEGRAM COMMAND MENU ---------------------- */
 bot.telegram.setMyCommands([
@@ -31,6 +35,7 @@ bot.telegram.setMyCommands([
     { command: 'edit_order', description: 'Изменить фйал ордер' },
     { command: 'domonetka', description: 'Домонетки' },
     { command: 'phone_code', description: 'Коды телефонов стран' },
+    { command: 'translate', description: 'Перевести HTML файл' },
     { command: 'bot_info', description: 'Информация о боте' }
 ]);
 
@@ -49,6 +54,7 @@ bot.start((ctx) => {
                     [{ text: "/edit_order" }],
                     [{ text: "/domonetka" }],
                     [{ text: "/phone_code" }],
+                    [{ text: "/translate" }],
                     [{ text: "/bot_info" }]
                 ],
                 resize_keyboard: true,
@@ -200,7 +206,7 @@ bot.command('preland', (ctx) => {
     );
 });
 
-/* ------------------------ prokla_land ------------------------ */
+/* ------------------------ /prokla_land ------------------------ */
 bot.command('prokla_land', (ctx) => {
     const userId = ctx.from.id;
     const text = ctx.message.text || '';
@@ -270,7 +276,7 @@ bot.command('prokla_land', (ctx) => {
     );
 });
 
-/* ------------------------ land_form ------------------------ */
+/* ------------------------ /land_form ------------------------ */
 bot.command('land_form', (ctx) => {
     const userId = ctx.from.id;
     const text = ctx.message.text || '';
@@ -564,6 +570,73 @@ bot.command('phone_code', (ctx) => {
     }
 });
 
+/* ---------------------- /translate ---------------------- */
+bot.command('translate', (ctx) => {
+    const userId = ctx.from.id;
+    const text = ctx.message.text || '';
+    
+    const paramText = text.replace('/translate', '').trim();
+    
+    if (!paramText) {
+        userSessions[userId] = {
+            type: 'translate',
+            waitLang: true,
+            targetLang: null
+        };
+        
+        return ctx.reply(
+            '🌍 Команда /translate\n\n' +
+            'Доступные языки для перевода:\n' +
+            '🇬🇧 EN - Английский\n' +
+            '🇪🇸 ES - Испанский\n' +
+            '🇫🇷 FR - Французский\n' +
+            '🇩🇪 DE - Немецкий\n' +
+            '🇮🇹 IT - Итальянский\n' +
+            '🇵🇹 PT - Португальский\n' +
+            '🇳🇱 NL - Голландский\n' +
+            '🇵🇱 PL - Польский\n' +
+            '🇷🇺 RU - Русский\n' +
+            '🇯🇵 JA - Японский\n' +
+            '🇨🇳 ZH - Китайский\n\n' +
+            '📋 Формат:\n/translate ES\n\n' +
+            '⚠️ После отправки команды с языком, отправьте HTML файл для перевода.',
+            {
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "📋 Скопировать команду",
+                                copy_text: { text: "/translate ES" }
+                            }
+                        ]
+                    ]
+                }
+            }
+        );
+    }
+    
+    const targetLang = paramText.toUpperCase();
+    const validLangs = ['EN', 'ES', 'FR', 'DE', 'IT', 'PT', 'NL', 'PL', 'RU', 'JA', 'ZH', 'EN-GB', 'EN-US', 'PT-BR', 'PT-PT'];
+    
+    if (!validLangs.includes(targetLang)) {
+        return ctx.reply(
+            '❌ Неверный код языка.\n\n' +
+            'Используйте один из: EN, ES, FR, DE, IT, PT, NL, PL, RU, JA, ZH'
+        );
+    }
+    
+    userSessions[userId] = {
+        type: 'translate',
+        waitLang: false,
+        targetLang: targetLang
+    };
+    
+    ctx.reply(
+        `✅ Язык перевода установлен: ${targetLang}\n\n` +
+        '📄 Теперь отправьте HTML файл для перевода.'
+    );
+});
+
 /* ------------------------ /bot_info ------------------------ */
 bot.command('bot_info', (ctx) => {
     ctx.reply(messages.botInfoMessage);
@@ -598,6 +671,121 @@ bot.on('document', async (ctx) => {
             console.error(err);
             ctx.reply('Ошибка при получении файла.');
         }
+        return;
+    }
+
+    if (session && session.type === 'translate' && !session.waitLang) {
+        const fileName = ctx.message.document.file_name;
+        
+        if (!fileName.endsWith('.html') && !fileName.endsWith('.htm')) {
+            return ctx.reply('❌ Пожалуйста, отправьте HTML файл (.html или .htm)');
+        }
+
+        try {
+            await ctx.reply('⏳ Начинаю перевод файла...');
+            
+            const fileId = ctx.message.document.file_id;
+            const url = await ctx.telegram.getFileLink(fileId);
+            const response = await fetch(url.href);
+            const buffer = Buffer.from(await response.arrayBuffer());
+            
+            const tempFilePath = path.join(__dirname, `temp_translate_${userId}_${Date.now()}.html`);
+            fs.writeFileSync(tempFilePath, buffer);
+            
+            const form = new FormData();
+            form.append('file', fs.createReadStream(tempFilePath), fileName);
+            form.append('target_lang', session.targetLang);
+            form.append('formality', 'prefer_more');
+            form.append('preserve_formatting', '1');
+            
+            const uploadResp = await axios.post(`${DEEPL_API_URL}/document`, form, {
+                headers: {
+                    ...form.getHeaders(),
+                    Authorization: `DeepL-Auth-Key ${DEEPL_API_KEY}`,
+                },
+            });
+            
+            const { document_id, document_key } = uploadResp.data;
+            
+            let status = 'queued';
+            let attempts = 0;
+            const maxAttempts = 60;
+            
+            while (status !== 'done' && attempts < maxAttempts) {
+                await new Promise(r => setTimeout(r, 1500));
+                
+                const statusResp = await axios.get(`${DEEPL_API_URL}/document/${document_id}`, {
+                    params: { document_key },
+                    headers: { Authorization: `DeepL-Auth-Key ${DEEPL_API_KEY}` },
+                });
+                
+                status = statusResp.data.status;
+                attempts++;
+                
+                if (status === 'error') {
+                    throw new Error('Ошибка перевода на стороне DeepL');
+                }
+                
+                if (attempts % 10 === 0) {
+                    await ctx.reply(`⏳ Перевод в процессе... (${Math.floor(attempts * 1.5)}s)`);
+                }
+            }
+            
+            if (status !== 'done') {
+                throw new Error('Превышено время ожидания перевода');
+            }
+            
+            const translatedResp = await axios.get(
+                `${DEEPL_API_URL}/document/${document_id}/result`,
+                {
+                    params: { document_key },
+                    headers: { Authorization: `DeepL-Auth-Key ${DEEPL_API_KEY}` },
+                    responseType: 'arraybuffer',
+                }
+            );
+            
+            const translatedFilePath = path.join(
+                __dirname,
+                `translated_${session.targetLang}_${fileName}`
+            );
+            fs.writeFileSync(translatedFilePath, translatedResp.data);
+            
+            await ctx.replyWithDocument(
+                { source: translatedFilePath, filename: `translated_${session.targetLang}_${fileName}` },
+                { caption: `✅ Перевод завершен!\n🌍 Язык: ${session.targetLang}` }
+            );
+            
+            if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
+            if (fs.existsSync(translatedFilePath)) fs.unlinkSync(translatedFilePath);
+            
+            delete userSessions[userId];
+            
+        } catch (err) {
+            console.error('Translation error:', err);
+            
+            let errorMessage = '❌ Ошибка при переводе файла.';
+            
+            if (err.response?.status === 403) {
+                errorMessage = '❌ Ошибка API ключа DeepL. Проверьте настройки.';
+            } else if (err.response?.status === 456) {
+                errorMessage = '❌ Превышена квота переводов DeepL API.';
+            } else if (err.message) {
+                errorMessage += `\n\nДетали: ${err.message}`;
+            }
+            
+            ctx.reply(errorMessage);
+            
+            const tempFiles = fs.readdirSync(__dirname).filter(f => 
+                f.startsWith(`temp_translate_${userId}`) || 
+                f.startsWith(`translated_${session.targetLang}`)
+            );
+            tempFiles.forEach(f => {
+                try {
+                    fs.unlinkSync(path.join(__dirname, f));
+                } catch {}
+            });
+        }
+        
         return;
     }
 
