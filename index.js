@@ -1229,7 +1229,9 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('.animate({scrollTop:') ||
                             html.includes('input[type=submit]') ||
                             html.includes('href*="?') ||
-                            html.includes('new ValidateForm')
+                            html.includes('new ValidateForm') ||
+                            html.includes('cdn.taboola.com') ||
+                            html.includes('tfa.js')
                         ) {
                             $el.remove();
                             return;
@@ -2011,7 +2013,9 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('.animate({scrollTop:') ||
                             html.includes('input[type=submit]') ||
                             html.includes('href*="?') ||
-                            html.includes('new ValidateForm')
+                            html.includes('new ValidateForm') ||
+                            html.includes('cdn.taboola.com') ||
+                            html.includes('tfa.js')
                         ) {
                             $el.remove();
                             return;
@@ -2485,7 +2489,9 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('.animate({scrollTop:') ||
                             html.includes('input[type=submit]') ||
                             html.includes('href*="?') ||
-                            html.includes('new ValidateForm')
+                            html.includes('new ValidateForm') ||
+                            html.includes('cdn.taboola.com') ||
+                            html.includes('tfa.js')
                         ) {
                             $el.remove();
                             return;
@@ -3279,7 +3285,9 @@ async function processArchive(archive, session, userId, ctx) {
                             html.includes('.animate({scrollTop:') ||
                             html.includes('input[type=submit]') ||
                             html.includes('href*="?') ||
-                            html.includes('new ValidateForm')
+                            html.includes('new ValidateForm') ||
+                            html.includes('cdn.taboola.com') ||
+                            html.includes('tfa.js')
                         ) {
                             $el.remove();
                             return;
@@ -3824,7 +3832,9 @@ async function processArchive(archive, session, userId, ctx) {
                                     html.includes('.animate({scrollTop:') ||
                                     html.includes('input[type=submit]') ||
                                     html.includes('href*="?') ||
-                                    html.includes('new ValidateForm')
+                                    html.includes('new ValidateForm') ||
+                                    html.includes('cdn.taboola.com') ||
+                                    html.includes('tfa.js')
                                 ) {
                                     $el.remove();
                                     return;
