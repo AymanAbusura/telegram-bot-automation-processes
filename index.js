@@ -1287,6 +1287,7 @@ async function processArchive(archive, session, userId, ctx) {
                             'form_short.js',
                             'tm.js',
                             'main3.js',
+                            'tracking.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -2071,6 +2072,7 @@ async function processArchive(archive, session, userId, ctx) {
                             'form_short.js',
                             'tm.js',
                             'main3.js',
+                            'tracking.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -2547,6 +2549,7 @@ async function processArchive(archive, session, userId, ctx) {
                             'form_short.js',
                             'tm.js',
                             'main3.js',
+                            'tracking.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -3343,6 +3346,7 @@ async function processArchive(archive, session, userId, ctx) {
                             'form_short.js',
                             'tm.js',
                             'main3.js',
+                            'tracking.js'
                         ];
 
                         if (removeFiles.some(f => src.includes(f))) {
@@ -3890,6 +3894,7 @@ async function processArchive(archive, session, userId, ctx) {
                                     'form_short.js',
                                     'tm.js',
                                     'main3.js',
+                                    'tracking.js'
                                 ];
 
                                 if (removeFiles.some(f => src.includes(f))) {
