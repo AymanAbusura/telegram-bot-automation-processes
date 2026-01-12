@@ -1619,74 +1619,100 @@ async function processArchive(archive, session, userId, ctx) {
                             let name = $input.attr('name') || '';
                             let id = $input.attr('id') || '';
 
-                            const firstNameVariants = [
-                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name', 'name'
-                            ];
-
-                            if (firstNameVariants.includes(name.toLowerCase())) {
-                                $input.attr('name', 'first_name');
-                                name = 'first_name';
+                            if (name.toLowerCase() === 'fio') {
+                                const allVisibleInputs = $form.find('input:not([type="hidden"])');
+                                const currentIndex = allVisibleInputs.index($input);
                                 
-                                $input.attr('id', 'first_name');
-                                
-                                $input.removeAttr('pattern');
-                                $input.removeAttr('value');
-                                $input.removeAttr('title');
-                                $input.removeAttr('data-input');
-                                $input.removeAttr('data-valid');
-                            }
+                                if (currentIndex === 0) {
+                                    $input.attr('name', 'first_name');
+                                    name = 'first_name';
+                                    $input.attr('id', 'first_name');
+                                    $input.removeAttr('pattern');
+                                    $input.removeAttr('value');
+                                    $input.removeAttr('title');
+                                    $input.removeAttr('data-input');
+                                    $input.removeAttr('data-valid');
+                                } else {
+                                    $input.attr('name', 'last_name');
+                                    name = 'last_name';
+                                    $input.attr('id', 'last_name');
+                                    $input.removeAttr('pattern');
+                                    $input.removeAttr('value');
+                                    $input.removeAttr('title');
+                                    $input.removeAttr('data-input');
+                                    $input.removeAttr('data-valid');
+                                }
+                            } else {
 
-                            const lastNameVariants = [
-                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name', 'form-last_name', 'last'
-                            ];
+                                const firstNameVariants = [
+                                    'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name', 'name'
+                                ];
 
-                            if (lastNameVariants.includes(name.toLowerCase())) {
-                                $input.attr('name', 'last_name');
-                                name = 'last_name';
-                                
-                                $input.attr('id', 'last_name');
+                                if (firstNameVariants.includes(name.toLowerCase())) {
+                                    $input.attr('name', 'first_name');
+                                    name = 'first_name';
+                                    
+                                    $input.attr('id', 'first_name');
+                                    
+                                    $input.removeAttr('pattern');
+                                    $input.removeAttr('value');
+                                    $input.removeAttr('title');
+                                    $input.removeAttr('data-input');
+                                    $input.removeAttr('data-valid');
+                                }
 
-                                $input.removeAttr('pattern');
-                                $input.removeAttr('value');
-                                $input.removeAttr('title');
-                                $input.removeAttr('data-input');
-                                $input.removeAttr('data-valid');
-                            }
+                                const lastNameVariants = [
+                                    'lastName', 'lastname', 'lname', 'surname', 'secondname', 'last_name', 'l_name', '1-last_name', 'form-last_name', 'last'
+                                ];
 
-                            const emailVariants = [
-                                '1-email', 'form-email', 'email', 'solrka', 'sendingmail'
-                            ];
+                                if (lastNameVariants.includes(name.toLowerCase())) {
+                                    $input.attr('name', 'last_name');
+                                    name = 'last_name';
+                                    
+                                    $input.attr('id', 'last_name');
 
-                            if (emailVariants.includes(name.toLowerCase())) {
-                                $input.attr('name', 'email');
-                                name = 'email';
+                                    $input.removeAttr('pattern');
+                                    $input.removeAttr('value');
+                                    $input.removeAttr('title');
+                                    $input.removeAttr('data-input');
+                                    $input.removeAttr('data-valid');
+                                }
 
-                                $input.attr('id', 'email');
-                                $input.attr('type', 'email');
+                                const emailVariants = [
+                                    '1-email', 'form-email', 'email', 'solrka', 'sendingmail'
+                                ];
 
-                                $input.removeAttr('pattern');
-                                $input.removeAttr('value');
-                                $input.removeAttr('title');
-                                $input.removeAttr('data-input');
-                                $input.removeAttr('data-valid');
-                            }
+                                if (emailVariants.includes(name.toLowerCase())) {
+                                    $input.attr('name', 'email');
+                                    name = 'email';
 
-                            const phoneVariants = [
-                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2', 'phone-num'
-                            ];
+                                    $input.attr('id', 'email');
+                                    $input.attr('type', 'email');
 
-                            if (phoneVariants.includes(name.toLowerCase())) {
-                                $input.attr('name', 'phone');
-                                name = 'phone';
-                                $input.attr('id', 'phone');
+                                    $input.removeAttr('pattern');
+                                    $input.removeAttr('value');
+                                    $input.removeAttr('title');
+                                    $input.removeAttr('data-input');
+                                    $input.removeAttr('data-valid');
+                                }
 
-                                $input.attr('type', 'tel');
+                                const phoneVariants = [
+                                    'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2', 'phone-num'
+                                ];
 
-                                $input.removeAttr('title');
-                                $input.removeAttr('pattern');
-                                $input.removeAttr('value');
-                                $input.removeAttr('data-input');
-                                $input.removeAttr('data-valid');
+                                if (phoneVariants.includes(name.toLowerCase())) {
+                                    $input.attr('name', 'phone');
+                                    name = 'phone';
+                                    $input.attr('id', 'phone');
+
+                                    $input.attr('type', 'tel');
+
+                                    $input.removeAttr('title');
+                                    $input.removeAttr('pattern');
+                                    $input.removeAttr('value');
+                                    $input.removeAttr('data-input');
+                                    $input.removeAttr('data-valid');
+                                }
                             }
 
                             if ($input.attr('type') !== 'submit' && $input.attr('type') !== 'checkbox' && !$input.attr('data-validation-status')) {
@@ -2882,74 +2908,100 @@ async function processArchive(archive, session, userId, ctx) {
                             let name = $input.attr('name') || '';
                             let id = $input.attr('id') || '';
 
-                            const firstNameVariants = [
-                                'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name', 'name'
-                            ];
-
-                            if (firstNameVariants.includes(name.toLowerCase())) {
-                                $input.attr('name', 'first_name');
-                                name = 'first_name';
+                            if (name.toLowerCase() === 'fio') {
+                                const allVisibleInputs = $form.find('input:not([type="hidden"])');
+                                const currentIndex = allVisibleInputs.index($input);
                                 
-                                $input.attr('id', 'first_name');
-                                
-                                $input.removeAttr('pattern');
-                                $input.removeAttr('value');
-                                $input.removeAttr('title');
-                                $input.removeAttr('data-input');
-                                $input.removeAttr('data-valid');
-                            }
+                                if (currentIndex === 0) {
+                                    $input.attr('name', 'first_name');
+                                    name = 'first_name';
+                                    $input.attr('id', 'first_name');
+                                    $input.removeAttr('pattern');
+                                    $input.removeAttr('value');
+                                    $input.removeAttr('title');
+                                    $input.removeAttr('data-input');
+                                    $input.removeAttr('data-valid');
+                                } else {
+                                    $input.attr('name', 'last_name');
+                                    name = 'last_name';
+                                    $input.attr('id', 'last_name');
+                                    $input.removeAttr('pattern');
+                                    $input.removeAttr('value');
+                                    $input.removeAttr('title');
+                                    $input.removeAttr('data-input');
+                                    $input.removeAttr('data-valid');
+                                }
+                            } else {
 
-                            const lastNameVariants = [
-                                'lastName', 'lastname', 'lname', 'surname', 'secondname', 'fio', 'last_name', 'l_name', '1-last_name', 'form-last_name', 'last'
-                            ];
+                                const firstNameVariants = [
+                                    'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name', 'name'
+                                ];
 
-                            if (lastNameVariants.includes(name.toLowerCase())) {
-                                $input.attr('name', 'last_name');
-                                name = 'last_name';
-                                
-                                $input.attr('id', 'last_name');
+                                if (firstNameVariants.includes(name.toLowerCase())) {
+                                    $input.attr('name', 'first_name');
+                                    name = 'first_name';
+                                    
+                                    $input.attr('id', 'first_name');
+                                    
+                                    $input.removeAttr('pattern');
+                                    $input.removeAttr('value');
+                                    $input.removeAttr('title');
+                                    $input.removeAttr('data-input');
+                                    $input.removeAttr('data-valid');
+                                }
 
-                                $input.removeAttr('pattern');
-                                $input.removeAttr('value');
-                                $input.removeAttr('title');
-                                $input.removeAttr('data-input');
-                                $input.removeAttr('data-valid');
-                            }
+                                const lastNameVariants = [
+                                    'lastName', 'lastname', 'lname', 'surname', 'secondname', 'last_name', 'l_name', '1-last_name', 'form-last_name', 'last'
+                                ];
 
-                            const emailVariants = [
-                                '1-email', 'form-email', 'email', 'solrka', 'sendingmail'
-                            ];
+                                if (lastNameVariants.includes(name.toLowerCase())) {
+                                    $input.attr('name', 'last_name');
+                                    name = 'last_name';
+                                    
+                                    $input.attr('id', 'last_name');
 
-                            if (emailVariants.includes(name.toLowerCase())) {
-                                $input.attr('name', 'email');
-                                name = 'email';
+                                    $input.removeAttr('pattern');
+                                    $input.removeAttr('value');
+                                    $input.removeAttr('title');
+                                    $input.removeAttr('data-input');
+                                    $input.removeAttr('data-valid');
+                                }
 
-                                $input.attr('id', 'email');
-                                $input.attr('type', 'email');
+                                const emailVariants = [
+                                    '1-email', 'form-email', 'email', 'solrka', 'sendingmail'
+                                ];
 
-                                $input.removeAttr('pattern');
-                                $input.removeAttr('value');
-                                $input.removeAttr('title');
-                                $input.removeAttr('data-input');
-                                $input.removeAttr('data-valid');
-                            }
+                                if (emailVariants.includes(name.toLowerCase())) {
+                                    $input.attr('name', 'email');
+                                    name = 'email';
 
-                            const phoneVariants = [
-                                'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2', 'phone-num'
-                            ];
+                                    $input.attr('id', 'email');
+                                    $input.attr('type', 'email');
 
-                            if (phoneVariants.includes(name.toLowerCase())) {
-                                $input.attr('name', 'phone');
-                                name = 'phone';
-                                $input.attr('id', 'phone');
+                                    $input.removeAttr('pattern');
+                                    $input.removeAttr('value');
+                                    $input.removeAttr('title');
+                                    $input.removeAttr('data-input');
+                                    $input.removeAttr('data-valid');
+                                }
 
-                                $input.attr('type', 'tel');
+                                const phoneVariants = [
+                                    'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2', 'phone-num'
+                                ];
 
-                                $input.removeAttr('title');
-                                $input.removeAttr('pattern');
-                                $input.removeAttr('value');
-                                $input.removeAttr('data-input');
-                                $input.removeAttr('data-valid');
+                                if (phoneVariants.includes(name.toLowerCase())) {
+                                    $input.attr('name', 'phone');
+                                    name = 'phone';
+                                    $input.attr('id', 'phone');
+
+                                    $input.attr('type', 'tel');
+
+                                    $input.removeAttr('title');
+                                    $input.removeAttr('pattern');
+                                    $input.removeAttr('value');
+                                    $input.removeAttr('data-input');
+                                    $input.removeAttr('data-valid');
+                                }
                             }
 
                             if ($input.attr('type') !== 'submit' && $input.attr('type') !== 'checkbox' && !$input.attr('data-validation-status')) {
