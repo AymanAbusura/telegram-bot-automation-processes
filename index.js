@@ -1805,6 +1805,7 @@ async function processArchive(archive, session, userId, ctx) {
                         const filesToDeleteInIndex = [
                             'order.php',
                             'form-scripts.js',
+                            'jquery.min.js',
                             'index.html',
                             'index.php',
                             'flags.png',
@@ -2332,6 +2333,7 @@ async function processArchive(archive, session, userId, ctx) {
                         const filesToDeleteInIndex = [
                             'order.php',
                             'form-scripts.js',
+                            'jquery.min.js',
                             'index.html',
                             'index.php',
                             'flags.png',
@@ -3108,6 +3110,7 @@ async function processArchive(archive, session, userId, ctx) {
                         const filesToDeleteInIndex = [
                             'order.php',
                             'form-scripts.js',
+                            'jquery.min.js',
                             'index.html',
                             'index.php',
                             'flags.png',
@@ -3656,6 +3659,7 @@ async function processArchive(archive, session, userId, ctx) {
                         const filesToDeleteInIndex = [
                             'order.php',
                             'form-scripts.js',
+                            'jquery.min.js',
                             'index.html',
                             'index.php',
                             'flags.png',
@@ -4247,6 +4251,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 const filesToDeleteInIndex = [
                                     'order.php',
                                     'form-scripts.js',
+                                    'jquery.min.js',
                                     'index.html',
                                     'index.php',
                                     'flags.png',
