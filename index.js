@@ -942,7 +942,8 @@ bot.on('text', async (ctx) => {
                     filename: resultFile.name 
                 });
 
-            } catch (err) {
+            } 
+            catch (err) {
                 console.error(`Error processing archive ${archive.fileName}:`, err);
                 if (err?.response?.description?.includes('file is too big')) {
                     await ctx.reply(`⚠️ Архив должен быть меньше 20 МБ`);
@@ -1010,7 +1011,7 @@ async function processArchive(archive, session, userId, ctx) {
         }
 
 
-        ['order.php', 'form-scripts.js'].forEach(f => {
+        ['order.php', 'form-scripts.js', 'offer_index.html'].forEach(f => {
             const p = path.join(rootPath, f);
             if (fs.existsSync(p)) fs.unlinkSync(p);
         });
@@ -1479,6 +1480,16 @@ async function processArchive(archive, session, userId, ctx) {
                             $iti.remove();
                         });
 
+                        $form.find('.iti-aio').each(function () {
+                            const $itiAio = $(this);
+                            const $phoneInput = $itiAio.find('input[type="tel"], input[name="phone"], input[id*="phone"]');
+                            
+                            if ($phoneInput.length) {
+                                $phoneInput.insertBefore($itiAio);
+                            }
+                            $itiAio.remove();
+                        });
+
                         $form.find('.phone__input').each(function () {
                             const $wrapper = $(this);
                             const $phoneInput = $wrapper.find('input[name="phone"], input[id="phone"], input[id="phone_raw"], input[type="tel"], input[data-intl-tel-input-id]');
@@ -1498,6 +1509,19 @@ async function processArchive(archive, session, userId, ctx) {
                             }
 
                             $dropdown.remove();
+                        });
+
+                        $form.find('.aio-sdk-input-container').each(function () {
+                            const $container = $(this);
+
+                            const $input = $container.find(
+                                'input[name="phone"], input[type="tel"], input[data-intl-tel-input-id]'
+                            );
+
+                            if ($input.length) {
+                                $container.empty();
+                                $container.append($input);
+                            }
                         });
 
                         var isSearchForm =
@@ -1645,7 +1669,7 @@ async function processArchive(archive, session, userId, ctx) {
                             } else {
 
                                 const firstNameVariants = [
-                                    'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name', 'name'
+                                    'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name', 'name', 'drfname'
                                 ];
 
                                 if (firstNameVariants.includes(name.toLowerCase())) {
@@ -1662,7 +1686,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 }
 
                                 const lastNameVariants = [
-                                    'lastName', 'lastname', 'lname', 'surname', 'secondname', 'last_name', 'l_name', '1-last_name', 'form-last_name', 'last'
+                                    'lastName', 'lastname', 'lname', 'surname', 'secondname', 'last_name', 'l_name', '1-last_name', 'form-last_name', 'last', 'drlname'
                                 ];
 
                                 if (lastNameVariants.includes(name.toLowerCase())) {
@@ -1679,7 +1703,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 }
 
                                 const emailVariants = [
-                                    '1-email', 'form-email', 'email', 'solrka', 'sendingmail'
+                                    '1-email', 'form-email', 'email', 'solrka', 'sendingmail', 'dremail'
                                 ];
 
                                 if (emailVariants.includes(name.toLowerCase())) {
@@ -1779,6 +1803,8 @@ async function processArchive(archive, session, userId, ctx) {
                     const indexFolderPath = path.join(rootPath, 'index');
                     if (fs.existsSync(indexFolderPath) && fs.statSync(indexFolderPath).isDirectory()) {
                         const filesToDeleteInIndex = [
+                            'order.php',
+                            'form-scripts.js',
                             'index.html',
                             'index.php',
                             'flags.png',
@@ -2304,6 +2330,8 @@ async function processArchive(archive, session, userId, ctx) {
                     const indexFolderPath = path.join(rootPath, 'index');
                     if (fs.existsSync(indexFolderPath) && fs.statSync(indexFolderPath).isDirectory()) {
                         const filesToDeleteInIndex = [
+                            'order.php',
+                            'form-scripts.js',
                             'index.html',
                             'index.php',
                             'flags.png',
@@ -2769,6 +2797,16 @@ async function processArchive(archive, session, userId, ctx) {
                             $iti.remove();
                         });
 
+                        $form.find('.iti-aio').each(function () {
+                            const $itiAio = $(this);
+                            const $phoneInput = $itiAio.find('input[type="tel"], input[name="phone"], input[id*="phone"]');
+                            
+                            if ($phoneInput.length) {
+                                $phoneInput.insertBefore($itiAio);
+                            }
+                            $itiAio.remove();
+                        });
+
                         $form.find('.phone__input').each(function () {
                             const $wrapper = $(this);
                             const $phoneInput = $wrapper.find('input[name="phone"], input[id="phone"], input[id="phone_raw"], input[type="tel"], input[data-intl-tel-input-id]');
@@ -2934,7 +2972,7 @@ async function processArchive(archive, session, userId, ctx) {
                             } else {
 
                                 const firstNameVariants = [
-                                    'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name', 'name'
+                                    'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name', 'name', 'drfname'
                                 ];
 
                                 if (firstNameVariants.includes(name.toLowerCase())) {
@@ -2951,7 +2989,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 }
 
                                 const lastNameVariants = [
-                                    'lastName', 'lastname', 'lname', 'surname', 'secondname', 'last_name', 'l_name', '1-last_name', 'form-last_name', 'last'
+                                    'lastName', 'lastname', 'lname', 'surname', 'secondname', 'last_name', 'l_name', '1-last_name', 'form-last_name', 'last', 'drlname'
                                 ];
 
                                 if (lastNameVariants.includes(name.toLowerCase())) {
@@ -2968,7 +3006,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 }
 
                                 const emailVariants = [
-                                    '1-email', 'form-email', 'email', 'solrka', 'sendingmail'
+                                    '1-email', 'form-email', 'email', 'solrka', 'sendingmail', 'dremail'
                                 ];
 
                                 if (emailVariants.includes(name.toLowerCase())) {
@@ -3068,6 +3106,8 @@ async function processArchive(archive, session, userId, ctx) {
                     const indexFolderPath = path.join(rootPath, 'index');
                     if (fs.existsSync(indexFolderPath) && fs.statSync(indexFolderPath).isDirectory()) {
                         const filesToDeleteInIndex = [
+                            'order.php',
+                            'form-scripts.js',
                             'index.html',
                             'index.php',
                             'flags.png',
@@ -3614,6 +3654,8 @@ async function processArchive(archive, session, userId, ctx) {
                     const indexFolderPath = path.join(rootPath, 'index');
                     if (fs.existsSync(indexFolderPath) && fs.statSync(indexFolderPath).isDirectory()) {
                         const filesToDeleteInIndex = [
+                            'order.php',
+                            'form-scripts.js',
                             'index.html',
                             'index.php',
                             'flags.png',
@@ -4203,6 +4245,8 @@ async function processArchive(archive, session, userId, ctx) {
                             const indexFolderPath = path.join(rootPath, 'index');
                             if (fs.existsSync(indexFolderPath) && fs.statSync(indexFolderPath).isDirectory()) {
                                 const filesToDeleteInIndex = [
+                                    'order.php',
+                                    'form-scripts.js',
                                     'index.html',
                                     'index.php',
                                     'flags.png',
