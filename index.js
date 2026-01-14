@@ -1805,6 +1805,7 @@ async function processArchive(archive, session, userId, ctx) {
                         const filesToDeleteInIndex = [
                             'order.php',
                             'form-scripts.js',
+                            'action.php',
                             'jquery.min.js',
                             'index.html',
                             'index.php',
@@ -2333,6 +2334,7 @@ async function processArchive(archive, session, userId, ctx) {
                         const filesToDeleteInIndex = [
                             'order.php',
                             'form-scripts.js',
+                            'action.php',
                             'jquery.min.js',
                             'index.html',
                             'index.php',
@@ -3110,6 +3112,7 @@ async function processArchive(archive, session, userId, ctx) {
                         const filesToDeleteInIndex = [
                             'order.php',
                             'form-scripts.js',
+                            'action.php',
                             'jquery.min.js',
                             'index.html',
                             'index.php',
@@ -3659,6 +3662,7 @@ async function processArchive(archive, session, userId, ctx) {
                         const filesToDeleteInIndex = [
                             'order.php',
                             'form-scripts.js',
+                            'action.php',
                             'jquery.min.js',
                             'index.html',
                             'index.php',
@@ -4251,6 +4255,8 @@ async function processArchive(archive, session, userId, ctx) {
                                 const filesToDeleteInIndex = [
                                     'order.php',
                                     'form-scripts.js',
+                                    'action.php',
+                                    'action.php',
                                     'jquery.min.js',
                                     'index.html',
                                     'index.php',
