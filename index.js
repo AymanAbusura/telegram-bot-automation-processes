@@ -35,7 +35,7 @@ bot.telegram.setMyCommands([
     { command: 'land_to_preland', description: 'Заменить форму на кнопку' },
     { command: 'edit_order', description: 'Изменить фйал ордер' },
     { command: 'domonetka', description: 'Домонетки' },
-    { command: 'phone_code', description: 'Коды телефонов стран' },
+    { command: 'phone', description: 'Коды телефонов стран' },
     { command: 'translate', description: 'Перевести HTML файл' },
     { command: 'bot_info', description: 'Информация о боте' }
 ]);

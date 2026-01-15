@@ -1,7 +1,13 @@
+const TRANSLATE_ENABLED = false;
+
 module.exports = function landCommand(bot, deps) {
     const { userSessions } = deps;
 
     bot.command('translate', (ctx) => {
+        if (!TRANSLATE_ENABLED) {
+            return ctx.reply('🚫 Команда /translate временно отключена.');
+        }
+
         const userId = ctx.from.id;
         const text = ctx.message.text || '';
         

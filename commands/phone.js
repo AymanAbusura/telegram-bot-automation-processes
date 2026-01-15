@@ -28,7 +28,7 @@ module.exports = function phoneCodeCommand(bot, deps) {
         console.error('Failed to load countryPhoneCodes.json:', err);
     }
 
-    bot.command('phone_code', (ctx) => {
+    bot.command('phone', (ctx) => {
         const parts = ctx.message.text.split(' ');
 
         if (parts.length < 2) {
@@ -40,7 +40,7 @@ module.exports = function phoneCodeCommand(bot, deps) {
                             [
                                 {
                                     text: "📋 Скопировать команду",
-                                    copy_text: { text: "/phone_code RU" }
+                                    copy_text: { text: "/phone RU" }
                                 }
                             ]
                         ]
