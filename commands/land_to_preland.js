@@ -1,4 +1,4 @@
-module.exports = function landCommand(bot, deps) {
+module.exports = function landToPrelandCommand(bot, deps) {
     const { userSessions, messages } = deps;
     
     bot.command('land_to_preland', (ctx) => {

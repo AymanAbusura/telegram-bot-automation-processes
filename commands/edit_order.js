@@ -1,4 +1,4 @@
-module.exports = function landCommand(bot, deps) {
+module.exports = function editOrderCommand(bot, deps) {
     const { userSessions } = deps;
 
     bot.command('edit_order', (ctx) => {

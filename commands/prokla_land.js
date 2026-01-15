@@ -1,4 +1,4 @@
-module.exports = function landCommand(bot, deps) {
+module.exports = function proklaLandCommand(bot, deps) {
     const { userSessions, messages } = deps;
 
     bot.command('prokla_land', (ctx) => {

@@ -1,4 +1,4 @@
-module.exports = function landCommand(bot, deps) {
+module.exports = function landFormCommand(bot, deps) {
     const { userSessions, messages } = deps;
 
     bot.command('land_form', (ctx) => {
