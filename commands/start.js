@@ -17,6 +17,7 @@ module.exports = function startCommand(bot, deps) {
                         [{ text: "/cobeklo" }],
                         [{ text: "/domonetka" }],
                         [{ text: "/translate" }],
+                        [{ text: "/compress" }],
                         [{ text: "/bot_info" }]
                     ],
                     resize_keyboard: true,
