@@ -39,7 +39,7 @@ module.exports = function phoneCodeCommand(bot, deps) {
                         inline_keyboard: [
                             [
                                 {
-                                    text: "📋 Скопировать команду",
+                                    text: "📋 Скопировать пример",
                                     copy_text: { text: "/phone RU" }
                                 }
                             ]

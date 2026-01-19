@@ -1,12 +1,15 @@
 module.exports = function prelandCommand(bot, deps) {
     const { userSessions, messages } = deps;
-    
+
     bot.command('preland', (ctx) => {
         const userId = ctx.from.id;
         const text = ctx.message.text || '';
 
         const paramText = text.replace('/preland', '').trim();
 
+        // ─────────────────────────────
+        // STEP 1: No params → show help
+        // ─────────────────────────────
         if (!paramText) {
             userSessions[userId] = {
                 type: 'prelanding',
@@ -15,6 +18,7 @@ module.exports = function prelandCommand(bot, deps) {
                 archives: [],
                 processingMultiple: false
             };
+
             return ctx.reply(
                 messages.preLandMessage,
                 {
@@ -22,7 +26,7 @@ module.exports = function prelandCommand(bot, deps) {
                         inline_keyboard: [
                             [
                                 {
-                                    text: "📋 Скопировать команду",
+                                    text: "📋 Скопировать пример",
                                     copy_text: {
                                         text: "/preland key=value"
                                     }
@@ -34,10 +38,19 @@ module.exports = function prelandCommand(bot, deps) {
             );
         }
 
+        // ─────────────────────────────
+        // STEP 2: Parse param (key=value)
+        // ─────────────────────────────
         const match = paramText.match(/^\s*([^=]+)=([^=]+)\s*$/);
-        if (!match) return ctx.reply('⛔️ Неверный формат.\nИспользуйте:\n/preland key=value');
+
+        if (!match) {
+            return ctx.reply(
+                '⛔️ Неверный формат.\n\nИспользуйте:\n/preland key=value'
+            );
+        }
 
         const [, key, value] = match;
+
         userSessions[userId] = {
             type: 'prelanding',
             waitPreParams: false,
@@ -46,17 +59,20 @@ module.exports = function prelandCommand(bot, deps) {
             processingMultiple: false
         };
 
+        // ─────────────────────────────
+        // STEP 3: Ask for ZIPs + button
+        // ─────────────────────────────
         ctx.reply(
-            `✅ Параметры сохранены: ${key}=${value}\n\n📦 Теперь отправьте ZIP архив(ы).\n\n⚠️ ВАЖНО: После отправки ВСЕХ архивов нажмите кнопку для копирования команды или напишите "process".`,
+            `✅ Параметры сохранены: ${key}=${value}\n\n` +
+            `📦 Теперь отправьте ZIP архив(ы).\n\n` +
+            `⚠️ После отправки всех архивов нажмите кнопку ниже.`,
             {
                 reply_markup: {
                     inline_keyboard: [
                         [
                             {
-                                text: "📋 Скопировать команду",
-                                copy_text: {
-                                    text: "process"
-                                }
+                                text: "🚀 Запустить обработку",
+                                callback_data: "process_preland_archives"
                             }
                         ]
                     ]

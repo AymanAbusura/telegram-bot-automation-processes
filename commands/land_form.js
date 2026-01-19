@@ -4,13 +4,14 @@ module.exports = function landFormCommand(bot, deps) {
     bot.command('land_form', (ctx) => {
         const userId = ctx.from.id;
         const text = ctx.message.text || '';
-
         const paramStr = text.replace('/land_form', '').trim();
 
+        // ─────────────────────────────
+        // STEP 1: No params → show help
+        // ─────────────────────────────
         if (!paramStr) {
             userSessions[userId] = {
                 type: 'land_form',
-                waitParams: true,
                 params: null,
                 marker: null,
                 archives: [],
@@ -18,15 +19,26 @@ module.exports = function landFormCommand(bot, deps) {
                 chatId: ctx.chat.id
             };
 
-            return ctx.reply(messages.landFormMessage,
+            return ctx.reply(
+                messages.landFormMessage,
                 {
                     reply_markup: {
                         inline_keyboard: [
                             [
                                 {
-                                    text: "📋 Скопировать команду",
+                                    text: "📋 Скопировать пример",
                                     copy_text: {
-                                        text: "/land_form\nmarker=Official site\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0"
+                                        text:
+                                            "/land_form\n" +
+                                            "marker=Official site\n" +
+                                            "kt=5\n" +
+                                            "metka=1A\n" +
+                                            "country=RU\n" +
+                                            "lang=RU\n" +
+                                            "number_code=+7\n" +
+                                            "funnel=PrimeAura\n" +
+                                            "source=Prime-Aura.com\n" +
+                                            "logs=0"
                                     }
                                 }
                             ]
@@ -36,64 +48,64 @@ module.exports = function landFormCommand(bot, deps) {
             );
         }
 
-        const lines = paramStr.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-
-        if (lines.length === 0) {
-            return ctx.reply(
-                '⛔️ Неверный формат.\nИспользуйте:\n/land_form\nmarker=Official site\nkt=5\nmetka=1A\ncountry=RU\nlang=RU\nnumber_code=+7\nfunnel=PrimeAura\nsource=Prime-Aura.com\nlogs=0'
-            );
-        }
+        // ─────────────────────────────
+        // STEP 2: Parse params
+        // ─────────────────────────────
+        const lines = paramStr
+            .split(/\r?\n/)
+            .map(l => l.trim())
+            .filter(Boolean);
 
         const params = {};
         let marker = null;
 
-        lines.forEach(line => {
-            const [k, v] = line.split('=');
-            if (k && v) {
-                const key = k.trim();
-                const value = decodeURIComponent(v.trim());
-                
-                if (key === 'marker') {
-                    marker = value;
-                } else {
-                    params[key] = value;
-                }
+        for (const line of lines) {
+            const idx = line.indexOf('=');
+            if (idx === -1) continue;
+
+            const key = line.slice(0, idx).trim();
+            const value = decodeURIComponent(line.slice(idx + 1).trim());
+
+            if (key === 'marker') {
+                marker = value;
+            } else {
+                params[key] = value;
             }
-        });
+        }
 
         if (!marker) {
-            return ctx.reply('⛔️ Параметр "marker" обязателен! Укажите текст, который нужно заменить на форму.');
+            return ctx.reply('⛔️ Параметр "marker" обязателен.');
         }
 
         if (Object.keys(params).length === 0) {
-            return ctx.reply('⛔️ Не указаны параметры для формы (kt, metka, country и т.д.)');
+            return ctx.reply('⛔️ Не указаны параметры формы.');
         }
 
-        userSessions[userId] = { 
-            type: 'land_form', 
-            waitParams: false, 
-            params: params,
-            marker: marker,
+        userSessions[userId] = {
+            type: 'land_form',
+            params,
+            marker,
             archives: [],
             processingMultiple: false,
             chatId: ctx.chat.id
         };
 
+        // ─────────────────────────────
+        // STEP 3: Ask for ZIPs + button
+        // ─────────────────────────────
         ctx.reply(
             `✅ Параметры сохранены!\n\n` +
             `🎯 Marker: "${marker}"\n` +
-            `📋 Параметры формы: ${Object.keys(params).length} параметров\n\n` +
+            `📋 Параметров формы: ${Object.keys(params).length}\n\n` +
             `📦 Теперь отправьте ZIP архив(ы).\n\n` +
-            `⚠️ ВАЖНО: После отправки ВСЕХ архивов нажмите кнопку для копирования команды или напишите "process".`,
+            `⚠️ После отправки всех архивов нажмите кнопку ниже.`,
             {
                 reply_markup: {
                     inline_keyboard: [
                         [
                             {
-                                text: "📋 Скопировать команду",
-                                copy_text: {
-                                    text: "process"
-                                }
+                                text: "🚀 Запустить обработку",
+                                callback_data: "process_land_form_archives"
                             }
                         ]
                     ]

@@ -1,21 +1,37 @@
 module.exports = function landToPrelandCommand(bot, deps) {
     const { userSessions, messages } = deps;
-    
+
     bot.command('land_to_preland', (ctx) => {
         const userId = ctx.from.id;
         const text = ctx.message.text || '';
         const paramStr = text.replace('/land_to_preland', '').trim();
 
+        // ─────────────────────────────
+        // STEP 1: No params → show help
+        // ─────────────────────────────
         if (!paramStr) {
-            return ctx.reply(messages.landToPrelandMessage,
+            userSessions[userId] = {
+                type: 'land_to_preland',
+                prelandParam: null,
+                marker: null,
+                params: null,
+                archives: [],
+                processingMultiple: false
+            };
+
+            return ctx.reply(
+                messages.landToPrelandMessage,
                 {
                     reply_markup: {
                         inline_keyboard: [
                             [
                                 {
-                                    text: "📋 Скопировать команду",
+                                    text: "📋 Скопировать пример",
                                     copy_text: {
-                                        text: "/land_to_preland\nkey=value\nmarker=Official Website"
+                                        text:
+                                            "/land_to_preland\n" +
+                                            "key=value\n" +
+                                            "marker=Official Website"
                                     }
                                 }
                             ]
@@ -25,48 +41,69 @@ module.exports = function landToPrelandCommand(bot, deps) {
             );
         }
 
-        const lines = paramStr.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-        if (lines.length === 0) {
-            return ctx.reply('⛔️ Неверный формат.\nИспользуйте:\n/land_to_preland\nkey=value\nmarker=Official Website');
+        // ─────────────────────────────
+        // STEP 2: Parse params
+        // ─────────────────────────────
+        const lines = paramStr
+            .split(/\r?\n/)
+            .map(l => l.trim())
+            .filter(Boolean);
+
+        if (lines.length < 1) {
+            return ctx.reply('⛔️ Неверный формат.');
         }
 
-        const keyValueMatch = lines[0].match(/^([^=\s]+)=([^=\s]+)$/);
-        if (!keyValueMatch) return ctx.reply('⛔️ Неверный формат первой строки.\nИспользуйте:\n/land_to_preland\nkey=value\nmarker=Official Website');
+        const firstLineMatch = lines[0].match(/^([^=\s]+)=([^=\s]+)$/);
+        if (!firstLineMatch) {
+            return ctx.reply('⛔️ Первая строка должна быть key=value');
+        }
 
-        const [, key, value] = keyValueMatch;
+        const [, key, value] = firstLineMatch;
 
         const params = {};
-        let marker = 'process';
-        lines.slice(1).forEach(line => {
-            const [k, v] = line.split('=');
-            if (k && v) {
-                const trimmedKey = k.trim();
-                const trimmedValue = decodeURIComponent(v.trim());
-                if (trimmedKey.toLowerCase() === 'marker') marker = trimmedValue;
-                else params[trimmedKey] = trimmedValue;
-            }
-        });
+        let marker = null;
 
-        userSessions[userId] = { 
-            type: 'land_to_preland', 
+        for (const line of lines.slice(1)) {
+            const idx = line.indexOf('=');
+            if (idx === -1) continue;
+
+            const k = line.slice(0, idx).trim();
+            const v = decodeURIComponent(line.slice(idx + 1).trim());
+
+            if (k.toLowerCase() === 'marker') {
+                marker = v;
+            } else {
+                params[k] = v;
+            }
+        }
+
+        if (!marker) {
+            return ctx.reply('⛔️ Параметр "marker" обязателен.');
+        }
+
+        userSessions[userId] = {
+            type: 'land_to_preland',
             prelandParam: { key, value },
-            marker: marker,
+            marker,
             params: Object.keys(params).length ? params : null,
             archives: [],
             processingMultiple: false
         };
 
+        // ─────────────────────────────
+        // STEP 3: Ask for ZIPs + button
+        // ─────────────────────────────
         ctx.reply(
-            `✅ Параметры сохранены!\n\n📦 Теперь отправьте ZIP архив(ы).\n\n⚠️ После отправки всех архивов нажмите кнопку или напишите "process".`,
+            '✅ Параметры сохранены!\n\n' +
+            '📦 Теперь отправьте ZIP архив(ы).\n\n' +
+            '⚠️ После отправки всех архивов нажмите кнопку ниже.',
             {
                 reply_markup: {
                     inline_keyboard: [
                         [
                             {
-                                text: "📋 Скопировать команду",
-                                copy_text: {
-                                    text: "process"
-                                }
+                                text: "🚀 Запустить обработку",
+                                callback_data: "process_land_to_preland_archives"
                             }
                         ]
                     ]
