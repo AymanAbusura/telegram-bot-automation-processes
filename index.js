@@ -41,7 +41,7 @@ bot.telegram.setMyCommands([
     { command: 'cobeklo', description: 'Кобекло' },
     { command: 'domonetka', description: 'Домонетки' },
     { command: 'translate', description: 'Перевести HTML файл' },
-    { command: 'compress', description: 'сжать изображение' },
+    { command: 'compress', description: 'Сжать изображение' },
     { command: 'bot_info', description: 'Информация о боте' }
 ]);
 
