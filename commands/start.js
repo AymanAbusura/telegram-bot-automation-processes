@@ -13,8 +13,9 @@ module.exports = function startCommand(bot, deps) {
                         [{ text: "/land_form" }],
                         [{ text: "/land_to_preland" }],
                         [{ text: "/edit_order" }],
-                        [{ text: "/domonetka" }],
                         [{ text: "/phone" }],
+                        [{ text: "/cobeklo" }],
+                        [{ text: "/domonetka" }],
                         [{ text: "/translate" }],
                         [{ text: "/bot_info" }]
                     ],

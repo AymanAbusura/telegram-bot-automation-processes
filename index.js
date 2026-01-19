@@ -36,8 +36,9 @@ bot.telegram.setMyCommands([
     { command: 'land_form', description: 'Добавить форму и настроить ленд' },
     { command: 'land_to_preland', description: 'Заменить форму на кнопку' },
     { command: 'edit_order', description: 'Изменить фйал ордер' },
-    { command: 'domonetka', description: 'Домонетки' },
     { command: 'phone', description: 'Коды телефонов стран' },
+    { command: 'cobeklo', description: 'Кобекло' },
+    { command: 'domonetka', description: 'Домонетки' },
     { command: 'translate', description: 'Перевести HTML файл' },
     { command: 'bot_info', description: 'Информация о боте' }
 ]);
@@ -620,6 +621,29 @@ document.addEventListener("DOMContentLoaded", function() {
                 { parse_mode: "Markdown" }
             );
         }
+
+        // ==================== COBEKLO CALLBACKS ====================
+        if (data === 'cobeklo_simple') {
+            const cobekloSimple = `<?php if ($_GET["cobeklo"] != "777") { echo '<script> window.location.replace("https://www.google.com/"); document.location.href="https://www.google.com/" </script>'; exit; } ?>`;
+
+            return ctx.reply(
+                `📌 Cobeklo (без rawClick):\n\`\`\`\n${cobekloSimple}\n\`\`\``,
+                { parse_mode: "Markdown" }
+            );
+        }
+        
+        if (data === 'cobeklo_rawclick') {
+            const cobekloRawClick =
+`<?php if (!isset($rawClick)){ echo 'Fuck off!'; exit(); } ?>
+<?php if ($_GET["cobeklo"] != "777") { echo '<script> window.location.replace("https://www.google.com/"); document.location.href="https://www.google.com/" </script>'; exit; } ?>
+<?php setcookie("FBpixel", $_GET["fbpixel"], time()+60*60*24); ?>`;
+
+            return ctx.reply(
+                `📌 Cobeklo (с rawClick):\n\`\`\`\n${cobekloRawClick}\n\`\`\``,
+                { parse_mode: "Markdown" }
+            );
+        }
+
 
         // ==================== LANDING / PRELAND / PROKLA / FORM CALLBACKS ====================
         const session = userSessions[userId];
