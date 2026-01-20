@@ -5,6 +5,7 @@ Secret:
 # dependencies
 /node_modules
 /hide_code
+/api
 /.pnp
 .pnp.js
 

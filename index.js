@@ -1057,7 +1057,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>`;
 
             return ctx.reply(
-                `📌 Код для newsProfit (OneProfit):\n🟩 Вставьте перед </body>:\n\`\`\`\n${newsProfitFull}\n\`\`\``,
+                `📌 Код для newsProfit (OneProfit):\n\n🟩 Вставьте перед </body>:\n\`\`\`\n${newsProfitFull}\n\`\`\``,
                 { parse_mode: "Markdown" }
             );
         }
