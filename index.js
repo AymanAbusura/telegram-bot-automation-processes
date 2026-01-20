@@ -20,11 +20,11 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 const userSessions = {};
 
 const ORDER_TEMPLATE_PATH = './api/order_template.php';
-const { generateFormScriptsContent } = require('./scripts/form-scripts');
-const { generateFormHTML } = require('./scripts/form');
+const { generateFormScriptsContent } = require('./scripts/form-scripts.js');
+const { generateFormHTML } = require('./scripts/form.js');
 const getButtonHtml = require('./scripts/buttonTemplate.js');
 const messages = require('./data/messages.json');
-const loadCommands = require('./commands');
+const loadCommands = require('./commands/index.js');
 
 const DEEPL_API_KEY = process.env.DEEPL_API_KEY || "your_deepl_api_key_here";
 const DEEPL_API_URL = 'https://api-free.deepl.com/v2'; // For PRO use: https://api.deepl.com/v2
@@ -43,6 +43,7 @@ bot.telegram.setMyCommands([
     { command: 'scripts', description: 'Скрипты для лендов' },
     { command: 'translate', description: 'Перевести HTML файл' },
     { command: 'compress', description: 'Сжать изображение' },
+    { command: 'warning', description: 'Предупреждение' },
     { command: 'bot_info', description: 'Информация о боте' }
 ]);
 
@@ -1056,7 +1057,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>`;
 
             return ctx.reply(
-                `📌 Код для newsProfit (OneProfit):\n\`\`\`\n${newsProfitFull}\n\`\`\``,
+                `📌 Код для newsProfit (OneProfit):\n🟩 Вставьте перед </body>:\n\`\`\`\n${newsProfitFull}\n\`\`\``,
                 { parse_mode: "Markdown" }
             );
         }
@@ -1136,7 +1137,7 @@ function tick() {
                 `📌 Код для таймера:\n\n` +
                 `🟦 Вставьте перед </body>:\n` +
                 `\`\`\`html\n${timerScriptBody}\n\`\`\`\n\n` +
-                `📍 HTML-разметка (куда выводится таймер):\n` +
+                `📍 Используйте в нужном месте на странице:\n` +
                 `\`\`\`html\n${timerHtml}\n\`\`\``,
                 { parse_mode: "Markdown" }
             );
@@ -1850,7 +1851,7 @@ async function processArchive(archive, session, userId, ctx) {
                         });
                     }
 
-                    const landingHead = require('./scripts/landing-head');
+                    const landingHead = require('./scripts/landing-head.js');
                     if ($('head').length) {
                         $('head').prepend(landingHead);
                     } else {
@@ -2410,7 +2411,7 @@ async function processArchive(archive, session, userId, ctx) {
                         });
                     }
 
-                    const landingHead = require('./scripts/landing-head');
+                    const landingHead = require('./scripts/landing-head.js');
                     if ($('head').length) {
                         $('head').prepend(landingHead);
                     } else {
@@ -2793,7 +2794,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 fs.copyFileSync(FORM_CSS_FILE, DEST_CSS_FILE);
                             }
 
-                            const landingHead = require('./scripts/landing-head');
+                            const landingHead = require('./scripts/landing-head.js');
                             if ($('head').length) {
                                 $('head').prepend(landingHead);
                             }

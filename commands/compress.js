@@ -1,4 +1,4 @@
-module.exports = (bot, { userSessions }) => {
+module.exports = function compressCommand(bot, { userSessions }) {
     bot.command('compress', (ctx) => {
         const userId = ctx.from.id;
         

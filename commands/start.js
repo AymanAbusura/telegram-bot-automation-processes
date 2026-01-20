@@ -19,6 +19,7 @@ module.exports = function startCommand(bot, deps) {
                         [{ text: "/scripts" }],
                         [{ text: "/translate" }],
                         [{ text: "/compress" }],
+                        [{ text: "/warning" }],
                         [{ text: "/bot_info" }]
                     ],
                     resize_keyboard: true,

@@ -6,9 +6,6 @@ module.exports = function proklaLandCommand(bot, deps) {
         const text = ctx.message.text || '';
         const paramStr = text.replace('/prokla_land', '').trim();
 
-        // ─────────────────────────────
-        // STEP 1: No params → show help
-        // ─────────────────────────────
         if (!paramStr) {
             userSessions[userId] = {
                 type: 'prokla_land',
@@ -47,9 +44,6 @@ module.exports = function proklaLandCommand(bot, deps) {
             );
         }
 
-        // ─────────────────────────────
-        // STEP 2: Parse params
-        // ─────────────────────────────
         const lines = paramStr
             .split(/\r?\n/)
             .map(l => l.trim())
@@ -62,7 +56,6 @@ module.exports = function proklaLandCommand(bot, deps) {
             );
         }
 
-        // First line: key=value (preland param)
         const firstLineMatch = lines[0].match(/^([^=\s]+)=([^=\s]+)$/);
         if (!firstLineMatch) {
             return ctx.reply(
@@ -72,7 +65,6 @@ module.exports = function proklaLandCommand(bot, deps) {
 
         const [, key, value] = firstLineMatch;
 
-        // Remaining lines: land params
         const params = {};
         for (const line of lines.slice(1)) {
             const idx = line.indexOf('=');
@@ -94,9 +86,6 @@ module.exports = function proklaLandCommand(bot, deps) {
             processingMultiple: false
         };
 
-        // ─────────────────────────────
-        // STEP 3: Ask for ZIPs + button
-        // ─────────────────────────────
         ctx.reply(
             '✅ Параметры сохранены!\n\n' +
             '📦 Теперь отправьте ZIP архив(ы).\n\n' +

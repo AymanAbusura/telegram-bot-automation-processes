@@ -1,6 +1,6 @@
 const TRANSLATE_ENABLED = false;
 
-module.exports = function landCommand(bot, deps) {
+module.exports = function translateCommand(bot, deps) {
     const { userSessions } = deps;
 
     bot.command('translate', (ctx) => {

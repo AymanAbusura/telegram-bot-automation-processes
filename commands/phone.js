@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-module.exports = function phoneCodeCommand(bot, deps) {
+module.exports = function phoneCommand(bot, deps) {
     const { messages } = deps;
 
     let countryMap = {};

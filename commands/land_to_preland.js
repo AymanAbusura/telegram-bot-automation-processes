@@ -6,9 +6,6 @@ module.exports = function landToPrelandCommand(bot, deps) {
         const text = ctx.message.text || '';
         const paramStr = text.replace('/land_to_preland', '').trim();
 
-        // ─────────────────────────────
-        // STEP 1: No params → show help
-        // ─────────────────────────────
         if (!paramStr) {
             userSessions[userId] = {
                 type: 'land_to_preland',
@@ -41,9 +38,6 @@ module.exports = function landToPrelandCommand(bot, deps) {
             );
         }
 
-        // ─────────────────────────────
-        // STEP 2: Parse params
-        // ─────────────────────────────
         const lines = paramStr
             .split(/\r?\n/)
             .map(l => l.trim())
@@ -90,9 +84,6 @@ module.exports = function landToPrelandCommand(bot, deps) {
             processingMultiple: false
         };
 
-        // ─────────────────────────────
-        // STEP 3: Ask for ZIPs + button
-        // ─────────────────────────────
         ctx.reply(
             '✅ Параметры сохранены!\n\n' +
             '📦 Теперь отправьте ZIP архив(ы).\n\n' +

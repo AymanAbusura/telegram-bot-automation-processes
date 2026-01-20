@@ -6,9 +6,6 @@ module.exports = function landFormCommand(bot, deps) {
         const text = ctx.message.text || '';
         const paramStr = text.replace('/land_form', '').trim();
 
-        // ─────────────────────────────
-        // STEP 1: No params → show help
-        // ─────────────────────────────
         if (!paramStr) {
             userSessions[userId] = {
                 type: 'land_form',
@@ -48,9 +45,6 @@ module.exports = function landFormCommand(bot, deps) {
             );
         }
 
-        // ─────────────────────────────
-        // STEP 2: Parse params
-        // ─────────────────────────────
         const lines = paramStr
             .split(/\r?\n/)
             .map(l => l.trim())
@@ -90,9 +84,6 @@ module.exports = function landFormCommand(bot, deps) {
             chatId: ctx.chat.id
         };
 
-        // ─────────────────────────────
-        // STEP 3: Ask for ZIPs + button
-        // ─────────────────────────────
         ctx.reply(
             `✅ Параметры сохранены!\n\n` +
             `🎯 Marker: "${marker}"\n` +

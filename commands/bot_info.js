@@ -1,4 +1,4 @@
-module.exports = function landCommand(bot, deps) {
+module.exports = function botInfoCommand(bot, deps) {
     const { messages } = deps;
     
     bot.command('bot_info', (ctx) => {

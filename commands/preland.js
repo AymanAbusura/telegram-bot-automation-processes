@@ -7,9 +7,6 @@ module.exports = function prelandCommand(bot, deps) {
 
         const paramText = text.replace('/preland', '').trim();
 
-        // ─────────────────────────────
-        // STEP 1: No params → show help
-        // ─────────────────────────────
         if (!paramText) {
             userSessions[userId] = {
                 type: 'prelanding',
@@ -38,9 +35,6 @@ module.exports = function prelandCommand(bot, deps) {
             );
         }
 
-        // ─────────────────────────────
-        // STEP 2: Parse param (key=value)
-        // ─────────────────────────────
         const match = paramText.match(/^\s*([^=]+)=([^=]+)\s*$/);
 
         if (!match) {
@@ -59,9 +53,6 @@ module.exports = function prelandCommand(bot, deps) {
             processingMultiple: false
         };
 
-        // ─────────────────────────────
-        // STEP 3: Ask for ZIPs + button
-        // ─────────────────────────────
         ctx.reply(
             `✅ Параметры сохранены: ${key}=${value}\n\n` +
             `📦 Теперь отправьте ZIP архив(ы).\n\n` +
