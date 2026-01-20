@@ -5,6 +5,10 @@ form {
   margin: 0 auto 20px;
 }
 
+.form_main {
+  width: 100%;
+}
+
 .f1t-form-field {
   padding-bottom: 10px;
 }
