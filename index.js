@@ -40,6 +40,7 @@ bot.telegram.setMyCommands([
     { command: 'phone', description: 'Коды телефонов стран' },
     { command: 'cobeklo', description: 'Кобекло' },
     { command: 'domonetka', description: 'Домонетки' },
+    { command: 'scripts', description: 'Скрипты для лендов' },
     { command: 'translate', description: 'Перевести HTML файл' },
     { command: 'compress', description: 'Сжать изображение' },
     { command: 'bot_info', description: 'Информация о боте' }
@@ -1005,7 +1006,64 @@ document.addEventListener("DOMContentLoaded", function() {
             );
         }
 
+        // ==================== SCRITPS CALLBACKS ====================
+        if (data === 'scripts_date') {
+            return ctx.reply(
+                `📌 <b>Код для Date_Script</b>\n\n` +
+                `🟦 <b>Вставьте перед &lt;/head&gt;:</b>\n` +
+                `<pre><code>&lt;script&gt;
+var appendNull=function(t){return t&lt;10?0+t.toString():t};
+function dtime_nums(t){
+    d=new Date,
+    p=new Date(d.getTime()+864e5*(t+1)),
+    monthb="01,02,03,04,05,06,07,08,09,10,11,12".split(","),
+    document.write(
+        appendNull(p.getDate())+"."+monthb[p.getMonth()]+"."+p.getFullYear()
+    )
+}
+&lt;/script&gt;</code></pre>\n\n` +
+        `📍 <b>Используйте в нужном месте на странице:</b>\n` +
+        `<pre><code>&lt;script&gt;dtime_nums(-1)&lt;/script&gt;</code></pre>`,
+                { parse_mode: "HTML" }
+            );
+        }
 
+        if (data === 'scripts_timer') {
+            const timerScriptBody = `<script type="text/javascript">
+start_timer();
+var time = 600;
+var intr;
+
+function start_timer() {
+    intr = setInterval(tick, 1000);
+}
+
+function tick() {
+    time = time - 1;
+    var mins = Math.floor(time / 60);
+    var secs = time - mins * 60;
+
+    if (mins == 0 && secs == 0) {
+        clearInterval(intr);
+    }
+
+    secs = secs >= 10 ? secs : "0" + secs;
+    $("#min").html("0" + mins);
+    $("#sec").html(secs);
+}
+</script>`;
+
+            const timerHtml = `<div id="min" class="countdown__item minute">36</div><span>:</span><div id="sec" class="countdown__item second">15</div>`;
+
+            return ctx.reply(
+                `📌 Код для таймера:\n\n` +
+                `🟦 Вставьте перед </body>:\n` +
+                `\`\`\`html\n${timerScriptBody}\n\`\`\`\n\n` +
+                `📍 HTML-разметка (куда выводится таймер):\n` +
+                `\`\`\`html\n${timerHtml}\n\`\`\``,
+                { parse_mode: "Markdown" }
+            );
+        }
         // ==================== LANDING / PRELAND / PROKLA / FORM CALLBACKS ====================
         const session = userSessions[userId];
         if (!session) return ctx.reply('⚠️ Сначала выберите команду /land, /preland, /prokla_land или /land_form');
