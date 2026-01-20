@@ -63,28 +63,43 @@ function deleteLandingFiles(rootPath) {
         }
     });
 
-    const indexFolderPath = path.join(rootPath, 'index');
-    if (fs.existsSync(indexFolderPath) && fs.statSync(indexFolderPath).isDirectory()) {
-        const filesToDeleteInIndex = [
-            'order.php', 'form-scripts.js', 'action.php', 'jquery.min.js', 'index.html',
-            'index.php', 'flags.png', 'flags@2x.png', 'flags.webp', 'flags@2x.webp',
-            'i18n.min.js', 'intlTelInput.css', 'intlTelInput.min.css', 'intlTelInput.min.js',
-            'intlTelInput.js', 'utils.js', 'utils.min.js', 'main3.js',
-            'tel.js', 'tm.js', 'track.js', 'backfix.js', 'fbevents.js', 'form_short.js', 'auth.js',
-            'jquery-3.7.1.min.js', 'functions.js', 'jquery-migration-3.7.1.min.js',
-            'lib.js', 'plgintlTel.js', 'validation.js', 'validate.js', 'email-decode.min.js',
-            'uwt.js', 'translations.js', 'bundle.umd.min.js', 'loader.js', 'form.js',
-            'validator.js', 'axios.min.js', 'app.js', 'jquery.maskedinput.min.js', 'polyfill.min.js',
-            'handlers.js', 'con0.js', 'intlTelInputWithUtils.min.js', 'index-aGoeQGI3.js', 'ywbackfix.js'
-        ];
-        
-        filesToDeleteInIndex.forEach(fileName => {
-            const fileToDelete = path.join(indexFolderPath, fileName);
-            if (fs.existsSync(fileToDelete)) {
-                fs.unlinkSync(fileToDelete);
+    const indexFolderNames = ['index', 'offer_index'];
+    const filesToDeleteInIndex = [
+        'order.php', 'form-scripts.js', 'action.php', 'jquery.min.js', 'index.html',
+        'index.php', 'flags.png', 'flags@2x.png', 'flags.webp', 'flags@2x.webp',
+        'i18n.min.js', 'intlTelInput.css', 'intlTelInput.min.css', 'intlTelInput.min.js',
+        'intlTelInput.js', 'utils.js', 'utils.min.js', 'main3.js',
+        'tel.js', 'tm.js', 'track.js', 'backfix.js', 'fbevents.js', 'form_short.js', 'auth.js',
+        'jquery-3.7.1.min.js', 'functions.js', 'jquery-migration-3.7.1.min.js',
+        'lib.js', 'plgintlTel.js', 'validation.js', 'validate.js', 'email-decode.min.js',
+        'uwt.js', 'translations.js', 'bundle.umd.min.js', 'loader.js', 'form.js',
+        'validator.js', 'axios.min.js', 'app.js', 'jquery.maskedinput.min.js', 'polyfill.min.js',
+        'handlers.js', 'con0.js', 'intlTelInputWithUtils.min.js', 'index-aGoeQGI3.js', 'ywbackfix.js'
+    ];
+    const leadTxtRegex = /^lead_.*\.txt$/;
+
+    indexFolderNames.forEach(folderName => {
+        const folderPath = path.join(rootPath, folderName);
+
+        if (!fs.existsSync(folderPath) || !fs.statSync(folderPath).isDirectory()) {
+            return;
+        }
+
+        const files = fs.readdirSync(folderPath);
+
+        files.forEach(file => {
+            const shouldDelete =
+                filesToDeleteInIndex.includes(file) ||
+                leadTxtRegex.test(file);
+
+            if (shouldDelete) {
+                const filePath = path.join(folderPath, file);
+                if (fs.statSync(filePath).isFile()) {
+                    fs.unlinkSync(filePath);
+                }
             }
         });
-    }
+    });
 
     const offerIndexPath = path.join(rootPath, 'offer_index');
     const indexPath = path.join(rootPath, 'index');
