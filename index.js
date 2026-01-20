@@ -333,23 +333,6 @@ bot.on('photo', async (ctx) => {
     }
     
     try {
-        await ctx.reply(
-            '⚠️ Внимание: Вы отправили изображение как фото.\n\n' +
-            'Telegram автоматически сжимает фото при отправке, поэтому дальнейшее сжатие может быть неэффективным.\n\n' +
-            '💡 Рекомендация: Отправьте изображение как ФАЙЛ для лучшего результата.\n\n' +
-            'Продолжить со сжатием этого фото?',
-            {
-                reply_markup: {
-                    inline_keyboard: [
-                        [
-                            { text: '✅ Да, продолжить', callback_data: 'compress_photo_continue' },
-                            { text: '❌ Отмена', callback_data: 'cancel_compress' }
-                        ]
-                    ]
-                }
-            }
-        );
-        
         const photo = ctx.message.photo[ctx.message.photo.length - 1];
         const fileId = photo.file_id;
         const file = await ctx.telegram.getFile(fileId);
@@ -359,16 +342,21 @@ bot.on('photo', async (ctx) => {
         const response = await fetch(url.href);
         const buffer = Buffer.from(await response.arrayBuffer());
         
-        session.originalBuffer = buffer;
-        session.originalSize = fileSize;
-        session.originalFormat = 'jpg';
-        session.waitingForConfirmation = true;
-        session.waitingForImage = false;
+        if (!session.images) {
+            session.images = [];
+        }
+        
+        session.images.push({
+            buffer: buffer,
+            size: fileSize,
+            format: 'jpg',
+            fileName: `photo_${Date.now()}.jpg`,
+            type: 'photo'
+        });
         
     } catch (err) {
         console.error('Error processing photo:', err);
-        await ctx.reply('❌ Ошибка при получении изображения. Попробуйте еще раз.');
-        delete userSessions[userId];
+        await ctx.reply('❌ Ошибка при получении фото. Попробуйте еще раз.');
     }
 });
 
@@ -382,55 +370,33 @@ bot.on('sticker', async (ctx) => {
     }
     
     try {
-        await ctx.reply('⏳ Получаю WebP изображение...');
-        
         const sticker = ctx.message.sticker;
         const fileId = sticker.file_id;
         
         const file = await ctx.telegram.getFile(fileId);
         const fileSize = file.file_size;
-        const fileSizeMB = (fileSize / (1024 * 1024)).toFixed(2);
         
         const url = await ctx.telegram.getFileLink(fileId);
         const response = await fetch(url.href);
         const buffer = Buffer.from(await response.arrayBuffer());
         
-        session.originalBuffer = buffer;
-        session.originalSize = fileSize;
-        session.originalFormat = 'webp';
-        session.originalFileName = `sticker_${Date.now()}.webp`;
-        session.waitingForImage = false;
-        session.waitingForQuality = true;
+        if (!session.images) {
+            session.images = [];
+        }
         
-        await ctx.reply(
-            `✅ WebP изображение получено!\n` +
-            `📊 Размер: ${fileSizeMB} МБ\n` +
-            `🎨 Формат: WebP\n` +
-            `📐 Разрешение: ${sticker.width}x${sticker.height}\n\n` +
-            `Выберите качество сжатия:`,
-            {
-                reply_markup: {
-                    inline_keyboard: [
-                        [
-                            { text: '🟢 Высокое (90%)', callback_data: 'compress_quality_90' },
-                            { text: '🟡 Среднее (75%)', callback_data: 'compress_quality_75' }
-                        ],
-                        [
-                            { text: '🟠 Низкое (60%)', callback_data: 'compress_quality_60' },
-                            { text: '🔴 Очень низкое (40%)', callback_data: 'compress_quality_40' }
-                        ],
-                        [
-                            { text: '❌ Отмена', callback_data: 'cancel_compress' }
-                        ]
-                    ]
-                }
-            }
-        );
+        session.images.push({
+            buffer: buffer,
+            size: fileSize,
+            format: 'webp',
+            fileName: `sticker_${Date.now()}.webp`,
+            width: sticker.width,
+            height: sticker.height,
+            type: 'sticker'
+        });
         
     } catch (err) {
         console.error('Error processing sticker:', err);
         await ctx.reply('❌ Ошибка при получении WebP стикера. Попробуйте еще раз.');
-        delete userSessions[userId];
     }
 });
 
@@ -439,7 +405,7 @@ bot.on('document', async (ctx) => {
     const userId = ctx.from.id;
     const session = userSessions[userId];
 
-     // ============ COMPRESS HANDLER ============
+    // ============ COMPRESS HANDLER ============
     if (session && session.type === 'compress' && session.waitingForImage) {
         const fileName = ctx.message.document.file_name;
         const fileExt = path.extname(fileName).toLowerCase();
@@ -454,11 +420,8 @@ bot.on('document', async (ctx) => {
         }
         
         try {
-            await ctx.reply('⏳ Получаю изображение...');
-            
             const fileId = ctx.message.document.file_id;
             const fileSize = ctx.message.document.file_size;
-            const fileSizeMB = (fileSize / (1024 * 1024)).toFixed(2);
             
             const url = await ctx.telegram.getFileLink(fileId);
             const response = await fetch(url.href);
@@ -468,42 +431,25 @@ bot.on('document', async (ctx) => {
             if (format === 'jpeg') format = 'jpg';
             if (format === 'tif') format = 'tiff';
             
-            session.originalBuffer = buffer;
-            session.originalSize = fileSize;
-            session.originalFormat = format;
-            session.originalFileName = fileName;
-            session.waitingForImage = false;
-            session.waitingForQuality = true;
+            session.images.push({
+                buffer: buffer,
+                size: fileSize,
+                format: format,
+                fileName: fileName,
+                type: 'document'
+            });
             
             await ctx.reply(
-                `✅ Изображение получено!\n` +
-                `📄 Файл: ${fileName}\n` +
-                `📊 Размер: ${fileSizeMB} МБ\n` +
+                `✅ Файл получен (${session.images.length})\n` +
+                `📄 Имя: ${fileName}\n` +
+                `📊 Размер: ${(fileSize / (1024 * 1024)).toFixed(2)} МБ\n` +
                 `🎨 Формат: ${format.toUpperCase()}\n\n` +
-                `Выберите качество сжатия:`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: '🟢 Высокое (90%)', callback_data: 'compress_quality_90' },
-                                { text: '🟡 Среднее (75%)', callback_data: 'compress_quality_75' }
-                            ],
-                            [
-                                { text: '🟠 Низкое (60%)', callback_data: 'compress_quality_60' },
-                                { text: '🔴 Очень низкое (40%)', callback_data: 'compress_quality_40' }
-                            ],
-                            [
-                                { text: '❌ Отмена', callback_data: 'cancel_compress' }
-                            ]
-                        ]
-                    }
-                }
+                `Отправьте еще изображения или нажмите "🚀 Запустить обработку"`
             );
             
         } catch (err) {
             console.error('Error processing image document:', err);
             await ctx.reply('❌ Ошибка при получении изображения. Попробуйте еще раз.');
-            delete userSessions[userId];
         }
         
         return;
@@ -750,37 +696,38 @@ bot.on('callback_query', async (ctx) => {
             return ctx.reply('❌ Сжатие изображения отменено.');
         }
         
-        // ==================== COMPRESS PHOTO CONTINUE ====================
-        if (data === 'compress_photo_continue') {
+        // ==================== START COMPRESS BATCH ====================
+        if (data === 'start_compress_batch') {
             const session = userSessions[userId];
             
-            if (!session || session.type !== 'compress' || !session.originalBuffer) {
+            if (!session || session.type !== 'compress') {
                 return ctx.reply('⚠️ Сессия истекла. Начните заново с команды /compress');
+            }
+            
+            if (!session.images || session.images.length === 0) {
+                return ctx.reply('❌ Сначала отправьте хотя бы одно изображение.');
             }
             
             try {
                 await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
                 
-                const fileSizeMB = (session.originalSize / (1024 * 1024)).toFixed(2);
-                
-                session.waitingForConfirmation = false;
-                session.waitingForQuality = true;
+                const totalSize = session.images.reduce((sum, img) => sum + img.size, 0);
+                const totalSizeMB = (totalSize / (1024 * 1024)).toFixed(2);
                 
                 await ctx.reply(
-                    `✅ Изображение получено!\n` +
-                    `📊 Размер: ${fileSizeMB} МБ\n` +
-                    `🎨 Формат: JPG (конвертировано Telegram)\n\n` +
-                    `Выберите качество сжатия:`,
+                    `📊 Получено изображений: ${session.images.length}\n` +
+                    `📦 Общий размер: ${totalSizeMB} МБ\n\n` +
+                    `Выберите качество сжатия для всех изображений:`,
                     {
                         reply_markup: {
                             inline_keyboard: [
                                 [
-                                    { text: '🟢 Высокое (90%)', callback_data: 'compress_quality_90' },
-                                    { text: '🟡 Среднее (75%)', callback_data: 'compress_quality_75' }
+                                    { text: '🟢 Высокое (90%)', callback_data: 'compress_batch_quality_90' },
+                                    { text: '🟡 Среднее (75%)', callback_data: 'compress_batch_quality_75' }
                                 ],
                                 [
-                                    { text: '🟠 Низкое (60%)', callback_data: 'compress_quality_60' },
-                                    { text: '🔴 Очень низкое (40%)', callback_data: 'compress_quality_40' }
+                                    { text: '🟠 Низкое (60%)', callback_data: 'compress_batch_quality_60' },
+                                    { text: '🔴 Очень низкое (40%)', callback_data: 'compress_batch_quality_40' }
                                 ],
                                 [
                                     { text: '❌ Отмена', callback_data: 'cancel_compress' }
@@ -790,7 +737,7 @@ bot.on('callback_query', async (ctx) => {
                     }
                 );
             } catch (err) {
-                console.error('Error in compress_photo_continue:', err);
+                console.error('Error in start_compress_batch:', err);
                 await ctx.reply('❌ Ошибка. Попробуйте еще раз.');
                 delete userSessions[userId];
             }
@@ -798,7 +745,124 @@ bot.on('callback_query', async (ctx) => {
             return;
         }
         
-        // ==================== COMPRESS QUALITY SELECTION ====================
+        // ==================== COMPRESS BATCH QUALITY SELECTION ====================
+        if (data.startsWith('compress_batch_quality_')) {
+            const quality = parseInt(data.replace('compress_batch_quality_', ''));
+            const session = userSessions[userId];
+            
+            if (!session || session.type !== 'compress' || !session.images || session.images.length === 0) {
+                return ctx.reply('⚠️ Сессия истекла. Начните заново с команды /compress');
+            }
+            
+            try {
+                await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
+                await ctx.reply(`⏳ Начинаю сжатие ${session.images.length} изображений с качеством ${quality}%...`);
+                
+                let successCount = 0;
+                let errorCount = 0;
+                
+                for (let i = 0; i < session.images.length; i++) {
+                    const image = session.images[i];
+                    
+                    try {
+                        let sharpInstance = sharp(image.buffer);
+                        const metadata = await sharpInstance.metadata();
+                        
+                        let compressedBuffer;
+                        const format = image.format;
+                        
+                        if (format === 'jpg' || format === 'jpeg') {
+                            compressedBuffer = await sharpInstance
+                                .jpeg({ quality: quality, mozjpeg: true })
+                                .toBuffer();
+                        } else if (format === 'png') {
+                            compressedBuffer = await sharpInstance
+                                .png({ 
+                                    quality: quality,
+                                    compressionLevel: 9,
+                                    adaptiveFiltering: true
+                                })
+                                .toBuffer();
+                        } else if (format === 'webp') {
+                            compressedBuffer = await sharpInstance
+                                .webp({ 
+                                    quality: quality,
+                                    effort: 6,
+                                    lossless: false
+                                })
+                                .toBuffer();
+                        } else if (format === 'avif') {
+                            compressedBuffer = await sharpInstance
+                                .avif({ 
+                                    quality: quality,
+                                    effort: 5
+                                })
+                                .toBuffer();
+                        } else if (format === 'tiff') {
+                            compressedBuffer = await sharpInstance
+                                .tiff({ 
+                                    quality: quality,
+                                    compression: 'jpeg'
+                                })
+                                .toBuffer();
+                        } else {
+                            compressedBuffer = await sharpInstance
+                                .jpeg({ quality: quality, mozjpeg: true })
+                                .toBuffer();
+                        }
+                        
+                        const compressedSize = compressedBuffer.length;
+                        const reduction = ((1 - compressedSize / image.size) * 100).toFixed(1);
+                        
+                        const baseName = path.basename(image.fileName, path.extname(image.fileName));
+                        const newFileName = `${baseName}.${format}`;
+                        const tempFilePath = path.join(__dirname, `temp_compress_${userId}_${i}_${Date.now()}.${format}`);
+                        
+                        fs.writeFileSync(tempFilePath, compressedBuffer);
+                        
+                        await ctx.replyWithDocument(
+                            { source: tempFilePath, filename: newFileName },
+                            {
+                                caption: 
+                                    `✅ ${i + 1}/${session.images.length}: ${image.fileName}\n` +
+                                    `📊 ${(image.size / (1024 * 1024)).toFixed(2)} МБ → ${(compressedSize / (1024 * 1024)).toFixed(2)} МБ\n` +
+                                    `💾 Уменьшение: ${reduction}%\n` +
+                                    `📐 ${metadata.width}x${metadata.height}`
+                            }
+                        );
+                        
+                        if (fs.existsSync(tempFilePath)) {
+                            fs.unlinkSync(tempFilePath);
+                        }
+                        
+                        successCount++;
+                        
+                    } catch (err) {
+                        errorCount++;
+                        console.error(`Error compressing image ${i + 1}:`, err);
+                        await ctx.reply(`❌ Ошибка при сжатии: ${image.fileName}`);
+                    }
+                }
+                
+                await ctx.reply(
+                    `🎉 Обработка завершена!\n\n` +
+                    `✅ Успешно: ${successCount}\n` +
+                    `❌ Ошибок: ${errorCount}\n` +
+                    `📊 Всего: ${session.images.length}`
+                );
+                
+                delete userSessions[userId];
+                
+            } catch (err) {
+                console.error('Error in batch compression:', err);
+                await ctx.reply('❌ Ошибка при пакетном сжатии. Попробуйте еще раз.');
+                delete userSessions[userId];
+            }
+            
+            return;
+        }
+        
+        // ==================== COMPRESS PHOTO CONTINUE (Legacy - removed) ====================
         if (data.startsWith('compress_quality_')) {
             const quality = parseInt(data.replace('compress_quality_', ''));
             const session = userSessions[userId];
@@ -813,9 +877,20 @@ bot.on('callback_query', async (ctx) => {
                 
                 const format = session.originalFormat || 'jpg';
                 
+                console.log(`Compressing image: format=${format}, quality=${quality}, size=${session.originalSize}`);
+                
                 let sharpInstance = sharp(session.originalBuffer);
                 
                 const metadata = await sharpInstance.metadata();
+                
+                console.log(`Image metadata:`, {
+                    format: metadata.format,
+                    width: metadata.width,
+                    height: metadata.height,
+                    space: metadata.space,
+                    channels: metadata.channels,
+                    hasAlpha: metadata.hasAlpha
+                });
                 
                 let compressedBuffer;
                 
@@ -858,6 +933,8 @@ bot.on('callback_query', async (ctx) => {
                         .jpeg({ quality: quality, mozjpeg: true })
                         .toBuffer();
                 }
+                
+                console.log(`Compression complete: originalSize=${session.originalSize}, compressedSize=${compressedBuffer.length}`);
                 
                 const compressedSize = compressedBuffer.length;
                 const originalSizeMB = (session.originalSize / (1024 * 1024)).toFixed(2);

@@ -15,6 +15,7 @@ module.exports = (bot, { userSessions }) => {
                 reply_markup: {
                     inline_keyboard: [
                         [
+                            { text: '🚀 Запустить обработку', callback_data: 'start_compress_batch' },
                             { text: '❌ Отмена', callback_data: 'cancel_compress' }
                         ]
                     ]
