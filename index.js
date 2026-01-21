@@ -1466,10 +1466,26 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                     });
                     $('link[data-type="F1TFunnelSdkCss"]').remove();
+                    
                     $('style').each((i, el) => {
-                        const styleContent = $(el).html() || '';
+                        let styleContent = $(el).html() || '';
+                        
                         if (styleContent.includes('.rf-form__loader')) {
-                            $(el).remove();
+                            styleContent = styleContent.replace(/\.rf-form__loader\s*::before\s*\{[\s\S]*?\}/g, '');
+                            
+                            styleContent = styleContent.replace(/\.rf-form__loader\s*\{[\s\S]*?\}/g, '');
+                            
+                            styleContent = styleContent.replace(/@keyframes\s+rf-spin\s*\{[\s\S]*?\}/g, '');
+                            
+                            styleContent = styleContent.replace(/\s*\}\s*/g, '');
+                            
+                            const cleanedContent = styleContent.trim();
+                            
+                            if (!cleanedContent || cleanedContent.length === 0) {
+                                $(el).remove();
+                            } else {
+                                $(el).html(styleContent);
+                            }
                         }
                     });
 
@@ -1941,9 +1957,24 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                     });
                     $('style').each((i, el) => {
-                        const styleContent = $(el).html() || '';
+                        let styleContent = $(el).html() || '';
+                        
                         if (styleContent.includes('.rf-form__loader')) {
-                            $(el).remove();
+                            styleContent = styleContent.replace(/\.rf-form__loader\s*::before\s*\{[\s\S]*?\}/g, '');
+                            
+                            styleContent = styleContent.replace(/\.rf-form__loader\s*\{[\s\S]*?\}/g, '');
+                            
+                            styleContent = styleContent.replace(/@keyframes\s+rf-spin\s*\{[\s\S]*?\}/g, '');
+                            
+                            styleContent = styleContent.replace(/\s*\}\s*/g, '');
+                            
+                            const cleanedContent = styleContent.trim();
+                            
+                            if (!cleanedContent || cleanedContent.length === 0) {
+                                $(el).remove();
+                            } else {
+                                $(el).html(styleContent);
+                            }
                         }
                     });
 
@@ -2037,9 +2068,24 @@ async function processArchive(archive, session, userId, ctx) {
                     });
                     
                     $('style').each((i, el) => {
-                        const styleContent = $(el).html() || '';
+                        let styleContent = $(el).html() || '';
+                        
                         if (styleContent.includes('.rf-form__loader')) {
-                            $(el).remove();
+                            styleContent = styleContent.replace(/\.rf-form__loader\s*::before\s*\{[\s\S]*?\}/g, '');
+                            
+                            styleContent = styleContent.replace(/\.rf-form__loader\s*\{[\s\S]*?\}/g, '');
+                            
+                            styleContent = styleContent.replace(/@keyframes\s+rf-spin\s*\{[\s\S]*?\}/g, '');
+                            
+                            styleContent = styleContent.replace(/\s*\}\s*/g, '');
+                            
+                            const cleanedContent = styleContent.trim();
+                            
+                            if (!cleanedContent || cleanedContent.length === 0) {
+                                $(el).remove();
+                            } else {
+                                $(el).html(styleContent);
+                            }
                         }
                     });
 
@@ -2513,9 +2559,24 @@ async function processArchive(archive, session, userId, ctx) {
                         }
                     });
                     $('style').each((i, el) => {
-                        const styleContent = $(el).html() || '';
+                        let styleContent = $(el).html() || '';
+                        
                         if (styleContent.includes('.rf-form__loader')) {
-                            $(el).remove();
+                            styleContent = styleContent.replace(/\.rf-form__loader\s*::before\s*\{[\s\S]*?\}/g, '');
+                            
+                            styleContent = styleContent.replace(/\.rf-form__loader\s*\{[\s\S]*?\}/g, '');
+                            
+                            styleContent = styleContent.replace(/@keyframes\s+rf-spin\s*\{[\s\S]*?\}/g, '');
+                            
+                            styleContent = styleContent.replace(/\s*\}\s*/g, '');
+                            
+                            const cleanedContent = styleContent.trim();
+                            
+                            if (!cleanedContent || cleanedContent.length === 0) {
+                                $(el).remove();
+                            } else {
+                                $(el).html(styleContent);
+                            }
                         }
                     });
 
