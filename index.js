@@ -1331,8 +1331,12 @@ function tick() {
     }
 });
 
-bot.catch((err, ctx) => {
+bot.catch(async (err, ctx) => {
     console.error('Global bot error:', err);
+    
+    const isTimeout = err.message?.includes('timeout') || 
+                      err.code === 'ETIMEDOUT' ||
+                      err.name === 'TimeoutError';
     
     const userId = ctx?.from?.id;
     
@@ -1357,9 +1361,11 @@ bot.catch((err, ctx) => {
         } catch {}
     }
     
-    try {
-        ctx.reply('❌ Произошла техническая ошибка. Пожалуйста, попробуйте снова.').catch(() => {});
-    } catch {}
+    if (!isTimeout) {
+        try {
+            ctx.reply('❌ Произошла техническая ошибка. Пожалуйста, попробуйте снова.').catch(() => {});
+        } catch {}
+    }
 });
 
 // ==================== ARCHIVE PROCESSING FUNCTION ====================
