@@ -43,7 +43,7 @@ bot.telegram.setMyCommands([
     { command: 'scripts', description: 'Скрипты для лендов' },
     { command: 'translate', description: 'Перевести HTML файл' },
     { command: 'compress', description: 'Сжать изображение' },
-    { command: 'warning', description: 'Предупреждение' },
+    { command: 'rules', description: 'Правила и требования для отправки архивов и ТЗ' },
     { command: 'bot_info', description: 'Информация о боте' }
 ]);
 
