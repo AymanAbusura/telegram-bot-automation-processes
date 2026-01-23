@@ -384,6 +384,18 @@ const FORM_TRANSLATIONS = {
         submit: "إرسال"
     },
 
+    AL: {
+        first_name_pl: "Emri",
+        last_name_pl: "Mbiemri",
+        email_pl: "Email",
+        phone_pl: "Numri juaj i telefonit",
+        err_first: "Emri juaj është shumë i shkurtër (të paktën 2 karaktere)",
+        err_last: "Mbiemri juaj është shumë i shkurtër (të paktën 2 karaktere)",
+        err_email: "Ju lutem shkruani një adresë emaili të vlefshme",
+        err_phone: "Ju lutem shkruani një numër telefoni të vlefshëm",
+        submit: "Dërgo"
+    },
+
     ZH: {
         first_name_pl: "名字",
         last_name_pl: "姓氏",
