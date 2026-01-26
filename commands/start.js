@@ -19,6 +19,7 @@ module.exports = function startCommand(bot, deps) {
                         [{ text: "/scripts" }],
                         [{ text: "/translate" }],
                         [{ text: "/compress" }],
+                        [{ text: "/webtools" }],
                         [{ text: "/guide" }],
                         [{ text: "/rules" }],
                         [{ text: "/bot_info" }]
