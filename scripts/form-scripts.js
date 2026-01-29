@@ -32,7 +32,7 @@ $(document).ready(function() {
   });
 
   $('input[name="first_name"], input[name="last_name"]').on('input', function() {
-    this.value = this.value.replace(/[^\p{L}\s'-]/gu, '');
+    this.value = this.value.replace(/[^\\p{L}\\s'-]/gu, '');
   });
 
   // ----------- FORM VALIDATION ----------- //
