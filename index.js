@@ -55,6 +55,62 @@ loadCommands(bot, {
     messages
 });
 
+// ==================== START MENU CALLBACK HANDLER ====================
+bot.action(/^cmd_(.+)$/, async (ctx) => {
+    const command = ctx.match[1];
+    
+    try {
+        await ctx.answerCbQuery();
+        
+        const commandContext = Object.create(ctx);
+        commandContext.message = {
+            message_id: ctx.callbackQuery.message.message_id,
+            from: ctx.from,
+            chat: ctx.chat,
+            date: Math.floor(Date.now() / 1000),
+            text: `/${command}`
+        };
+        
+        const handlers = bot.context;
+        
+        switch(command) {
+            case 'land':
+            case 'preland':
+            case 'prokla_land':
+            case 'land_form':
+            case 'land_to_preland':
+            case 'edit_order':
+            case 'phone':
+            case 'scripts':
+            case 'translate':
+            case 'compress':
+            case 'scrape':
+            case 'webtools':
+            case 'guide':
+            case 'rules':
+            case 'bot_info':
+                await bot.handleUpdate({
+                    update_id: Date.now(),
+                    message: {
+                        message_id: Date.now(),
+                        from: ctx.from,
+                        chat: ctx.chat,
+                        date: Math.floor(Date.now() / 1000),
+                        text: `/${command}`,
+                        entities: [{ type: 'bot_command', offset: 0, length: command.length + 1 }]
+                    }
+                });
+                break;
+            default:
+                await ctx.reply('❌ Неизвестная команда.');
+        }
+        
+    } catch (err) {
+        console.error('Start menu callback error:', err);
+        await ctx.reply('❌ Произошла ошибка. Попробуйте еще раз.');
+    }
+});
+
 // ==================== FUNCTION TO DELETE FILES ====================
 function deleteLandingFiles(rootPath) {
     const filesToDelete = ['index1.html', 'offer_index.html', 'videoPreview.webp', 'preview.webp', 'full_preview.webp'];

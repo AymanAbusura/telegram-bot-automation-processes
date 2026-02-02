@@ -6,25 +6,39 @@ module.exports = function startCommand(bot, deps) {
             messages.greetingMessage,
             {
                 reply_markup: {
-                    keyboard: [
-                        [{ text: "/land" }],
-                        [{ text: "/preland" }],
-                        [{ text: "/prokla_land" }],
-                        [{ text: "/land_form" }],
-                        [{ text: "/land_to_preland" }],
-                        [{ text: "/edit_order" }],
-                        [{ text: "/phone" }],
-                        [{ text: "/scripts" }],
-                        [{ text: "/translate" }],
-                        [{ text: "/compress" }],
-                        [{ text: "/scrape" }],
-                        [{ text: "/webtools" }],
-                        [{ text: "/guide" }],
-                        [{ text: "/rules" }],
-                        [{ text: "/bot_info" }]
-                    ],
-                    resize_keyboard: true,
-                    one_time_keyboard: false
+                    inline_keyboard: [
+                        [
+                            { text: "🏠 Ленденги", callback_data: "cmd_land" },
+                            { text: "📄 Прилендинги", callback_data: "cmd_preland" }
+                        ],
+                        [
+                            { text: "🎯 Проклолендинги", callback_data: "cmd_prokla_land" }
+                        ],
+                        [
+                            { text: "📝 Добавить форму", callback_data: "cmd_land_form" },
+                            { text: "🔄 Форма → Кнопка", callback_data: "cmd_land_to_preland" }
+                        ],
+                        [
+                            { text: "✏️ Изменить ордер", callback_data: "cmd_edit_order" },
+                            { text: "📱 Коды телефонов", callback_data: "cmd_phone" }
+                        ],
+                        [
+                            { text: "📜 Скрипты", callback_data: "cmd_scripts" },
+                            { text: "🌐 Перевести HTML", callback_data: "cmd_translate" }
+                        ],
+                        [
+                            { text: "🗜 Сжать изображение", callback_data: "cmd_compress" },
+                            { text: "🌍 Скачать сайт", callback_data: "cmd_scrape" }
+                        ],
+                        [
+                            { text: "🔗 Полезные сайты", callback_data: "cmd_webtools" },
+                            { text: "📖 Мануал", callback_data: "cmd_guide" }
+                        ],
+                        [
+                            { text: "📋 Правила", callback_data: "cmd_rules" },
+                            { text: "ℹ️ О боте", callback_data: "cmd_bot_info" }
+                        ]
+                    ]
                 }
             }
         );
