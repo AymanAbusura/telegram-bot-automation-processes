@@ -8,6 +8,7 @@ const cheerio = require('cheerio');
 const FormData = require('form-data');
 const axios = require('axios');
 const sharp = require('sharp');
+const { URL } = require('url');
 const { promisify } = require('util');
 const sleep = promisify(setTimeout);
 
@@ -38,9 +39,7 @@ bot.telegram.setMyCommands([
     { command: 'land_to_preland', description: 'Заменить форму на кнопку' },
     { command: 'edit_order', description: 'Изменить фйал ордер' },
     { command: 'phone', description: 'Коды телефонов стран' },
-    { command: 'cobeklo', description: 'Кобекло' },
-    { command: 'domonetka', description: 'Домонетки' },
-    { command: 'scripts', description: 'Скрипты для лендов' },
+    { command: 'scripts', description: 'Скрипты для лендов [доментки и скрипты]' },
     { command: 'translate', description: 'Перевести HTML файл' },
     { command: 'compress', description: 'Сжать изображение' },
     { command: 'scrape', description: 'Скачать сайт' },
@@ -633,63 +632,110 @@ bot.on('document', async (ctx) => {
 bot.on('text', async (ctx) => {
     const userId = ctx.from.id;
     const session = userSessions[userId];
+    if (!session) return;
 
-    if (session && session.type === 'edit_order' && !session.waitFile) {
-        const text = ctx.message.text.trim();
+    const text = ctx.message.text.trim();
+    if (text.startsWith('/')) return;
 
-        if (text.toLowerCase() === 'done') {
-            if (!session.versions || session.versions.length === 0) 
-                return ctx.reply('❌ Нет кода для сохранения. Сначала загрузите order.php');
+    try {
+        switch (session.type) {
+            /* ==================== SCRAPE ==================== */
+            case 'scrape': {
+                if (!session.waitingForUrl) return;
 
-            const latestCode = session.versions[session.versions.length - 1];
-            const tmpFilePath = path.join(__dirname, `edited_order_${userId}.php`);
-            fs.writeFileSync(tmpFilePath, latestCode, 'utf8');
-
-            ctx.replyWithDocument({ source: tmpFilePath, filename: 'order.php' })
-                .then(() => {
-                    ctx.reply('✅ Редактирование завершено.');
-                    if (fs.existsSync(tmpFilePath)) {
-                        fs.unlinkSync(tmpFilePath);
+                let targetUrl;
+                try {
+                    targetUrl = new URL(text);
+                    if (!['http:', 'https:'].includes(targetUrl.protocol)) {
+                        return ctx.reply('❌ Поддерживаются только HTTP и HTTPS.');
                     }
-                    delete userSessions[userId];
-                })
-                .catch(err => {
-                    console.error(err);
-                    ctx.reply('❌ Ошибка при отправке файла.');
+                } catch {
+                    return ctx.reply(
+                        '❌ Неверный URL.\n\nПример:\nhttps://example.com'
+                    );
+                }
+
+                session.waitingForUrl = false;
+
+                const processingMsg = await ctx.reply('⏳ Начинаю скачивание сайта...');
+
+                const tempDir = path.join(__dirname, `scrape_${userId}_${Date.now()}`);
+                fs.mkdirSync(tempDir, { recursive: true });
+
+                await downloadWebsite(targetUrl, tempDir, ctx, processingMsg);
+
+                await ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    processingMsg.message_id,
+                    null,
+                    '📦 Создаю ZIP архив...'
+                );
+
+                const zip = new AdmZip();
+                addDirectoryToZip(zip, tempDir, '');
+
+                const hostname = targetUrl.hostname.replace(/[^a-z0-9]/gi, '_');
+                const zipPath = path.join(__dirname, `${hostname}.zip`);
+                zip.writeZip(zipPath);
+
+                const sizeMB = fs.statSync(zipPath).size / (1024 * 1024);
+
+                if (sizeMB > 50) {
+                    await ctx.reply(`❌ Архив слишком большой (${sizeMB.toFixed(2)} МБ)`);
+                } else {
+                    await ctx.replyWithDocument({
+                        source: zipPath,
+                        filename: `${hostname}.zip`
+                    });
+                }
+
+                fs.rmSync(tempDir, { recursive: true, force: true });
+                fs.unlinkSync(zipPath);
+                delete userSessions[userId];
+                return;
+            }
+
+            /* ==================== EDIT ORDER ==================== */
+            case 'edit_order': {
+                if (session.waitFile) return;
+
+                const changes = {};
+                text.split(',').forEach(pair => {
+                    const [key, value] = pair.split('=').map(s => s.trim());
+                    if (key && value !== undefined) {
+                        changes[key] = value.replace(/^['"]|['"]$/g, '');
+                    }
                 });
-            return;
+
+                if (!Object.keys(changes).length) {
+                    return ctx.reply('❌ Формат неверный. Пример: $box=91');
+                }
+
+                const updatedCode = applyChangesToOrderPhp(session.code, changes);
+                session.code = updatedCode;
+
+                const tmpPath = path.join(__dirname, `order_${userId}.php`);
+                fs.writeFileSync(tmpPath, updatedCode, 'utf8');
+
+                await ctx.replyWithDocument({
+                    source: tmpPath,
+                    filename: 'order.php'
+                });
+
+                fs.unlinkSync(tmpPath);
+                delete userSessions[userId];
+                return;
+            }
+
+            /* ==================== FALLBACK ==================== */
+            default:
+                return;
         }
 
-        const changes = {};
-        text.split(',').forEach(pair => {
-            const [key, value] = pair.split('=').map(s => s.trim());
-            if (key && value !== undefined) changes[key] = value.replace(/^['"]|['"]$/g, '');
-        });
-
-        if (!session.versions) session.versions = [];
-
-        const baseCode = session.versions.length > 0 ? session.versions[session.versions.length - 1] : session.code;
-        const newVersion = applyChangesToOrderPhp(baseCode, changes);
-
-        session.versions.push(newVersion);
-        
-        ctx.reply(
-            '✅ Изменения внесены и сохранены как новая версия.\n\n⚠️ После отправки всех изменений нажмите кнопку ниже.',
-            {
-                reply_markup: {
-                    inline_keyboard: [
-                        [
-                            {
-                                text: '🚀 Запустить обработку',
-                                callback_data: 'process_edit_order'
-                            }
-                        ]
-                    ]
-                }
-            }
-        );
-
-        return;
+    } catch (err) {
+        console.error('TEXT ROUTER ERROR:', err);
+        ctx.reply('❌ Произошла ошибка при обработке сообщения.');
+        delete userSessions[userId];
     }
 });
 
@@ -1014,7 +1060,7 @@ bot.on('callback_query', async (ctx) => {
         }
 
         // ==================== EDIT ORDER ====================
-        if (data === 'process_edit_order') {
+        if (data === 'process_edit') {
             try {
                 await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
             } catch {}
@@ -1050,8 +1096,29 @@ bot.on('callback_query', async (ctx) => {
             return;
         }
 
-        // ==================== DOMONETKA CALLBACKS ====================
-        if (data === 'domonetka_luckyfeed') {
+        // ==================== SCRIPTS CALLBACKS ====================
+        if (data === 'cobeklo_simple') {
+            const cobekloSimple = `<?php if ($_GET["cobeklo"] != "777") { echo '<script> window.location.replace("https://www.google.com/"); document.location.href="https://www.google.com/" </script>'; exit; } ?>`;
+
+            return ctx.reply(
+                `📌 Cobeklo (без Fuckoff):\n\`\`\`\n${cobekloSimple}\n\`\`\``,
+                { parse_mode: "Markdown" }
+            );
+        }
+        
+        if (data === 'cobeklo_rawclick') {
+            const cobekloRawClick =
+`<?php if (!isset($rawClick)){ echo 'Fuck off!'; exit(); } ?>
+<?php if ($_GET["cobeklo"] != "777") { echo '<script> window.location.replace("https://www.google.com/"); document.location.href="https://www.google.com/" </script>'; exit; } ?>
+<?php setcookie("FBpixel", $_GET["fbpixel"], time()+60*60*24); ?>`;
+
+            return ctx.reply(
+                `📌 Cobeklo (с Fuckoff):\n\`\`\`\n${cobekloRawClick}\n\`\`\``,
+                { parse_mode: "Markdown" }
+            );
+        }
+
+        if (data === 'luckyfeed') {
             const luckyFeedHead =
                 `<script src="//static.bestgonews.com/m1sh81qh8/ivl867tq2h8q/h18mp0quv3y0kzh57o.js"></script>`;
             const luckyFeedBody =
@@ -1065,7 +1132,7 @@ bot.on('callback_query', async (ctx) => {
             );
         }
 
-        if (data === 'domonetka_newsprofit') {
+        if (data === 'newsprofit') {
             const newsProfitFull =
                 `<script src="https://mixer-events.com/back.js"></script>
 <script>
@@ -1079,31 +1146,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 { parse_mode: "Markdown" }
             );
         }
-
-        // ==================== COBEKLO CALLBACKS ====================
-        if (data === 'cobeklo_simple') {
-            const cobekloSimple = `<?php if ($_GET["cobeklo"] != "777") { echo '<script> window.location.replace("https://www.google.com/"); document.location.href="https://www.google.com/" </script>'; exit; } ?>`;
-
-            return ctx.reply(
-                `📌 Cobeklo (без rawClick):\n\`\`\`\n${cobekloSimple}\n\`\`\``,
-                { parse_mode: "Markdown" }
-            );
-        }
         
-        if (data === 'cobeklo_rawclick') {
-            const cobekloRawClick =
-`<?php if (!isset($rawClick)){ echo 'Fuck off!'; exit(); } ?>
-<?php if ($_GET["cobeklo"] != "777") { echo '<script> window.location.replace("https://www.google.com/"); document.location.href="https://www.google.com/" </script>'; exit; } ?>
-<?php setcookie("FBpixel", $_GET["fbpixel"], time()+60*60*24); ?>`;
-
-            return ctx.reply(
-                `📌 Cobeklo (с rawClick):\n\`\`\`\n${cobekloRawClick}\n\`\`\``,
-                { parse_mode: "Markdown" }
-            );
-        }
-
-        // ==================== SCRITPS CALLBACKS ====================
-        if (data === 'scripts_date') {
+        if (data === 'date') {
             return ctx.reply(
                 `📌 <b>Код для Date_Script</b>\n\n` +
                 `🟦 <b>Вставьте перед &lt;/head&gt;:</b>\n` +
@@ -1124,7 +1168,7 @@ function dtime_nums(t){
             );
         }
 
-        if (data === 'scripts_timer') {
+        if (data === 'timer') {
             const timerScriptBody = `<script type="text/javascript">
 start_timer();
 var time = 600;
@@ -1149,7 +1193,7 @@ function tick() {
 }
 </script>`;
 
-            const timerHtml = `<div id="min" class="countdown__item minute">36</div><span>:</span><div id="sec" class="countdown__item second">15</div>`;
+            const timerHtml = `<div id="min" class="countdown__item minute">10</div><span>:</span><div id="sec" class="countdown__item second">00</div>`;
 
             return ctx.reply(
                 `📌 Код для таймера:\n\n` +
@@ -3047,6 +3091,220 @@ function applyChangesToOrderPhp(code, changes) {
     }
 
     return code;
+}
+
+// ==================== MAIN DOWNLOAD ====================
+async function downloadWebsite(url, outputDir, ctx, processingMsg) {
+    const downloadedUrls = new Set();
+    const resources = [];
+
+    const mainHtml = await downloadHtml(url.href, outputDir, resources, downloadedUrls);
+    if (!mainHtml) throw new Error('Не удалось загрузить главную страницу');
+
+    let processed = 0;
+    const total = resources.length;
+
+    for (const resource of resources) {
+        if (downloadedUrls.has(resource.url)) continue;
+
+        try {
+            if (resource.type === 'css') {
+                await downloadCssAndExtractResources(resource.url, outputDir, resources, downloadedUrls);
+            } else {
+                await downloadResource(resource.url, outputDir);
+            }
+            downloadedUrls.add(resource.url);
+            processed++;
+
+            if (processed % 10 === 0 || processed === total) {
+                try {
+                    await ctx.telegram.editMessageText(
+                        ctx.chat.id,
+                        processingMsg.message_id,
+                        null,
+                        `⏳ Скачивание ресурсов... (${processed}/${total})`
+                    );
+                } catch {}
+            }
+        } catch (err) {
+            console.error(`Failed to download resource: ${resource.url}`, err.message);
+        }
+    }
+}
+
+// ==================== DOWNLOAD HTML ====================
+async function downloadHtml(url, outputDir, resources, downloadedUrls) {
+    try {
+        const response = await axios.get(url, {
+            timeout: 30000,
+            maxRedirects: 5,
+            headers: { 'User-Agent': 'Mozilla/5.0' }
+        });
+
+        const html = response.data;
+        const $ = cheerio.load(html);
+
+        // CSS
+        $('link[rel="stylesheet"]').each((i, el) => {
+            const href = $(el).attr('href');
+            if (href) resources.push({ url: resolveUrl(href, url), type: 'css' });
+        });
+
+        // JS
+        $('script[src]').each((i, el) => {
+            const src = $(el).attr('src');
+            if (src) resources.push({ url: resolveUrl(src, url), type: 'js' });
+        });
+
+        // IMG
+        $('img[src]').each((i, el) => {
+            const src = $(el).attr('src');
+            if (src) resources.push({ url: resolveUrl(src, url), type: 'img' });
+        });
+
+        // inline style backgrounds
+        $('[style*="background"]').each((i, el) => {
+            const style = $(el).attr('style');
+            const matches = style.match(/url\(['"]?([^'")]+)['"]?\)/g);
+            if (matches) {
+                matches.forEach(m => {
+                    const match = m.match(/url\(['"]?([^'")]+)['"]?\)/);
+                    if (match && match[1]) resources.push({ url: resolveUrl(match[1], url), type: 'img' });
+                });
+            }
+        });
+
+        // favicon
+        $('link[rel~="icon"]').each((i, el) => {
+            const href = $(el).attr('href');
+            if (href) resources.push({ url: resolveUrl(href, url), type: 'img' });
+        });
+
+        // Save HTML
+        const parsedUrl = new URL(url);
+        let filename = parsedUrl.pathname === '/' ? 'index.html' : parsedUrl.pathname;
+        filename = filename.split('/').filter(Boolean).join('_');
+        if (!filename) filename = 'index.html';
+        if (!filename.endsWith('.html') && !filename.endsWith('.htm')) filename += '.html';
+
+        const filepath = path.join(outputDir, filename);
+        fs.mkdirSync(path.dirname(filepath), { recursive: true });
+        fs.writeFileSync(filepath, html, 'utf8');
+
+        downloadedUrls.add(url);
+        return html;
+
+    } catch (err) {
+        console.error(`Failed to download HTML: ${url}`, err.message);
+        return null;
+    }
+}
+
+// ==================== DOWNLOAD RESOURCE ====================
+async function downloadResource(url, outputDir) {
+    try {
+        const response = await axios.get(url, {
+            timeout: 30000,
+            responseType: 'arraybuffer',
+            maxRedirects: 5,
+            headers: { 'User-Agent': 'Mozilla/5.0' }
+        });
+
+        const parsed = new URL(url);
+        const parts = parsed.pathname.split('/').filter(Boolean);
+        const filename = parts.pop() || 'file';
+
+        let dir = outputDir;
+        for (const part of parts) {
+            dir = path.join(dir, part.replace(/[^a-z0-9_\-\.]/gi, '_'));
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        }
+
+        fs.writeFileSync(path.join(dir, filename.replace(/[^a-z0-9_\-\.]/gi, '_')), response.data);
+
+    } catch (err) {
+        console.error(`Failed to download resource: ${url}`, err.message);
+    }
+}
+
+// ==================== PARSE CSS ====================
+async function downloadCssAndExtractResources(cssUrl, outputDir, resources, downloadedUrls) {
+    try {
+        const response = await axios.get(cssUrl, {
+            responseType: 'text',
+            timeout: 30000,
+            headers: { 'User-Agent': 'Mozilla/5.0' }
+        });
+
+        const cssContent = response.data;
+
+        await saveResource(cssUrl, cssContent, outputDir);
+
+        const urlRegex = /url\(\s*['"]?([^'")]+)['"]?\s*\)/g;
+        let match;
+        while ((match = urlRegex.exec(cssContent)) !== null) {
+            const assetUrl = match[1];
+            if (assetUrl.startsWith('data:')) continue;
+            const resolved = resolveUrl(assetUrl, cssUrl);
+            if (!downloadedUrls.has(resolved)) resources.push({ url: resolved, type: 'asset' });
+        }
+
+    } catch (err) {
+        console.error(`Failed to process CSS: ${cssUrl}`, err.message);
+    }
+}
+
+// ==================== SAVE RESOURCE ====================
+async function saveResource(url, data, outputDir) {
+    const parsed = new URL(url);
+    const parts = parsed.pathname.split('/').filter(Boolean);
+    const filename = parts.pop() || 'file';
+
+    let dir = outputDir;
+    for (const part of parts) {
+        dir = path.join(dir, part);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    }
+
+    fs.writeFileSync(path.join(dir, filename), data);
+}
+
+// ==================== RESOLVE URL ====================
+function resolveUrl(href, baseUrl) {
+    try {
+        if (href.startsWith('http://') || href.startsWith('https://')) return href;
+
+        if (href.startsWith('//')) {
+            const base = new URL(baseUrl);
+            return `${base.protocol}${href}`;
+        }
+
+        if (href.startsWith('/')) {
+            const base = new URL(baseUrl);
+            return `${base.protocol}//${base.host}${href}`;
+        }
+
+        const base = new URL(baseUrl);
+        return new URL(href, base).href;
+
+    } catch (err) {
+        return href;
+    }
+}
+
+// ==================== ZIP ====================
+function addDirectoryToZip(zip, dirPath, zipPath) {
+    const files = fs.readdirSync(dirPath);
+    files.forEach(file => {
+        const filePath = path.join(dirPath, file);
+        const fileZipPath = path.join(zipPath, file);
+        const stats = fs.statSync(filePath);
+        if (stats.isDirectory()) {
+            addDirectoryToZip(zip, filePath, fileZipPath);
+        } else {
+            zip.addLocalFile(filePath, zipPath);
+        }
+    });
 }
 
 bot.launch();
