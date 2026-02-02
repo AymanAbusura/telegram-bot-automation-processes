@@ -27,7 +27,7 @@ $(document).ready(function() {
     });
 
     $(inputPhone).on('input', function() {
-      this.value = this.value.replace(/\\D/g, '');
+      this.value = this.value.replace(/[^\\d\\u0660-\\u0669]/g, '');
     });
   });
 
