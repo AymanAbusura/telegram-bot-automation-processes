@@ -382,7 +382,8 @@ function replaceFunnelNames(html, session) {
         'ShaddersAgent', 'FortuixAgent', 'SecuroomAi', 'MonitrexPRO',
         'AffinexisAgent', 'NethertoxAGENT', 'FinovexPro', 'PrimeAura',
         'SpectraX', 'SpectraX Bot', 'BlockJet', 'NovusX', 'Blizzetrix',
-        'Coinsterix', 'PrimeAurora', 'Fluxorium Corporation'
+        'Coinsterix', 'PrimeAurora', 'Fluxorium Corporation', 'AmanaPrimeX',
+        'Amana Investments', 'Vorexlan'
     ];
 
     const sortedNames = [...funnelNames].sort((a, b) => b.length - a.length);
