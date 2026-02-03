@@ -18,6 +18,7 @@ module.exports = function startCommand(bot, deps) {
                         ],
                         [
                             { text: "✏️ Изменить ордер", callback_data: "cmd_edit_order" },
+                            { text: "🛡️ Антиспам ордер", callback_data: "cmd_order_antispam" },
                             { text: "📜 Скрипты", callback_data: "cmd_scripts" }
                         ],
                         [

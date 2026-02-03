@@ -7,6 +7,7 @@ Secret:
 /hide_code
 /api
 /data/funnelNames.json
+/commands/order_antispam.js
 /.pnp
 .pnp.js
 

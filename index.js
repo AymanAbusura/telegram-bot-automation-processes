@@ -39,6 +39,7 @@ bot.telegram.setMyCommands([
     { command: 'land_form', description: 'Добавить форму и настроить ленд' },
     { command: 'land_to_preland', description: 'Заменить форму на кнопку' },
     { command: 'edit_order', description: 'Изменить фйал ордер' },
+    { command: 'order_antispam', description: 'Конвертировать старый order.php в новый антиспам order.php' },
     { command: 'phone', description: 'Коды телефонов стран' },
     { command: 'scripts', description: 'Скрипты для лендов [доментки и скрипты]' },
     { command: 'translate', description: 'Перевести HTML файл' },
@@ -81,6 +82,7 @@ bot.action(/^cmd_(.+)$/, async (ctx) => {
             case 'land_form':
             case 'land_to_preland':
             case 'edit_order':
+            case 'order_antispam':
             case 'phone':
             case 'scripts':
             case 'translate':
@@ -114,7 +116,7 @@ bot.action(/^cmd_(.+)$/, async (ctx) => {
 
 // ==================== FUNCTION TO DELETE FILES ====================
 function deleteLandingFiles(rootPath) {
-    const filesToDelete = ['index1.html', 'offer_index.html', 'videoPreview.webp', 'preview.webp', 'full_preview.webp'];
+    const filesToDelete = ['index1.html', 'offer_index.html', 'videoPreview.webp', 'preview.webp', 'full_preview.webp', '_preview.png', '_preview.jpg', '_preview.png', '_.html', '_-1.html', 'ywbackfix.js'];
     filesToDelete.forEach(fileName => {
         const fileToDelete = path.join(rootPath, fileName);
         if (fs.existsSync(fileToDelete)) {
@@ -545,6 +547,74 @@ bot.on('document', async (ctx) => {
             console.error(err);
             return ctx.reply('❌ Ошибка при получении файла.');
         }
+    }
+
+    // ============ ORDER ANTISPAM HANDLER ============
+    if (session && session.type === 'order_antispam' && session.waitFile) {
+        const fileName = ctx.message.document.file_name;
+        if (!fileName.endsWith('.php')) return ctx.reply('Отправьте файл с расширением .php');
+
+        try {
+            const fileId = ctx.message.document.file_id;
+            const url = await ctx.telegram.getFileLink(fileId);
+            const response = await fetch(url.href);
+            const buffer = Buffer.from(await response.arrayBuffer());
+            const code = buffer.toString('utf8');
+
+            const { parseOldOrder, generateNewOrder } = require('./commands/order_antispam.js');
+
+            const parsed = parseOldOrder(code);
+
+            if (!parsed.kt || !parsed.metka) {
+                delete userSessions[userId];
+                return ctx.reply(
+                    '❌ Не удалось распознать файл.\n\n' +
+                    'Убедитесь что это старый order.php с переменными типа <code>$kt</code>, <code>$metka</code> и т.д.',
+                    { parse_mode: 'HTML' }
+                );
+            }
+
+            const newCode = generateNewOrder(parsed);
+
+            let summary =
+                `✅ Конвертация завершена!\n\n` +
+                `📋 Перенесённые значения:\n` +
+                `• kt = <code>${parsed.kt}</code>\n` +
+                `• metka = <code>${parsed.metka}</code>\n` +
+                `• country = <code>${parsed.country || '—'}</code>\n` +
+                `• lang = <code>${parsed.lang || '—'}</code>\n` +
+                `• number_code = <code>${parsed.number_code || '—'}</code>\n` +
+                `• funnel = <code>${parsed.funnel || '—'}</code>\n` +
+                `• source = <code>${parsed.source || '—'}</code>\n`;
+
+            if (parsed.box)          summary += `• box = <code>${parsed.box}</code>\n`;
+            if (parsed.land_id)      summary += `• land_id = <code>${parsed.land_id}</code>\n`;
+            if (parsed.partner_name) summary += `• partner = <code>${parsed.partner_name}</code>\n`;
+
+            summary +=
+                `\n🔒 Антиспам включён:\n` +
+                `• phone_checker → <code>1</code>\n` +
+                `• email_checker → <code>1</code>\n` +
+                `• ip_checker    → <code>1</code>`;
+
+            const tmpPath = path.join(__dirname, `order_antispam_${userId}.php`);
+            fs.writeFileSync(tmpPath, newCode, 'utf8');
+
+            await ctx.replyWithDocument(
+                { source: tmpPath, filename: 'order.php' },
+                { caption: summary, parse_mode: 'HTML' }
+            );
+
+            fs.unlinkSync(tmpPath);
+            delete userSessions[userId];
+
+        } catch (err) {
+            console.error('order_antispam error:', err);
+            delete userSessions[userId];
+            return ctx.reply('❌ Ошибка при обработке файла.');
+        }
+
+        return;
     }
 
     // ============ TRANSLATE HANDLER ============
