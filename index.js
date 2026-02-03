@@ -24,6 +24,7 @@ const ORDER_TEMPLATE_PATH = './api/order_template.php';
 const { generateFormScriptsContent } = require('./scripts/form-scripts.js');
 const { generateFormHTML } = require('./scripts/form.js');
 const getButtonHtml = require('./scripts/buttonTemplate.js');
+const funnelNames = require('./data/funnelNames.json');
 const messages = require('./data/messages.json');
 const loadCommands = require('./commands/index.js');
 
@@ -372,19 +373,6 @@ function replaceFunnelNames(html, session) {
     if (!p.funnel) {
         return html;
     }
-
-    const funnelNames = [
-        'Nearest Edge', 'Paragonix Edge', 'Pantera Edge', 'Ethereon Edge',
-        'Nearest Finance', 'Atom Capital', 'Nearest Earn', 'Eclipse Earn',
-        'Paragonix Earn', 'Equinox Earn', 'Iron Earn', 'Arcane Trade',
-        'EdgeVaultra', 'SBI Earn', 'ParagonixPrimeX', 'NetherexPro',
-        'Pantera Earn', 'San Miguel Corporation', 'Finesse Serendipidade',
-        'ShaddersAgent', 'FortuixAgent', 'SecuroomAi', 'MonitrexPRO',
-        'AffinexisAgent', 'NethertoxAGENT', 'FinovexPro', 'PrimeAura',
-        'SpectraX', 'SpectraX Bot', 'BlockJet', 'NovusX', 'Blizzetrix',
-        'Coinsterix', 'PrimeAurora', 'Fluxorium Corporation', 'AmanaPrimeX',
-        'Amana Investments', 'Vorexlan'
-    ];
 
     const sortedNames = [...funnelNames].sort((a, b) => b.length - a.length);
     
