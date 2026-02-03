@@ -9,9 +9,7 @@ module.exports = function startCommand(bot, deps) {
                     inline_keyboard: [
                         [
                             { text: "🏠 Ленденги", callback_data: "cmd_land" },
-                            { text: "📄 Прилендинги", callback_data: "cmd_preland" }
-                        ],
-                        [
+                            { text: "📄 Прилендинги", callback_data: "cmd_preland" },
                             { text: "🎯 Проклолендинги", callback_data: "cmd_prokla_land" }
                         ],
                         [
@@ -20,11 +18,11 @@ module.exports = function startCommand(bot, deps) {
                         ],
                         [
                             { text: "✏️ Изменить ордер", callback_data: "cmd_edit_order" },
-                            { text: "📱 Коды телефонов", callback_data: "cmd_phone" }
+                            { text: "📜 Скрипты", callback_data: "cmd_scripts" }
                         ],
                         [
-                            { text: "📜 Скрипты", callback_data: "cmd_scripts" },
-                            { text: "🌐 Перевести HTML", callback_data: "cmd_translate" }
+                            { text: "📱 Код страны", callback_data: "cmd_phone" },
+                            { text: "🌐 Перевести лендинг", callback_data: "cmd_translate" }
                         ],
                         [
                             { text: "🗜 Сжать изображение", callback_data: "cmd_compress" },
