@@ -6,7 +6,6 @@ Secret:
 /node_modules
 /hide_code
 /api
-/callbacks
 /.pnp
 .pnp.js
 
