@@ -124,8 +124,8 @@ function deleteLandingFiles(rootPath) {
 
     const indexFolderNames = ['index', 'offer_index'];
     const filesToDeleteInIndex = [
-        'order.php', 'form-scripts.js', 'action.php', 'jquery.min.js', 'index.html',
-        'index.php', 'flags.png', 'flags@2x.png', 'flags.webp', 'flags@2x.webp',
+        'order.php', 'form-scripts.js', 'action.php', 'jquery.min.js', 'index.html', '_.html',
+        '_-1.html', 'index.php', 'flags.png', 'flags@2x.png', 'flags.webp', 'flags@2x.webp',
         'i18n.min.js', 'intlTelInput.css', 'intlTelInput.min.css', 'intlTelInput.min.js',
         'intlTelInput.js', 'utils.js', 'utils.min.js', 'main3.js',
         'tel.js', 'tm.js', 'track.js', 'backfix.js', 'fbevents.js', 'form_short.js', 'auth.js',
