@@ -120,7 +120,9 @@ function deleteLandingFiles(rootPath) {
         'index1.html', 'offer_index.html', 'videoPreview.webp', 'preview.webp', 
         'full_preview.webp', '_preview.png', '_preview.jpg', '_preview.png', 
         '_.html', '_-1.html', 'ywbackfix.js', 'flags@2x.png', 'flags.png',
-        'intlTelInput.css', 'intlTelInput.min.js', 'utils.js', 'form-scripts.js',
+        'intlTelInput.css', 'intlTelInput.min.js', 'utils.js', 'fbevents.js',
+        'flags.webp', 'flags@2x.webp', 'web-vitals.js', 'surveys.js', 'dead-clicks-autocapture.js',
+        'posthog-recorder.js', 'config.js', 'tr.txt', 'tracker.js', 'array.js'
     ];
     filesToDelete.forEach(fileName => {
         const fileToDelete = path.join(rootPath, fileName);
@@ -265,7 +267,8 @@ function cleanScripts($) {
             'bundle.umd.min.js', './index/track.js', 'loader.js', 'i18n.min.js',
             'form.js', 'validator.js', 'axios.min.js', 'app.js', 'jquery.maskedinput.min.js',
             'polyfill.min.js', 'handlers.js', 'con0.js', 'form_short.js', 'tm.js',
-            'main3.js', 'tracking.js', 'tracker.js', './index/tracker.js', 'tel.js', './index/tel.js'
+            'main3.js', 'tracking.js', 'tracker.js', './index/tracker.js', 'tel.js', './index/tel.js',
+            'web-vitals.js', 'surveys.js', 'dead-clicks-autocapture.js', 'posthog-recorder.js', 'config.js'
         ];
 
         if (removeFiles.some(f => src.includes(f))) {
@@ -381,6 +384,16 @@ function cleanScripts($) {
         }
 
         if ($el.attr('data-cf-beacon') || html.includes('window.F1TFunnelsSdkConfig')) {
+            $el.remove();
+            return;
+        }
+
+        if (
+            $el.attr('data-scrapbook-elem') ||
+            html.includes('data-scrapbook-') ||
+            html.includes('scrapbook-slot-index') ||
+            (html.includes('shadowRoot') && html.includes('attachShadow'))
+        ) {
             $el.remove();
             return;
         }
@@ -1700,6 +1713,20 @@ async function processArchive(archive, session, userId, ctx) {
 
                     cleanScripts($);
 
+                    $('[data-scrapbook-shadowdom]').remove();
+                    $('[data-scrapbook-elem]').remove();
+                    $('*').each(function() {
+                        const tagName = this.tagName?.toLowerCase();
+                        if (tagName && tagName.includes('-')) {
+                            const $el = $(this);
+                            if ($el.attr('data-scrapbook-shadowdom') || 
+                                $el.attr('data-scrapbook-elem') ||
+                                $el.html()?.includes('data-scrapbook-')) {
+                                $el.remove();
+                            }
+                        }
+                    });
+
                     $('noscript').remove();
 
                     $('body .rf-form__loader.js-rf-loader').remove();
@@ -1934,7 +1961,7 @@ async function processArchive(archive, session, userId, ctx) {
                             } else {
 
                                 const firstNameVariants = [
-                                    'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name', 'name', 'drfname'
+                                    'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', '2-first_name', 'form-first_name', 'name', 'drfname'
                                 ];
 
                                 if (firstNameVariants.includes(name.toLowerCase())) {
@@ -1951,7 +1978,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 }
 
                                 const lastNameVariants = [
-                                    'lastName', 'lastname', 'lname', 'surname', 'secondname', 'last_name', 'l_name', '1-last_name', 'form-last_name', 'last', 'drlname'
+                                    'lastName', 'lastname', 'lname', 'surname', 'secondname', 'last_name', 'l_name', '1-last_name', '2-last_name', 'form-last_name', 'last', 'drlname'
                                 ];
 
                                 if (lastNameVariants.includes(name.toLowerCase())) {
@@ -1968,7 +1995,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 }
 
                                 const emailVariants = [
-                                    '1-email', 'form-email', 'email', 'solrka', 'sendingmail', 'dremail'
+                                    '1-email', '2-email', 'form-email', 'email', 'solrka', 'sendingmail', 'dremail'
                                 ];
 
                                 if (emailVariants.includes(name.toLowerCase())) {
@@ -1986,7 +2013,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 }
 
                                 const phoneVariants = [
-                                    'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2', 'phone-num'
+                                    'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2', 'phone-num', '1-phone', '2-phone'
                                 ];
 
                                 if (phoneVariants.includes(name.toLowerCase())) {
@@ -2188,6 +2215,20 @@ async function processArchive(archive, session, userId, ctx) {
 
                     cleanScripts($);
 
+                    $('[data-scrapbook-shadowdom]').remove();
+                    $('[data-scrapbook-elem]').remove();
+                    $('*').each(function() {
+                        const tagName = this.tagName?.toLowerCase();
+                        if (tagName && tagName.includes('-')) {
+                            const $el = $(this);
+                            if ($el.attr('data-scrapbook-shadowdom') || 
+                                $el.attr('data-scrapbook-elem') ||
+                                $el.html()?.includes('data-scrapbook-')) {
+                                $el.remove();
+                            }
+                        }
+                    });
+
                     $('form').each((i, el) => {
                         $(el).attr('action', '');
                     });
@@ -2312,6 +2353,20 @@ async function processArchive(archive, session, userId, ctx) {
                     });
 
                     cleanScripts($);
+                    
+                    $('[data-scrapbook-shadowdom]').remove();
+                    $('[data-scrapbook-elem]').remove();
+                    $('*').each(function() {
+                        const tagName = this.tagName?.toLowerCase();
+                        if (tagName && tagName.includes('-')) {
+                            const $el = $(this);
+                            if ($el.attr('data-scrapbook-shadowdom') || 
+                                $el.attr('data-scrapbook-elem') ||
+                                $el.html()?.includes('data-scrapbook-')) {
+                                $el.remove();
+                            }
+                        }
+                    });
 
                     $('noscript').remove();
 
@@ -2530,7 +2585,7 @@ async function processArchive(archive, session, userId, ctx) {
                             } else {
 
                                 const firstNameVariants = [
-                                    'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', 'form-first_name', 'name', 'drfname'
+                                    'firstName', 'firstname', 'fname', 'first_name', 'first', 'f_name', '1-first_name', '2-first_name', 'form-first_name', 'name', 'drfname'
                                 ];
 
                                 if (firstNameVariants.includes(name.toLowerCase())) {
@@ -2547,7 +2602,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 }
 
                                 const lastNameVariants = [
-                                    'lastName', 'lastname', 'lname', 'surname', 'secondname', 'last_name', 'l_name', '1-last_name', 'form-last_name', 'last', 'drlname'
+                                    'lastName', 'lastname', 'lname', 'surname', 'secondname', 'last_name', 'l_name', '1-last_name', '2-last_name', 'form-last_name', 'last', 'drlname'
                                 ];
 
                                 if (lastNameVariants.includes(name.toLowerCase())) {
@@ -2564,7 +2619,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 }
 
                                 const emailVariants = [
-                                    '1-email', 'form-email', 'email', 'solrka', 'sendingmail', 'dremail'
+                                    '1-email', '2-email', 'form-email', 'email', 'solrka', 'sendingmail', 'dremail'
                                 ];
 
                                 if (emailVariants.includes(name.toLowerCase())) {
@@ -2582,7 +2637,7 @@ async function processArchive(archive, session, userId, ctx) {
                                 }
 
                                 const phoneVariants = [
-                                    'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2', 'phone-num'
+                                    'phone_visible', 'dphone', 'phone_raw', 'phonevisible', 'phone', 'mobile', 'telek', 'phone_number', 'fullphone', 'form-phone_number', 'phone1', 'search2', 'phone-num', '1-phone', '2-phone'
                                 ];
 
                                 if (phoneVariants.includes(name.toLowerCase())) {
@@ -2796,6 +2851,20 @@ async function processArchive(archive, session, userId, ctx) {
 
                     cleanScripts($);
 
+                    $('[data-scrapbook-shadowdom]').remove();
+                    $('[data-scrapbook-elem]').remove();
+                    $('*').each(function() {
+                        const tagName = this.tagName?.toLowerCase();
+                        if (tagName && tagName.includes('-')) {
+                            const $el = $(this);
+                            if ($el.attr('data-scrapbook-shadowdom') || 
+                                $el.attr('data-scrapbook-elem') ||
+                                $el.html()?.includes('data-scrapbook-')) {
+                                $el.remove();
+                            }
+                        }
+                    });
+
                     const markerText = session.marker || 'Official Site';
                     $('form').each((i, el) => {
                         const hasTargetInputs = $(el).find('input[name="first_name"], input[name="last_name"], input[name="email"], input[name="phone"]'
@@ -2951,6 +3020,20 @@ async function processArchive(archive, session, userId, ctx) {
                             });
 
                             cleanScripts($);
+
+                            $('[data-scrapbook-shadowdom]').remove();
+                            $('[data-scrapbook-elem]').remove();
+                            $('*').each(function() {
+                                const tagName = this.tagName?.toLowerCase();
+                                if (tagName && tagName.includes('-')) {
+                                    const $el = $(this);
+                                    if ($el.attr('data-scrapbook-shadowdom') || 
+                                        $el.attr('data-scrapbook-elem') ||
+                                        $el.html()?.includes('data-scrapbook-')) {
+                                        $el.remove();
+                                    }
+                                }
+                            });
 
                             $('form').each((i, form) => {
                                 const $form = $(form);
