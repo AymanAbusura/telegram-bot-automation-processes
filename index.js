@@ -116,7 +116,12 @@ bot.action(/^cmd_(.+)$/, async (ctx) => {
 
 // ==================== FUNCTION TO DELETE FILES ====================
 function deleteLandingFiles(rootPath) {
-    const filesToDelete = ['index1.html', 'offer_index.html', 'videoPreview.webp', 'preview.webp', 'full_preview.webp', '_preview.png', '_preview.jpg', '_preview.png', '_.html', '_-1.html', 'ywbackfix.js'];
+    const filesToDelete = [
+        'index1.html', 'offer_index.html', 'videoPreview.webp', 'preview.webp', 
+        'full_preview.webp', '_preview.png', '_preview.jpg', '_preview.png', 
+        '_.html', '_-1.html', 'ywbackfix.js', 'flags@2x.png', 'flags.png',
+        'intlTelInput.css', 'intlTelInput.min.js', 'utils.js', 'form-scripts.js',
+    ];
     filesToDelete.forEach(fileName => {
         const fileToDelete = path.join(rootPath, fileName);
         if (fs.existsSync(fileToDelete)) {
