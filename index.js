@@ -135,7 +135,7 @@ function deleteLandingFiles(rootPath) {
         'lib.js', 'plgintlTel.js', 'validation.js', 'validate.js', 'email-decode.min.js',
         'uwt.js', 'translations.js', 'bundle.umd.min.js', 'loader.js', 'form.js',
         'validator.js', 'axios.min.js', 'app.js', 'jquery.maskedinput.min.js', 'polyfill.min.js',
-        'handlers.js', 'con0.js', 'intlTelInputWithUtils.min.js', 'index-aGoeQGI3.js', 'ywbackfix.js'
+        'handlers.js', 'con0.js', 'intlTelInputWithUtils.min.js', 'index-aGoeQGI3.js', 'ywbackfix.js', 'tracker.js'
     ];
     const leadTxtRegex = /^lead_.*\.txt$/;
 
@@ -229,7 +229,11 @@ function cleanScripts($) {
             return;
         }
 
-        if (html.includes('fbq(')) {
+        if (
+            src.includes('connect.facebook.net') ||
+            src.includes('facebook.net/signals') ||
+            html.includes('fbq(')
+        ) {
             $el.remove();
             return;
         }
@@ -256,7 +260,7 @@ function cleanScripts($) {
             'bundle.umd.min.js', './index/track.js', 'loader.js', 'i18n.min.js',
             'form.js', 'validator.js', 'axios.min.js', 'app.js', 'jquery.maskedinput.min.js',
             'polyfill.min.js', 'handlers.js', 'con0.js', 'form_short.js', 'tm.js',
-            'main3.js', 'tracking.js'
+            'main3.js', 'tracking.js', 'tracker.js', './index/tracker.js', 'tel.js', './index/tel.js'
         ];
 
         if (removeFiles.some(f => src.includes(f))) {
@@ -332,6 +336,16 @@ function cleanScripts($) {
             $el.remove();
             return;
         }
+
+        if (!src && (
+            html.includes('offlink') ||
+            /let\s+\w+\s*=\s*["'][?&][a-f0-9]{32}/.test(html) || 
+            (html.includes('let') && html.includes('=') && html.includes('?') && html.includes('&'))
+        )) {
+            $el.remove();
+            return;
+        }
+
 
         if (/\.on\(\s*["']submit["']\s*,\s*['"]form['"]/.test(html) ||
             /(\$|jQuery)\(\s*["']a["']\s*\)\.click\s*\(/.test(html) ||
@@ -2016,6 +2030,12 @@ async function processArchive(archive, session, userId, ctx) {
                         });
                     });
 
+                    $('input[type="hidden"]').each(function() {
+                        if ($(this).closest('form').length === 0) {
+                            $(this).remove();
+                        }
+                    });
+
                     $('link[rel="stylesheet"]').each((i, el) => {
                         const $el = $(el);
                         const href = $el.attr('href');
@@ -2604,6 +2624,12 @@ async function processArchive(archive, session, userId, ctx) {
                                 $input.after('\n', errorDiv);
                             }
                         });
+                    });
+
+                    $('input[type="hidden"]').each(function() {
+                        if ($(this).closest('form').length === 0) {
+                            $(this).remove();
+                        }
                     });
 
                     $('link[rel="stylesheet"]').each((i, el) => {
