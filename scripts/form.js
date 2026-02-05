@@ -643,4 +643,4 @@ function generateFormHTML(params) {
 `.trim();
 }
 
-module.exports = { generateFormHTML };
+module.exports = { generateFormHTML, FORM_TRANSLATIONS };

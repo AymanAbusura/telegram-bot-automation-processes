@@ -24,6 +24,7 @@ const ORDER_TEMPLATE_PATH = './api/order_template.php';
 const { generateFormScriptsContent } = require('./scripts/form-scripts.js');
 const { generateFormHTML } = require('./scripts/form.js');
 const getButtonHtml = require('./scripts/buttonTemplate.js');
+const { FORM_TRANSLATIONS } = require('./scripts/form.js');
 const funnelNames = require('./data/funnelNames.json');
 const messages = require('./data/messages.json');
 const loadCommands = require('./commands/index.js');
@@ -1736,6 +1737,9 @@ async function processArchive(archive, session, userId, ctx) {
                     $('body #loading').remove();
                     $('body .custom-form__mask').remove();
 
+                    const userLang = (session.params?.lang || 'EN').toUpperCase();
+                    const T = FORM_TRANSLATIONS[userLang] || FORM_TRANSLATIONS['EN'];
+                    
                     $('form').each((i, form) => {
                         const $form = $(form);
 
@@ -2041,16 +2045,16 @@ async function processArchive(archive, session, userId, ctx) {
                             let errorText = '';
                             switch ($input.attr('name')) {
                                 case 'first_name':
-                                    errorText = 'Your first name is too short (at least 2 characters)';
+                                    errorText = T.err_first;
                                     break;
                                 case 'last_name':
-                                    errorText = 'Your last name is too short (at least 2 characters)';
+                                    errorText = T.err_last;
                                     break;
                                 case 'email':
-                                    errorText = 'Please enter your real email address (example@email.com)';
+                                    errorText = T.err_email;
                                     break;
                                 case 'phone':
-                                    errorText = 'Please enter a valid phone number';
+                                    errorText = T.err_phone;
                                     break;
                             }
 
@@ -2374,6 +2378,9 @@ async function processArchive(archive, session, userId, ctx) {
                     $('body .rf-form__loader.js-rf-loader').remove();
                     $('body .rf-form__loader1.js-rf-loader1').remove();
 
+                    const userLang = (session.params?.lang || 'EN').toUpperCase();
+                    const T = FORM_TRANSLATIONS[userLang] || FORM_TRANSLATIONS['EN'];
+
                     $('form').each((i, form) => {
                         const $form = $(form);
 
@@ -2665,16 +2672,16 @@ async function processArchive(archive, session, userId, ctx) {
                             let errorText = '';
                             switch ($input.attr('name')) {
                                 case 'first_name':
-                                    errorText = 'Your first name is too short (at least 2 characters)';
+                                    errorText = T.err_first;
                                     break;
                                 case 'last_name':
-                                    errorText = 'Your last name is too short (at least 2 characters)';
+                                    errorText = T.err_last;
                                     break;
                                 case 'email':
-                                    errorText = 'Please enter your real email address (example@email.com)';
+                                    errorText = T.err_email;
                                     break;
                                 case 'phone':
-                                    errorText = 'Please enter a valid phone number';
+                                    errorText = T.err_phone;
                                     break;
                             }
 
