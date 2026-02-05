@@ -8,6 +8,9 @@ module.exports = function webtoolsCommand(bot, deps) {
             reply_markup: {
                 inline_keyboard: [
                     [{ text: '🧹 DirtyMarkup', url: 'https://www.10bestdesign.com/dirtymarkup/' }],
+                    [{ text: '🔄 Convert', url: 'https://www.freeconvert.com' }],
+                    [{ text: '🔄 PNG → WEBP', url: 'https://www.freeconvert.com/png-to-webp' }],
+                    [{ text: '🔄 JPG → WEBP', url: 'https://www.freeconvert.com/jpg-to-webp' }],
                     [{ text: '🗜 CompressWEBP', url: 'https://imagecompressor.com/' }],
                     [{ text: '🗜 CompressPNG', url: 'https://compresspng.com/' }],
                     [{ text: '🗜 CompressJPEG', url: 'https://compressjpeg.com/' }],
