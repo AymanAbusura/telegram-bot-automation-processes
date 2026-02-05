@@ -228,7 +228,8 @@ function cleanScripts($) {
             "'[name=phone]'", '"[name=phone]"', 'Order is not accepted', 'You was ordering',
             'recently_confirmed', 'in_progress', 'duplicate_order_phone', 'order_in_progress',
             'order_recently_confirmed', '.offset().top', '.animate({scrollTop:',
-            'input[type=submit]', 'href*="?"', 'new ValidateForm', 'cdn.taboola.com', 'tfa.js'
+            'input[type=submit]', 'href*="?"', 'new ValidateForm', 'cdn.taboola.com', 'tfa.js',
+            'track.js', 'tracker.js', 'tracking.js', '__mrfCompass',
         ];
 
         if (patternsToRemove.some(pattern => html.includes(pattern))) {
