@@ -875,7 +875,7 @@ bot.on('text', async (ctx) => {
                 delete userSessions[userId];
                 return;
             }
-
+            
             /* ==================== KPI CUSTOM INPUT ==================== */
             case 'kpi_custom_input': {
                 if (!session.waitingForInput) return;
@@ -898,6 +898,19 @@ bot.on('text', async (ctx) => {
                 }
 
                 try {
+                    if (session.cancelMessageId) {
+                        try {
+                            await ctx.telegram.editMessageReplyMarkup(
+                                ctx.chat.id,
+                                session.cancelMessageId,
+                                null,
+                                { inline_keyboard: [] }
+                            );
+                        } catch (err) {
+                            console.log('Could not remove cancel button:', err.message);
+                        }
+                    }
+
                     const today = new Date().getDate();
                     const oldValue = await global.kpiHelpers.getDayValue(today);
                     const result = await global.kpiHelpers.updateDayValue(today, value);

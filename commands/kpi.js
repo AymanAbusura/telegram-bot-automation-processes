@@ -400,18 +400,13 @@ module.exports = function kpiCommand(bot, deps) {
             }
         });
     });
-
+    
     /* ==================== CUSTOM VALUE INPUT ==================== */
     bot.action('kpi_custom', async (ctx) => {
         await ctx.answerCbQuery();
         const userId = ctx.from.id;
 
-        userSessions[userId] = {
-            type: 'kpi_custom_input',
-            waitingForInput: true
-        };
-
-        await ctx.editMessageText(
+        const sentMessage = await ctx.editMessageText(
             '✏️ *Свое значение*\n\n' +
             'Отправьте число (0-999):\n\n' +
             'Примеры:\n' +
@@ -428,6 +423,12 @@ module.exports = function kpiCommand(bot, deps) {
                 }
             }
         );
+
+        userSessions[userId] = {
+            type: 'kpi_custom_input',
+            waitingForInput: true,
+            cancelMessageId: sentMessage.message_id
+        };
     });
 
     /* ==================== BACK BUTTON ==================== */
