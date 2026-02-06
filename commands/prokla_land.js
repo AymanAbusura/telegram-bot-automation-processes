@@ -71,9 +71,24 @@ module.exports = function proklaLandCommand(bot, deps) {
             if (idx === -1) continue;
 
             const k = line.slice(0, idx).trim();
-            const v = line.slice(idx + 1).trim();
+            let v = line.slice(idx + 1).trim();
 
             if (k && v) {
+                if (k === 'country' || k === 'lang') {
+                    v = v.toUpperCase();
+                }
+                
+                if (k === 'metka') {
+                    const metkaMatch = v.match(/([a-zA-Z])(\d+)|(\d+)([a-zA-Z])/);
+                    if (metkaMatch) {
+                        if (metkaMatch[1] && metkaMatch[2]) {
+                            v = metkaMatch[2] + metkaMatch[1].toUpperCase();
+                        } else if (metkaMatch[3] && metkaMatch[4]) {
+                            v = metkaMatch[3] + metkaMatch[4].toUpperCase();
+                        }
+                    }
+                }
+                
                 params[k] = decodeURIComponent(v);
             }
         }

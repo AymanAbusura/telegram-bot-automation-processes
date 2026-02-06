@@ -58,11 +58,26 @@ module.exports = function landFormCommand(bot, deps) {
             if (idx === -1) continue;
 
             const key = line.slice(0, idx).trim();
-            const value = decodeURIComponent(line.slice(idx + 1).trim());
+            let value = decodeURIComponent(line.slice(idx + 1).trim());
 
             if (key === 'marker') {
                 marker = value;
             } else {
+                if (key === 'country' || key === 'lang') {
+                    value = value.toUpperCase();
+                }
+                
+                if (key === 'metka') {
+                    const metkaMatch = value.match(/([a-zA-Z])(\d+)|(\d+)([a-zA-Z])/);
+                    if (metkaMatch) {
+                        if (metkaMatch[1] && metkaMatch[2]) {
+                            value = metkaMatch[2] + metkaMatch[1].toUpperCase();
+                        } else if (metkaMatch[3] && metkaMatch[4]) {
+                            value = metkaMatch[3] + metkaMatch[4].toUpperCase();
+                        }
+                    }
+                }
+                
                 params[key] = value;
             }
         }
