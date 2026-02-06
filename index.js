@@ -876,6 +876,54 @@ bot.on('text', async (ctx) => {
                 return;
             }
 
+            /* ==================== KPI CUSTOM INPUT ==================== */
+            case 'kpi_custom_input': {
+                if (!session.waitingForInput) return;
+
+                const text = ctx.message.text.trim();
+                
+                if (text === '/cancel') {
+                    delete userSessions[userId];
+                    return ctx.reply('❌ Отменено');
+                }
+
+                const value = parseInt(text);
+                
+                if (isNaN(value) || value < 0 || value > 999) {
+                    return ctx.reply(
+                        '❌ Неверный формат!\n\n' +
+                        'Отправьте число от 0 до 999\n' +
+                        'Или /cancel для отмены'
+                    );
+                }
+
+                try {
+                    const today = new Date().getDate();
+                    const oldValue = await global.kpiHelpers.getDayValue(today);
+                    const result = await global.kpiHelpers.updateDayValue(today, value);
+
+                    if (result.error) {
+                        delete userSessions[userId];
+                        return ctx.reply(`❌ ${result.error}`);
+                    }
+
+                    delete userSessions[userId];
+                    
+                    await ctx.reply(
+                        `✅ *Данные обновлены!*\n\n` +
+                        `📅 ${today} число\n` +
+                        `⚙️ Настройка: ${oldValue} → *${value}*`,
+                        { parse_mode: 'Markdown' }
+                    );
+                } catch (error) {
+                    console.error('KPI Custom Input Error:', error);
+                    delete userSessions[userId];
+                    await ctx.reply('❌ Ошибка при обновлении данных');
+                }
+                
+                return;
+            }
+
             /* ==================== FALLBACK ==================== */
             default:
                 return;

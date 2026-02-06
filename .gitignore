@@ -8,6 +8,7 @@ Secret:
 /api
 /data/funnelNames.json
 /commands/order_antispam.js
+google-credentials.json
 /.pnp
 .pnp.js
 
